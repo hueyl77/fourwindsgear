@@ -1,0 +1,38 @@
+<?php
+$location = 'backend';
+$websiteCode = Mage::app()->getRequest()->getParam("website", null);
+if($websiteCode){
+    $websiteId = Mage::app()->getWebsite($websiteCode)->getId();
+}
+$storeCode = Mage::app()->getRequest()->getParam("store", null);
+if($storeCode){
+    $storeId = Mage::app()->getStore($storeCode)->getId();
+}
+
+$helper = Mage::helper("jmbasetheme");
+$assignedProfiles = $helper->getAssignedProfiles($storeCode, $location, $websiteCode);
+$baseUrl = $helper->getBaseUrl($storeCode, $location);
+$designPackage = $helper->getDesignPackage($storeCode, $location, $websiteCode);
+$defaultTheme = $helper->getDefaultTheme($storeCode, $location, $websiteCode);
+
+?>
+
+<script type="text/javascript">
+    <?php if($websiteCode): ?>
+    var websiteId = <?php echo $websiteId; ?>, websiteCode = '<?php echo $websiteCode ?>';
+    <?php endif; ?>
+    <?php if($storeCode): ?>
+    var storeId = <?php echo $storeId; ?>, storeCode = '<?php echo $storeCode ?>';
+    <?php endif; ?>
+    var designPackage = '<?php echo $designPackage; ?>';
+    var defaultTheme = '<?php echo $defaultTheme; ?>', baseUrl ='<?php echo $baseUrl; ?>';
+    var assignedProfiles = <?php echo json_encode($assignedProfiles);?>;
+    //for message
+    var PROFILE_NAME_EXIST = '<?php echo $this->__('Profile "%s" already exists. Please enter another profile name.'); ?>';
+    var ENTER_PROFILE_NAME = '<?php echo $this->__('Please enter the profile name.'); ?>';
+    var SELECT_PROFILE = '<?php echo $this->__('Please select one profile.'); ?>';
+    var PROFILE_USED_BY_OTHER_STORE = '<?php echo $this->__('Editing %s profile will affect and overwrite the profile settings in other configuration scope used it as well. Are you sure you want to continue?'); ?>';
+    var DO_YOU_WANT_TO_CLONE_THIS_PROFILE = '<?php echo $this->__('Do you want to clone this profile?'); ?>';
+    var CONFIRM_DELETE_PROFILE = '<?php echo $this->__('Are you sure you want to delete this profile?'); ?>';
+    var DELETE_IMAGE_LABEL = '<?php echo $this->__('Delete Image'); ?>';
+</script>

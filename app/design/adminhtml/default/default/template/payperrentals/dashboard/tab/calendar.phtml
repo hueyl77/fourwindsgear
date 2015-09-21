@@ -1,0 +1,86 @@
+<div style="margin:20px;">
+    <?php
+    $rentalcalblock = $this->getLayout()->getBlockSingleton('ITwebexperts_Payperrentals_Block_Adminhtml_Rentalcal');
+    $threeMonths = new DateInterval('P12M');
+    $startDate = new DateTime();
+    $startDate->sub($threeMonths);
+    $endDate = new DateTime();
+    $endDate->add($threeMonths);
+    $collection = $rentalcalblock->getCollection($startDate->format('Y-m-d'), $endDate->format('Y-m-d'));
+    $events = $rentalcalblock->convertCollectionToEventsArray($collection);
+    $eventsCombinedStart = $rentalcalblock->combineStartandEndTurnoverArray($events,"start");
+    $eventsCombinedEnd = $rentalcalblock->combineStartandEndTurnoverArray($events,"end");
+    $eventsJSON = $rentalcalblock->convertEventsArrayToJSONstartend($eventsCombinedStart,"start");
+    $eventsJSON .= $rentalcalblock->convertEventsArrayToJSONstartend($eventsCombinedEnd,"end");
+    //
+
+    ?>
+    <script>
+
+        $jppr(document).ready(function() {
+
+            var date = new Date();
+            var d = date.getDate();
+            var m = date.getMonth();
+            var y = date.getFullYear();
+
+            var tooltip = $jppr('<div/>').qtip({
+                id: 'fullcalendar',
+                prerender: true,
+                content: {
+                    text: ' ',
+                    title: {
+                        button: true
+                    }
+                },
+                position: {
+                    my: 'bottom center',
+                    at: 'top center',
+                    target: 'mouse',
+                    viewport: $jppr('#fullcalendar'),
+                    adjust: {
+                        mouse: false,
+                        scroll: false
+                    }
+                },
+                show: false,
+                hide: false,
+                style: 'qtip-light'
+            }).qtip('api');
+
+        $eventsJSON = [<?php echo $eventsJSON;?>];
+            $jppr('#calendar').fullCalendar({
+                eventClick: function(data, event, view) {
+                    var content = '<h3>'+data.title+'</h3>' +'<p>'+
+                        data.description + '</p>';
+
+                    tooltip.set({
+                        'content.text': content
+                    })
+                        .reposition(event).show(event);
+                },
+                dayClick: function() { tooltip.hide() },
+                eventResizeStart: function() { tooltip.hide() },
+                eventDragStart: function() { tooltip.hide() },
+                viewDisplay: function() { tooltip.hide() },
+                defaultDate: new Date(y, m, d),
+                editable: false,
+            events: $eventsJSON
+            });
+            window.onload = function() {
+                $jppr('#calendar').fullCalendar('render');
+            };
+            var cal = ics();
+            $jppr.each($eventsJSON,function(i,$event){
+                cal.addEvent($event.title, $event.description, '', $event.start, $event.end);
+            });
+            $jppr("#icaldownload").on('click',function(){
+                cal.download('ical','.ics');
+            });
+        });
+
+    </script>
+    <button id="icaldownload" style="float:right;margin-bottom:10px;">Download iCal</button>
+    <div id='calendar'></div>
+
+</div>

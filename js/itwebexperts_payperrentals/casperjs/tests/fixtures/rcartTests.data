@@ -1,0 +1,3 @@
+testName=loginAdmin --- expected=
+testName=checkInventoryReport --- product=tsr --- startDate=1 --- expected=1/2
+testName=checkInventoryReport --- product=tsr --- startDate=2 --- expected=1/2

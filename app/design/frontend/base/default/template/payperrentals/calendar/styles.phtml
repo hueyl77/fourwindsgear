@@ -1,0 +1,255 @@
+<?php if(Mage::app()->getStore()->isAdmin()): ?>
+    <script type="text/javascript">
+        (function ($) {
+            $.fn.nextTo = function (baseElement, options) {
+                if (this.length == 0) return false;
+
+                var settings = $.extend({
+                    position: 'bottom', // bottom/top/right/left
+                    shareBorder: 'right', // bottom/top/right/left
+                    offsetX: 0,
+                    offsetY: 0
+                }, options || {});
+
+                var looseElement = this;
+                var baseOffset = baseElement.offset();
+                var looseOffset = looseElement.offset();
+
+                looseElement.css('position', 'absolute');
+
+                // general position
+                if (settings.position == 'bottom')
+                    looseElement.css('top', (baseOffset.top + baseElement.outerHeight()) + 'px');
+                else if (settings.position == 'top')
+                    looseElement.css('top', (baseOffset.top - looseElement.outerHeight()) + 'px');
+                else if (settings.position == 'right')
+                    looseElement.css('left', (baseOffset.left + baseElement.outerWidth()) + 'px');
+                else if (settings.position == 'left')
+                    looseElement.css('left', (baseOffset.left - looseElement.outerWidth()) + 'px');
+
+                // align border
+                if (settings.shareBorder == 'right')
+                    looseElement.css('left', baseOffset.left - (looseElement.outerWidth() - baseElement.outerWidth()) + 'px');
+                else if (settings.shareBorder == 'left')
+                    looseElement.css('left', baseOffset.left + 'px');
+                else if (settings.shareBorder == 'top')
+                    looseElement.css('top', baseOffset.top + 'px');
+                else if (settings.shareBorder == 'bottom')
+                    looseElement.css('top', baseOffset.top - (looseElement.outerHeight() - baseElement.outerHeight()) + 'px');
+
+                // add offset
+                looseElement.css('left', (parseInt(looseElement.css('left').replace('px', '')) + settings.offsetX) + 'px');
+                looseElement.css('top', (parseInt(looseElement.css('top').replace('px', '')) + settings.offsetY) + 'px');
+            };
+            $jppr('#changeButton').hide();
+            $jppr('#topDates .btn-resfreshCalendar').hide();
+        })(jQuery);
+        /**
+         * Moves buttons to correct position after calendar inputs are loaded
+         */
+        $jppr(document).ready(function(){
+            if($jppr('#topDates .timeSelector').length > 0){
+                $jppr('#changeButton').nextTo($jppr('#topDates .end_time'), {position:'right', shareBorder:'bottom', offsetX:20});
+                $jppr('#changeButton').show();
+                $jppr('#topDates .btn-resfreshCalendar').nextTo($jppr('#changeButton'), {position:'right', shareBorder:'bottom', offsetX:20});
+
+                $jppr('#topDates .btn-resfreshCalendar').show();
+            }else {
+                $jppr('#changeButton').nextTo($jppr('#topDates .readEndDate'), {position:'right', shareBorder:'bottom', offsetX:20});
+                $jppr('#topDates .btn-resfreshCalendar').nextTo($jppr('#changeButton'), {position:'right', shareBorder:'bottom',  offsetX:20});
+            }
+        });
+    </script>
+<?php endif;?>
+<style type="text/css">
+
+    <?php if(!ITwebexperts_Payperrentals_Helper_Config::showTurnovers()): ?>
+    .turnoverAfter, .turnoverBefore{
+
+    }
+   <?php else: ?>
+    .turnoverBefore{
+        border: 0px solid #ffffff;
+        background: none !important;
+        background-color: #E6DF2A !important;
+        font-weight: normal;
+        color: #ffffff;
+        text-align: center;
+        /*opacity: 1;
+        filter:Alpha(Opacity=100);*/
+        vertical-align: middle;
+    }
+
+    .turnoverAfter{
+        border: 0px solid #ffffff;
+        background: none !important;
+        background-color: #E6DF2A !important;
+        font-weight: normal;
+        color: #ffffff;
+        text-align: center;
+        /*opacity: 1;
+        filter:Alpha(Opacity=100);*/
+        vertical-align: middle;
+    }
+    <?php endif; ?>
+    <?php if(!Mage::app()->getStore()->isAdmin()): ?>
+        .qty .product-qty {width:35px}
+        .actions div, .product-shop .qty {margin: 5px 0}
+
+        /*.product-options-bottom .add-to-cart-buttons{
+            margin-top: 5px;
+        }*/
+        .day-detail-container, .legend-detail-container{
+            margin-top:8px;
+        }
+        .chooseDatesLabel{
+            margin-top:10px;
+        }
+        /*.products-grid li.item {padding-bottom: 100px;}*/
+   <?php else: ?>
+    .datesSelectorTop, .datesSelectorTop .start-time-line, .datesSelectorTop .end-time-line, .datesSelectorTop .date-field, .currency-switcher {
+        display: inline-block;
+        float: left;
+    }
+    .datesSelectorTop .date-field, .currency-switcher {
+        margin-top: 0;
+        margin-right: 25px;
+    }
+    #topDates .day-detail-container{
+        display: none;
+    }
+    #topDates .legend-detail-container{
+        display: none;
+    }
+    .start-time-line, .end-time-line {
+        width: 385px;
+    }
+
+    /*TODO optimize switcher css*/
+    .switcher {
+        padding-bottom: 5px;
+    }
+
+    .dateStartLine, .dateEndLine {display: inline-block; width: 100%;margin:0;}
+    .dateStartLine {margin-bottom: 0px}
+    .dateStartLine .date-line, .dateEndLine .date-line {float: left; margin-right: 30px}
+    #dialogDates {margin: 15px 0 10px 0}
+    #dialogDates td {padding-right: 15px}
+    #dialogDates td.button-column {padding:0}
+    #dialogDates .label {
+        /*width:80px;*/
+        padding-right: 5px;
+    }
+
+    #dialogDates .input-text {
+        width: 70px;
+    }
+
+    #sales_order_view #dialogDates {margin: 0}
+    #sales_order_view #dialogDates table tr td {padding-bottom: 10px; padding-right: 5px}
+    .page-create-order #order-items .entry-edit-head .icon-head {padding-top: 3px}
+    .page-create-order #order-items .entry-edit-head #quick-add-container {float: left; margin-left: 15px; padding-top: 2px}
+    #percent_price_model_table {min-width: 700px;}
+    #percent_price_model_table select {width: 100px;}
+    <?php endif; ?>
+
+    .datePicker {
+        width: 100%;
+    }
+
+    .datePickerDiv {
+        position: absolute;
+        display: none;
+        z-index: 1000;
+    }
+
+    .datesInputs {
+        display: none;
+    }
+
+    .datesShow {
+        margin-top: 20px;
+        display: none;
+    }
+
+    .errorShow {
+        margin-top: 20px;
+        color: red;
+        font-weight: bold;
+        display: none;
+        clear: both;
+    }
+
+    .product-options p.required {
+        top: 0px;
+    }
+
+    <?php if($_useNonsequential): ?>
+    .readStartDate {
+    <?php if(!isset($isFrontendGlobal)): ?> width: 300px;
+    <?php else: ?> width: 200px;
+    <?php endif; ?>
+
+    }
+
+    <?php endif;?>
+    <?php if ($_selectedArray !== false && !Mage::app()->getStore()->isAdmin() && ITwebexperts_Payperrentals_Helper_Config::NoCalendarUseTodayAsStartDate()): ?>
+        .datesSelector, .chooseDatesLabel, .btn-resfreshCalendar{
+            display: none !important;
+        }
+    <?php endif;?>
+    <?php if($useButtons && !Mage::app()->getStore()->isAdmin() || $_useNonsequential || $_selectedArray !== false && !Mage::app()->getStore()->isAdmin()): ?>
+    .dateSelectorEnd {
+        display: none !important;
+    }
+
+    .datePickerDiv .ui-state-active {
+        color: #ff0084 !important
+    }
+
+    <?php if ($useButtons && $_useGlobalDates): ?>
+    .price-box {
+        display: none !important;
+    }
+
+    .btn-resfreshCalendar {
+        display: none !important;
+    }
+
+    .product-options-bottom .add-to-cart {
+        display: none;
+    }
+
+    .priceList .normalPrice {
+        display: none;
+    }
+
+    <?php endif; ?>
+    <?php endif; ?>
+    <?php if(!ITwebexperts_Payperrentals_Helper_Config::NoCalendarUseTodayAsStartDate() && $_selectedArray != false && !Mage::app()->getStore()->isAdmin()):?>
+    .dateSelectorEnd {
+        display: none !important;
+    }
+
+    <?php endif; ?>
+</style>
+
+<?php if ($_product && $_product->getIsReservation() == ITwebexperts_Payperrentals_Model_Product_Isreservation::STATUS_RENTAL): ?>
+    <style type="text/css">
+        .regular-price {
+            display: none;
+        }
+    </style>
+<?php endif; ?>
+<?php if ($_product && $_product->getTypeId() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE_BUNDLE): ?>
+    <style type="text/css">
+        .price-notice {
+            display: none;
+        }
+    </style>
+<?php endif; ?>
+<?php
+$resultObject = new Varien_Object();
+Mage::dispatchEvent('calendar_styles', array('js_container_prefix' => $_jsContainerPrefix, 'js_function_prefix' => $_jsFunctionPrefix, 'is_admin_global' => (isset($isAdminGlobal) ? $isAdminGlobal : false), 'is_admin' => (isset($isAdmin) ? $isAdmin : false), 'result' => $resultObject));
+echo $resultObject->getReturn();
+?>

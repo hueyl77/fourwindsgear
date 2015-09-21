@@ -1,0 +1,274 @@
+<div class="content-header">
+	<table cellspacing="0" class="grid-header">
+		<tr>
+			<td><h3><?php echo $this->__('Serial Report')?></h3></td>
+		</tr>
+	</table>
+</div>
+<?php if(count(Mage::app()->getWebsites())): ?>
+    <?php echo $this->getChildHtml('store_switcher') ?>
+<?php endif; ?>
+<div class="entry-edit" style="margin-bottom:20px;">
+	<form id="edit_form" name="edit_form">
+		<input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+			<table cellspacing="0" class="form-list-s">
+				<tr>
+					<td class="label"><?php echo $this->__('Search by serial')?></td>
+					<td class="input-ele"><input class="input-text productName" name="productName" /></td>
+
+					<td class="label"><?php echo $this->__('Go to date')?></td>
+					<td>
+						<?php
+						$gotoDate = '';
+						$gotoDateFullCalendar = '';
+						if(urldecode($this->getRequest()->getParam('gotoDate'))){
+							$zDate = new Zend_Date(urldecode($this->getRequest()->getParam('gotoDate')), Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT));
+							$gotoDate = urldecode($this->getRequest()->getParam('gotoDate'));
+							$gotoDateFullCalendar = $zDate->get('yyyy-MM-dd');
+						}
+						echo $this->getLayout()->createBlock('core/html_date')
+								//->setTime('true')
+								->setImage(Mage::getDesign()->getSkinUrl('images/grid-cal.gif'))
+								->setFormat(Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT))
+								->setName('gotoDate')
+								->setValue($gotoDate)
+								->setId('gotoDate')
+								->setClass('datetime-picker input-text gotoDate')
+								->toHtml();
+
+						?>
+					</td>
+
+				</tr>
+				<tr>
+					<td colspan="4" class="a-right" style="padding-top: 10px;">
+						<button class="searchBut" type="button" style="display: inline-block;"><span><?php echo $this->__('Search')?></span></button>
+                        <button class="searchAllBut" type="button" style="display: inline-block;"><span><?php echo $this->__('Reset')?></span></button>
+					</td>
+				</tr>
+			</table>
+	</form>
+
+</div>
+
+<div id="calendarProducts"></div>
+
+<div id="pager">
+	<?php
+	echo $this->getPagerHtml();
+	?>
+</div>
+
+<?php $localeDateFormat = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_LONG); ?>
+<?php $localeDateFormat = str_replace('y', 'yy', $localeDateFormat); ?>
+<?php $localeDateFormat = str_replace('yyyyy', 'yy', $localeDateFormat); ?>
+<?php $localeDateFormat = str_replace('yyyy', 'yy', $localeDateFormat); ?>
+<?php $localeDateFormat = str_replace('yyy', 'yy', $localeDateFormat); ?>
+<?php $localeDateFormat = str_replace('yy', 'yyyy', $localeDateFormat); ?>
+<?php $monthFormat = str_replace('d', '', $localeDateFormat); ?>
+<?php $weekFormat = str_replace('', '', $localeDateFormat); ?>
+<?php $weekFormat = $weekFormat . "{ &#8212;" . $weekFormat . "}"; ?>
+<?php $dayFormat = str_replace('yy', '', $localeDateFormat); ?>
+
+<?php $localeDateFormat = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT); ?>
+<?php $localeDateFormat = str_replace('y', 'yy', $localeDateFormat); ?>
+<?php $localeDateFormat = str_replace('yyyyy', 'yy', $localeDateFormat); ?>
+<?php $localeDateFormat = str_replace('yyyy', 'yy', $localeDateFormat); ?>
+<?php $localeDateFormat = str_replace('yyy', 'yy', $localeDateFormat); ?>
+<?php $monthFormatC = str_replace('yy', '', $localeDateFormat); ?>
+<?php $monthFormatC = str_replace('MM', '', $monthFormatC); ?>
+<?php $monthFormatC = str_replace('///', '/', $monthFormatC); ?>
+<?php $monthFormatC = str_replace('//', '/', $monthFormatC); ?>
+<?php $monthFormatC = rtrim($monthFormatC, '/'); ?>
+<?php $weekFormatC = 'ddd ' . $monthFormatC; ?>
+<?php $weekFormatC = str_replace('//', '/', $weekFormatC); ?>
+<?php $dayFormatC = str_replace('yy', '', $localeDateFormat); ?>
+
+<?php
+
+	$collection = $this->getPager()->getCollection();
+	$resources = array();
+    $productsids = array();
+	foreach($collection as $resProduct) {
+
+
+		$Product = Mage::getModel('catalog/product')->load($resProduct->getId());
+		//get Serials
+		$coll = Mage::getModel('payperrentals/serialnumbers')
+				->getCollection()
+				->addEntityIdFilter($Product->getId())
+		;
+
+		$nameqty = '<div style="width:150px;float:left;line-height:48px;"><b>'.$Product->getName().'</b> </div>';
+		foreach ($coll as $item) {
+			$resources[] = array(
+				'name' => $nameqty . '<div style="width:100px;float:left;line-height:48px;">'.$item->getSn().'</div>',
+				'id' => $item->getSn()
+			);
+
+			$productsids[] = $item->getSn();
+			$nameqty = '<div style="width:150px;float:left;line-height:48px;">&nbsp;</div>';
+		}
+	}
+
+	$resources_JSON_array = json_encode($resources);
+?>
+
+<script type="text/javascript">
+
+	$jppr(document).ready(function() {
+
+		var date = new Date();
+		var d = date.getDate();
+		var m = date.getMonth();
+		var y = date.getFullYear();
+
+		var calendar = $jppr('#calendarProducts').fullCalendar({
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'resourceDay,resourceWeek,resourceMonth'
+			},
+            titleFormat: {
+                resourceMonth: '<?php echo $monthFormat;?>',
+                resourceWeek: '<?php echo $weekFormat;?>',
+                resourceDay: '<?php echo $dayFormat;?>'
+            },
+            columnFormat:{
+                resourceMonth: '<?php echo $monthFormatC;?>',
+                resourceWeek: '<?php echo $weekFormatC;?>'
+            },
+            defaultView: 'resourceMonth',
+			firstDay: 1,
+			editable: false,
+			selectable: false,
+			minTime: <?php echo intval(Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_STORE_OPEN_TIME));?>,
+			maxTime: <?php echo (intval(Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_STORE_CLOSE_TIME))+1);?>,
+			slotMinutes: <?php echo Mage::helper('payperrentals/config')->getTimeIncrement();?>,
+			selectHelper: false,
+			resources: <?php echo $resources_JSON_array;?>,
+			events:{
+				url: '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/getSerialevents/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>',
+				type: 'POST',
+				data: {
+					productsids: '<?php echo implode(',',$productsids);?>'
+				},
+				error: function() {
+					alert('there was an error while fetching events!');
+				},
+				color: 'yellow',   // a non-ajax option
+				textColor: 'black' // a non-ajax option
+			},
+            //height: calcCalendarHeight(),
+            aspectRatio: 12,
+			loading: function (bool) {
+				if (bool)
+					$jppr('#loading-mask').show();
+				else{
+					$jppr('#loading-mask').hide();
+                    $jppr('a.fc-event').each(function(){
+                        $jppr(this).qtip({
+                            content: {
+                                text: $jppr(this).attr('href'),
+                                title: {
+                                    text: 'Order Details',
+                                    button: 'Close' // Close button
+                                }
+                            },
+                            position: {
+                                at: 'top left',
+                                adjust: {
+                                    y: -140,
+                                    x: -100
+                                }
+                            },
+                            style: { classes: 'qtip-shadow qtip-red' }
+                        });
+                    });
+				}
+			},
+            viewDisplay: function(view) {
+                $jppr('a.fc-event').each(function(){
+                    $jppr(this).qtip({
+                        content: {
+                            text: $jppr(this).attr('href'),
+                            title: {
+                                text: 'Order Details',
+                                button: 'Close' // Close button
+                            }
+                        },
+                        position: {
+                            at: 'top left',
+                            adjust: {
+                                y: -140,
+                                x: -100
+                            }
+                        },
+                        style: { classes: 'qtip-shadow qtip-red' }
+                    });
+                });
+            },
+            eventClick: function(event) {
+                if (event.url) {
+					window.open(event.textColor);
+                    return false;
+                }
+            }
+
+		});
+
+		function calcCalendarHeight() {
+            return $jppr(window).height() - 40;
+		}
+
+		$jppr(window).resize(function() {
+			$jppr('#calendarProducts').fullCalendar('option', 'height', calcCalendarHeight());
+		});
+		$jppr('.searchBut').click(function(){
+
+			if($jppr('.productName').val() == ''){
+				if($jppr('.gotoDate').val() != ''){
+                    $jppr('#calendarProducts').fullCalendar('gotoDate', new Date($jppr.formatDateTime('yy-mm-dd',new Date($jppr('.gotoDate').val()))));
+				}
+			} else{
+				var location = '<?php echo  Mage::getUrl("payperrentals_admin/adminhtml_serialreport/index",array('key'=> $this->getRequest()->getParam('key')))?>'+'?productName='+$jppr('.productName').val()+'&';
+				if($jppr('.gotoDate').val() != ''){
+					location = location +'gotoDate='+encodeURIComponent($jppr('.gotoDate').val());
+				}
+				window.location.href = location;
+			}
+			return false;
+		});
+		$jppr('.searchAllBut').click(function(){
+			var location = '<?php echo  Mage::getUrl("payperrentals_admin/adminhtml_serialreport/index",array('key'=> $this->getRequest()->getParam('key')))?>';
+			if($jppr('.gotoDate').val() != ''){
+				location = location +'?gotoDate='+encodeURIComponent($jppr('.gotoDate').val());
+			}
+			window.location.href = location;
+		});
+
+		$jppr('.searchBut').trigger('click');
+
+	});
+
+</script>
+<style type="text/css">
+	#pager ol li{
+		display: inline-block;
+	}
+	#pager .limiter{
+		display: block;
+	}
+	#pager .pages{
+		display: block;
+		margin-top:20px;
+		font-size:14px;
+	}
+	#pager ol{
+		display: inline-block;
+	}
+	.notreturnedColor span, .returnedColor span{
+		color:#ffffff !important;
+	}
+
+</style>

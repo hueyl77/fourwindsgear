@@ -1,0 +1,198 @@
+
+<script type="text/javascript">
+    //<![CDATA[
+    //todo here have to use topDates->session start end date and get the price...check if is bundle->showWindow ...else... use jquery to fill the grid... and push the confirm button
+    //no need for any price calculating function/ i can use the jquery data to know when the configure button was pressed or if the checkbox was pressed first time.
+    //go over the calculate price if checkbox was just pressed. if configure button was pressed->showWindow
+    //if the product is configured, keep the returned price and then on trigger button just update the rows with jquery and productConfigure.onConfirmButton
+    var checkboxWasPressed = $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().attr('is_pressed') == '0';
+    var isInQuote = <?php echo Mage::app()->getRequest()->getActionName() == 'configureQuoteItems'?'true':'false'; ?>;
+    function updateRowWithPrice(price, stockAvail, stockRest, qty){
+        var listType = 'product_to_add';
+        //oldConfirmCallback = productConfigure.confirmCallback[listType];
+        //productConfigure.setConfirmCallback(listType, null);
+        $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.qty').removeAttr('disabled');
+
+        productConfigure.setConfirmCallback(listType, function() {
+            $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.price').html(price);
+            $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.currentstock').html(stockAvail);
+            $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.remainingstock').html(stockRest);
+            $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.qty').val(qty);
+
+            $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.qty').change(function () {
+                $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.remainingstock').html($jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.currentstock').html() - $jppr(this).val());
+            });
+            var checkbox = $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.checkbox').get(0);
+
+            sales_order_create_search_gridJsObject.setCheckboxChecked(checkbox, true);
+            if ($jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.checkbox').first().attr('isadd') == '1' && typeof $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.checkbox').first().attr('clicked') === 'undefined') {
+                $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.checkbox').first().attr('clicked', 1);
+                order.productGridAddSelected();
+            }
+        }.bind(this));
+    }
+
+    if(!checkboxWasPressed && !isInQuote){
+        if($jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.checkbox').first().attr('isadd') != '1') {
+            $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().attr('is_pressed', '0');
+        }
+        calculatePrice<?php echo $_jsFunctionPrefix ?> = function (selfObj) {
+            <?php
+
+            if(Mage::getSingleton('core/session')->getData('startDateInitial') && Mage::getSingleton('core/session')->getData('endDateInitial')){
+                $qty = 1;
+                $startDate = Mage::getSingleton('core/session')->getData('startDateInitial');
+                $endDate = Mage::getSingleton('core/session')->getData('endDateInitial');
+                $isAvailable = true;
+
+                $priceAmount = ITwebexperts_Payperrentals_Helper_Price::calculatePrice($_product, $startDate, $endDate, $qty, ITwebexperts_Payperrentals_Helper_Data::getCustomerGroup());
+                if($priceAmount == -1){
+                    $isAvailable = false;
+                }
+                $maxQty = ITwebexperts_Payperrentals_Helper_Inventory::getQuantity($_product, $startDate, $endDate);
+                if($maxQty == 'is_overbook'){
+                    $maxQty = 1;
+                }
+
+            }else{
+                $isAvailable = false;
+            }
+            ?>
+            <?php if($isAvailable):?>
+                var price = '<?php echo Mage::helper('core')->currency($priceAmount);?>';
+                var stockAvail = '<?php echo $maxQty;?>';
+                var stockRest = '<?php  echo ($maxQty - $qty);?>';
+                updateRowWithPrice(price, stockAvail, stockRest, 1);
+                productConfigure.onConfirmBtn();
+            <?php else: ?>
+                productConfigure._showWindow();
+            <?php endif;?>
+
+        };
+
+    }else {
+        var noPriceMessage = '<?php echo $this->__('No price is available for these rental periods');?>';
+        var noQtyMessage = '<?php echo $this->__('No quantity available for these rental periods');?>';
+
+        /**
+         * Function which is used in admin to calculate prices.
+         */
+        calculatePrice<?php echo $_jsFunctionPrefix ?> = function (selfObj) {
+            //showAjaxLoader($selfID.find('.priceQuote'));
+            Element.show('loading-mask');
+            var qtyDisabledArr = [];
+            $jppr('.qty-disabled').each(function () {
+                qtyDisabledArr.push($jppr(this).attr('id'));
+                $jppr(this).removeAttr('disabled');
+            });
+            if (typeof bundle !== 'undefined') {
+                for (var option in bundle.config.selected) {
+                    if (bundle.config.options[option]) {
+                        for (var i = 0; i < bundle.config.selected[option].length; i++) {
+                            if (bundle.config.options[option].selections[bundle.config.selected[option][i]].typeid == 'reservation') {
+                                //alert( $jppr('input[name="bundle_option_qty['+option+']"]').attr('id'));
+                                $jppr('input[name="bundle_option_qty[' + option + ']"]').attr('onblur', '');
+                                $jppr('input[name="bundle_option_qty[' + option + ']"]').attr('onkeyup', '');
+                            }
+                        }
+                    }
+                }
+            }
+            if (typeof $jppr('<?php echo $_jsContainerPrefix ?>').data('wait_price') === 'undefined') {
+                $jppr('<?php echo $_jsContainerPrefix ?>').data('wait_price', 1);
+                $jppr.ajax({
+                    cache: false,
+                    dataType: 'json',
+                    type: 'post',
+                    url: '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/getpriceandavailability/",array('product_id'=>$this->getProduct()->getId(),'form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>',
+                    data: $jppr('<?php echo $_jsContainerPrefix ?>').closest('form').find('*').serialize(),
+                    success: function (data) {
+                        $jppr('<?php echo $_jsContainerPrefix ?>').removeData('price_current_product');
+                        $jppr('.qty-disabled').each(function () {
+                            $jppr(this).attr('disabled', 'disabled');
+                        });
+                        if (data.amount >= 0) {
+                            $jppr('<?php echo $_jsContainerPrefix ?> .datesPrice').html('Price for selected dates: ' + data.formatAmount);
+                        } else {
+                            $jppr('<?php echo $_jsContainerPrefix ?> .datesPrice').html('No Price for the selected dates');
+                        }
+
+                        //show current stock and remaining stock?
+                        $jppr('<?php echo $_jsContainerPrefix ?> .datesPrice').html(data.stockText + $jppr('<?php echo $_jsContainerPrefix ?> .datesPrice').html());
+
+                        if (data.amount == -1 || data.available == false) {
+                            $jppr('.buttons-set button[type="submit"]').hide();
+
+                            if (data.available == false && data.maxqty != $jppr('#calendarTable<?php echo $quoteItemId;?>').parent().find('input[name="qty"]').first().val() && data.maxqty > 0) {
+                                $jppr('<?php echo $_jsContainerPrefix ?> .datesPrice').html(noQtyMessage);
+                            } else {
+                                $jppr('<?php echo $_jsContainerPrefix ?> .datesPrice').html(noPriceMessage);
+                            }
+                        } else {
+                            $jppr('<?php echo $_jsContainerPrefix ?>').data('price_current_product', data.amount);
+                            $jppr('.buttons-set button[type="submit"]').show();
+                            updateRowWithPrice(data.formatAmount, data.stockAvail, data.stockRest, data.qty);
+                        }
+                        $jppr('<?php echo $_jsContainerPrefix ?>').removeData('wait_price');
+                       // if ($jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().find('.checkbox').first().attr('isadd') == '1') {
+                        //} else {
+                            Element.hide('loading-mask');
+                        //}
+                    }
+                });
+            }
+
+        };
+    }
+
+        $jppr('#product_composite_configure_fields_qty').css('margin-top', '15px');
+
+        $jppr('#calendarTable<?php echo $quoteItemId;?>').parent().find('input[name="qty"]').first().val(1);
+
+        $jppr('#calendarTable<?php echo $quoteItemId;?>').parent().find('input[name="qty"]').first().keydown(function (event) {
+            $jppr('.buttons-set button[type="submit"]').hide();
+        });
+        $jppr('#calendarTable<?php echo $quoteItemId;?>').parent().find('input[name="qty"]').first().change(function (event) {
+            $jppr('.buttons-set button[type="submit"]').hide();
+            if ($jppr('#calendarTable<?php echo $quoteItemId;?>').parent().find('.qtycheck').length == 0) {
+                $jppr('<dt style="margin-top: 10px"><div class="form-button qtycheck" style="width:160px;"><span><span>Check Price and availability</span></span></div></dt>').insertAfter($jppr('#calendarTable<?php echo $quoteItemId;?>').parent().find('input[name="qty"]').first().parent());
+            }
+            $jppr('#calendarTable<?php echo $quoteItemId;?>').parent().find('.qtycheck').click(function (event) {
+                var $selfID = $jppr('#calendarTable<?php echo $quoteItemId;?>');
+                updateInputVals<?php echo $_jsFunctionPrefix ?>($selfID);
+                event.stopImmediatePropagation();
+            });
+            $jppr('#calendarTable<?php echo $quoteItemId;?>').parent().find('.qtycheck').trigger('click');
+            event.stopImmediatePropagation();
+        });
+
+    $jppr('.super-attribute-select').change(function () {
+        updateInputVals<?php echo $_jsFunctionPrefix ?>($jppr('<?php echo $_jsContainerPrefix ?>'));
+    });
+
+    $jppr('.color-swatch-wrapper li').click(function () {
+        updateInputVals<?php echo $_jsFunctionPrefix ?>($jppr('<?php echo $_jsContainerPrefix ?>'));
+    });
+
+    $jppr('input[name^="bundle_option"], select[name^="bundle_option"], .bundle-option-select').change(function () {
+        updateInputVals<?php echo $_jsFunctionPrefix ?>($jppr('<?php echo $_jsContainerPrefix ?>'));
+    });
+
+    $jppr('input[name^="options"]').change(function () {
+        updateInputVals<?php echo $_jsFunctionPrefix ?>($jppr('<?php echo $_jsContainerPrefix ?>'));
+    });
+
+        <?php if(isset($_startTimeInit) && $_startTimeInit != ''):	?>
+        $jppr('#calendarTable<?php echo $quoteItemId;?>').find('.start_time option[value="<?php echo $_startTimeInit;?>"]').attr("selected", "selected");
+        $jppr('#calendarTable<?php echo $quoteItemId;?>').find('.end_time option[value="<?php echo $_endTimeInit;?>"]').attr("selected", "selected");
+        <?php endif; ?>
+
+
+        /** Initialize keydown event for qty field */
+        $jppr('#calendarTable<?php echo $quoteItemId; ?>').parent().find('input[name="qty"]').first().trigger('keydown');
+
+
+
+
+    //]]>
+</script>

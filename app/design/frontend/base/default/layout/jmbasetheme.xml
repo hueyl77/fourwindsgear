@@ -1,0 +1,32 @@
+<layout version="0.1.0">
+    <jmbasetheme_index_index>
+        <reference name="root">
+            <action method="setTemplate">
+                <template>page/2columns-left.phtml</template>
+            </action>
+        </reference>
+        <reference name="left">
+            <block type="jmbasetheme/left" name="jmbasetheme_left" template="jmbasetheme/left.phtml"/>
+        </reference>
+        <reference name="content">
+            <block type="jmbasetheme/index" name="jmbasetheme_index" template="jmbasetheme/index.phtml"/>
+        </reference>
+    </jmbasetheme_index_index>
+    <default>
+        <reference name="head">
+            <action method="addJs">
+                <file>jquery/jquery.1.9.1.min.js</file>
+            </action>
+            <action method="addJs">
+                <file>jquery/jquery.noConflict.js</file>
+            </action>
+            <action method="addCss">
+                <stylesheet helper="jmbasetheme/data/getCSSProfileUrl"/>
+            </action>
+            <block type="core/template" template="joomlart/jmbasetheme/jmbasethemehead.phtml"/>
+        </reference>
+<!--        <reference name="header">
+            <block type="jmbasetheme/demo_switcher" name="jm_demo_switcher" as="jm_demo_switcher" template="joomlart/jmbasetheme/switcher.phtml"></block>
+        </reference>-->
+    </default>
+</layout>

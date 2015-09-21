@@ -1,0 +1,71 @@
+<div class="jm-product-list <?php echo $config['mode']; ?> clearfix">	
+		<div class="listing-type-grid category-products">
+			<?php $_collectionSize = $listall?$listall->count():0 ?>
+			<?php $i = 0;
+				$width = 100;
+				// -- added by Duchh 15/12/2009
+				$thumbnailw = $config['width'];
+				$thumbnailh = $config['height'];
+				$numberchar = $config['max'];
+
+				if ($config['perrow']) $width = 99/$config['perrow'];
+				$width = "style=\"width:{$width}%;\"";    
+        $return = false;
+                
+			?>							
+			<?php if($_collectionSize){?>
+              <?php 
+                foreach ($listall->getItems() as $_product){ 
+                  $product = Mage::getModel('catalog/product')->load($_product->getId());
+                  $attribute = $product->getResource()->getAttribute('label');
+                  if(is_object($attribute)){
+                   $attdefaultvalue = $attribute->getDefaultValue();
+                         $attributeValue = Mage::getModel('catalog/product')->load($_product->getId())->getlabel();
+                         $attributeValueName = Mage::getModel('catalog/product')->load($_product->getId())->getAttributeText('label');
+                   }
+                   if(strlen($attributeValue) &&  ($attdefaultvalue !== $attributeValue)) { 
+                     $labeltype = $attributeValueName;        
+                   } 
+                   else {
+                     $labeltype = "";
+                   }
+                    //Optimize image
+                    $img_file = $this->helper('catalog/image')->init($_product, 'thumbnail')->resize(100, 100)->setWatermarkSize('30x10');
+                    // Read image path, convert to base64 encoding
+                    $imgData = file_get_contents($img_file);
+                    // Format the image SRC:  data:{mime};base64,{data};
+                    $src = 'data:image/' . $type . ';base64,' . base64_encode($imgData); 
+              ?> 
+						
+              <?php if($i++%$config['perrow']==0): ?>
+				        <div class="products-grid">
+				      <?php endif; ?>
+                <div class="item">
+                  <div class="item-inner">
+                      <a class="product-image" title="<?php echo $this->htmlEscape($_product->getName()) ?>" href="<?php echo $_product->getProductUrl() ?>">
+                        <img src="<?php echo $this->helper('catalog/image')->init($_product, 'thumbnail')->resize(80, 80)->setWatermarkSize('30x10'); ?>" alt="<?php echo $this->htmlEscape($_product->getName()) ?>"/>
+                        <?php if ($labeltype): ?>
+                        <span class="icon-label <?php echo $labeltype; ?>-label"><?php echo $labeltype;  ?></span>   
+                        <?php endif; ?>
+                      </a>
+                      <h2 class="product-name">
+                        <a title="<?php echo $this->htmlEscape($_product->getName()) ?>" href="<?php echo $_product->getProductUrl() ?>"><?php echo $_product->getName() ?></a>
+                      </h2>
+					            <?php echo $this->getReviewsSummaryHtml($_product, true, true)?>
+                      <?php echo $this->getPriceHtml($_product,true, '_jmproduct') ?>
+                      
+                      <?php if($numberchar) : ?>
+                        <p class="pdescription"><?php echo substr(nl2br($_product->getShortDescription()), 0, $numberchar).'...';?></p>
+                      <?php endif; ?>
+
+                      
+                  </div>
+                </div>
+              <?php if($i%$config['perrow']==0 || $i==$_collectionSize): ?>
+				        </div>
+				      <?php endif; ?>		
+						
+				<?php }?>		
+			<?php }?>	
+		</div>
+</div>

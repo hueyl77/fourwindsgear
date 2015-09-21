@@ -1,0 +1,42 @@
+<div class="content-header">
+	<table cellspacing="0" class="grid-header">
+		<tr>
+			<td><h3><?php echo $this->__('Rental Queue Report')?></h3></td>
+		</tr>
+	</table>
+</div>
+<?php if(count(Mage::app()->getWebsites())): ?>
+    <?php echo $this->getChildHtml('store_switcher') ?>
+<?php endif; ?>
+<div class="entry-edit" style="margin-bottom:20px;">
+	<form id="edit_form" name="edit_form">
+		<input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+		<div style="">
+
+			</div>
+
+	</form>
+</div>
+<div id="rentalTable" class="grid">
+
+
+<?php
+ echo $this->getRentalQueueTable();
+?>
+</div>
+
+
+<?php
+
+?>
+
+<script type="text/javascript">
+	$jppr(document).ready(function() {
+
+	});
+
+</script>
+<style type="text/css">
+
+
+</style>

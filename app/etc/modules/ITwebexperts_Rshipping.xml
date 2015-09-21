@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <ITwebexperts_Rshipping>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Mage_Core />
+                <ITwebexperts_Payperrentals/>
+            </depends>
+        </ITwebexperts_Rshipping>
+    </modules>
+</config>

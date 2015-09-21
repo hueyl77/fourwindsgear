@@ -1,0 +1,16 @@
+
+<h3><?php echo Mage::helper('jmbasetheme')->__('Demo')?></h3>
+<?php if ($styles): ?>
+<ul class="ub-demo-styles">
+    <?php foreach ($styles as $fileName): ?>
+        <?php 
+            $label = substr($fileName, 0, strpos($fileName, '.xml')); 
+            $url = Mage::getModel('core/url')->getUrl('jmbasetheme/demo/apply', array('style' => strtolower($label)));
+        ?>
+        
+        <li class="demo-item">
+            <a href="<?php echo $url; ?>"><?php echo Mage::helper('jmbasetheme')->__(ucfirst($label)); ?></a>
+        </li>
+    <?php endforeach; ?>
+</ul>
+<?php endif; ?>

@@ -1,0 +1,32 @@
+<?php
+
+if (Mage::registry('is_product_grid')): ?>
+    <div style="text-align: center; margin-top: -20px;"><?php echo  $this->__('Rental Inventory Calculation Dates') ?>:</div>
+    <div class="filter">
+        <?php $dates = Mage::helper('payperrentals/timebox')->getProductGridDates(); ?>
+        <span class="label"><?php echo  $this->__('Start') ?>:</span>
+        <?php echo $this->getLayout()->createBlock('core/html_date')
+            ->setImage(Mage::getDesign()->getSkinUrl('images/grid-cal.gif'))
+            ->setFormat(Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT))
+            ->setName('payperrental_custgrid_startdate')
+            ->setValue(ITwebexperts_Payperrentals_Helper_Date::formatDbDate($dates['start_date']))
+            ->setId('payperrental_custgrid_startdate')
+            ->setClass('datetime-picker input-text payperrental_custgrid_startdate')
+            ->toHtml();    ?>
+
+        <span class="label"><?php echo  $this->__('End') ?>:</span>
+        <?php echo $this->getLayout()->createBlock('core/html_date')
+            ->setImage(Mage::getDesign()->getSkinUrl('images/grid-cal.gif'))
+            ->setFormat(Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT))
+            ->setName('payperrental_custgrid_enddate')
+            ->setValue(ITwebexperts_Payperrentals_Helper_Date::formatDbDate($dates['end_date']))
+            ->setId('payperrental_custgrid_enddate')
+            ->setClass('datetime-picker input-text payperrental_custgrid_enddate')
+            ->toHtml();    ?>
+    </div>
+</td>
+<td class="filter-actions a-right">
+<?php endif; ?>
+<?php
+$button = $this->getData('reset_button');
+echo $button;

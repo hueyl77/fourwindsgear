@@ -1,0 +1,20 @@
+#special price s4: 25-26 monthly
+#res-config-1- 1 days $5 - s4
+#res-config-1 - 1 days $1 - any
+#res-bundle-2 - 1 days $95, 5 days $285
+#res-bundle-product1
+#res-configurable-product
+
+#testName=checkPrices --- url=res-config-1.html --- startDate=1 --- endDate=2 --- qty=1 --- expected=1
+#testName=checkPrices --- url=res-config-1.html --- startDate=1 --- endDate=3 --- qty=1 --- expected=2
+#testName=checkPrices --- url=res-config-1.html --- startDate=1 --- endDate=4 --- qty=1 --- expected=3
+#testName=checkPrices --- url=res-config-1.html --- startDate=2015,0,25 --- endDate=2015,0,26 --- qty=1 --- expected=5
+#testName=checkPrices --- url=res-config-1.html --- startDate=2015,0,23 --- endDate=2015,0,27 --- qty=1 --- expected=7
+#
+testName=checkPrices --- url=res-bundle-2.html --- startDate=1 --- endDate=12 --- qty=1 --- expected=665
+testName=checkPrices --- url=res-configurable-product.html --- startDate=1 --- endDate=2 --- qty=1 --- expected=1 --- options=Res bundle 1::red
+testName=checkPrices --- url=res-configurable-product.html --- startDate=1 --- endDate=3 --- qty=1 --- expected=2 --- options=Res bundle 1::red
+testName=checkPrices --- url=res-configurable-product.html --- startDate=1 --- endDate=4 --- qty=1 --- expected=3 --- options=Res bundle 1::red
+testName=checkPrices --- url=res-configurable-product.html --- startDate=2015,0,25 --- endDate=2015,0,26 --- qty=1 --- expected=5 --- options=Res bundle 1::red
+testName=checkPrices --- url=res-configurable-product.html --- startDate=2015,0,23 --- endDate=2015,0,27 --- qty=1 --- expected=8 --- options=Res bundle 1::red
+testName=checkPrices --- url=res-bundle-product1.html --- startDate=1 --- endDate=4 --- qty=1 --- expected=3 --- options=Res bundle 1::Res bundle 1

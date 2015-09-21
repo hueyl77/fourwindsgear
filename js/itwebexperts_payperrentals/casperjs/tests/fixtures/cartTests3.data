@@ -1,0 +1,6 @@
+#here bundle options needs to be updated after product import they are different. maybe do a check by name?
+testName=changeSettingsGeneral --- section=payperrentals --- group=calendar_options --- field=product_calendar_padding_days --- value=0
+testName=changeSettingsGeneral --- section=general --- group=locale --- field=code --- value=en_US
+testName=addToCart --- url=res-configurable-product.html --- startDate=3 --- endDate=4 --- qty=1 --- expected= --- options=attribute92::4
+testName=loginCustomer --- expected=
+testName=checkoutCart --- expected=

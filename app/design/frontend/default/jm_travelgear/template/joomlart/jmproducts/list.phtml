@@ -1,0 +1,88 @@
+<?php
+    $_productCollection=$this->getLoadedProductCollection();
+    $_helper = $this->helper('catalog/output');
+    $baseconfig =  Mage::helper("jmbasetheme")->getactiveprofile();
+    if ($baseconfig) : 
+      $productlistimagewidth = isset($baseconfig["productlistimagewidth"])&&$baseconfig["productlistimagewidth"]?$baseconfig["productlistimagewidth"]:180;
+      $productlistimageheight = isset($baseconfig["productlistimageheight"])&&$baseconfig["productlistimageheight"]?$baseconfig["productlistimageheight"]:180;
+      $productgriddeslenght = isset($baseconfig["productgriddeslenght"])&&$baseconfig["productgriddeslenght"]?$baseconfig["productgriddeslenght"]:0;
+      $productgridimageheight = isset($baseconfig["productgridimageheight"])&&$baseconfig["productgridimageheight"]?$baseconfig["productgridimageheight"]:180;
+      $productgridimagewidth = isset($baseconfig["productgridimagewidth"])&&$baseconfig["productgridimagewidth"]?$baseconfig["productgridimagewidth"]:180;
+      $showlabel = $baseconfig["showlabel"];
+	  else :
+      $productlistimagewidth = 180;
+      $productlistimageheight = 180;
+      $productgriddeslenght = 0;
+      $productgridimageheight = 180;
+      $productgridimagewidth = 180;
+      $showlabel = 0;
+	  endif;
+  	$randomid = rand();  
+?>
+
+<div class="jm-product-list <?php echo $config['mode']; ?> clearfix">	
+		<?php if($config['title']){?><div class="page-title category-title">
+		<h1><?php echo $config['title']; ?></h1>
+		</div><?php }; ?>
+		
+		<div class="listing-type-grid category-products">
+			<?php $_collectionSize = $listall?$listall->count():0; ?>
+			
+			<?php $i = 0;
+				$width = 100;
+				// -- added by Duchh 15/12/2009
+				$thumbnailw = $config['width'];
+				$thumbnailh = $config['height'];
+				$numberchar = $config['max'];
+
+				if ($config['perrow']) $width = 100/$config['perrow'];
+				$width = "style=\"width:{$width}%;\"";    
+        $return = false;                
+			?>							
+			<?php if($_collectionSize){?>
+				<ul class="products-grid" id="productsgrid<?php echo $randomid; ?>">
+				<?php $j=0;?>
+				<?php foreach ($listall->getItems() as $_product){ 
+						$_rowCount = ceil($_collectionSize/$config['perrow']);
+						if ($i%$config['perrow']==0) : $j++; endif;
+						$i++;
+						$product = Mage::getModel('catalog/product')->load($_product->getId());
+						$attribute = $product->getResource()->getAttribute('label');
+						if(is_object($attribute)){
+						 
+						    $_options= $attribute->getSource()->getAllOptions(true, true);
+							foreach($_options as $option){
+								  if ($option['value'] == $product->getData("label")){
+									$class =  $option['label'];
+								  }
+							 }		   
+							 $attdefaultvalue = $attribute->getDefaultValue();
+							 $attributeValue = Mage::getModel('catalog/product')->load($_product->getId())->getlabel();
+							 $attributeValueName = Mage::getModel('catalog/product')->load($_product->getId())->getAttributeText('label');
+								 if(strlen($attributeValue) &&  ($attdefaultvalue !== $attributeValue)) { 
+									 $labeltype = $class;   
+									 $labelname = $attributeValueName;     
+									 } 
+									 else {
+									 $labeltype = "";
+							 } 
+						}
+				?> 
+						<li class="item <?php if ($j==$_rowCount) : echo "item-row-last"; endif; ?> <?php if(($i-1)%$config['perrow']==0): ?> first<?php elseif($i%$config['perrow']==0): ?> last<?php endif; ?>" <?php echo $width;?>>
+							<div class="inner">
+									<a class="product-image" title="<?php echo $this->htmlEscape($_product->getName()) ?>" href="<?php echo $_product->getProductUrl() ?>">
+										<img src="<?php echo $this->helper('catalog/image')->init($_product, 'thumbnail')->resize($thumbnailw, $thumbnailh)->setWatermarkSize('30x10'); ?>" alt="<?php echo $this->htmlEscape($_product->getName()) ?>"/>
+										<?php if ($labeltype && $showlabel): ?>
+											<span class="icon-label <?php echo $labeltype; ?>-label"><?php echo $labelname;	?></span>		
+										<?php endif; ?>
+									</a>
+								<a class="product-name" title="<?php echo $this->htmlEscape($_product->getName()) ?>" href="<?php echo $_product->getProductUrl() ?>"><?php echo $_product->getName() ?></a>
+								<?php echo $this->getPriceHtml($_product,true, '_jmproduct_' . rand()) ?>
+							</div>
+						</li>
+				<?php }?>		
+				</ul>
+				<script type="text/javascript">decorateGeneric($$('ul.products-grid'), ['odd','even','first','last'])</script>
+			<?php }?>	
+		</div>
+</div>

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * @category   BL
+ * @package    BL_CustomGrid
+ * @copyright  Copyright (c) 2012 Benoît Leulliette <benoit.leulliette@gmail.com>
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<customgrid>
+    <grid_types>
+
+        
+        <!--<sales_order type="customgrid/grid_type_order" module="customgrid">
+            <name>Orders</name>
+            <sort_order>30000</sort_order>
+            <custom_columns>
+                <start_date model="payperrentals/custom_column_order_startdate" module="customgrid">
+                    <name>Start Date</name>
+                    <description><![CDATA[Display reservation start date]]></description>
+                    <group>Payperrentals</group>
+                    <availability>
+                        <excluded_versions>
+                            <version>1.4.0.*</version>
+                        </excluded_versions>
+                    </availability>
+                    <allow_customization>1</allow_customization>
+                    <model_params>
+                        <startdate_field>start_date</startdate_field>
+                    </model_params>
+                </start_date>
+                <end_date model="payperrentals/custom_column_order_enddate" module="customgrid">
+                    <name>End Date</name>
+                    <description><![CDATA[Display reservation end date]]></description>
+                    <group>Payperrentals</group>
+                    <availability>
+                        <excluded_versions>
+                            <version>1.4.0.*</version>function
+                        </excluded_versions>
+                    </availability>
+                    <allow_customization>1</allow_customization>
+                    <model_params>
+                        <enddate_field>end_date</enddate_field>
+                    </model_params>
+                </end_date>
+            </custom_columns>
+        </sales_order>-->
+
+    </grid_types>
+</customgrid>

@@ -1,0 +1,105 @@
+<?php
+//Turn off add jquery from old themes & extension
+if ( !defined('JM_ADD_JQUERY') ){
+    define('JM_ADD_JQUERY', true);
+}
+
+$curenturl = Mage::helper('core/url')->getCurrentUrl();
+if(strpos($curenturl,"https") === false){
+	$baseurl = Mage::getBaseUrl();
+}else{
+	$baseurl = Mage::getStoreConfig("web/secure/base_url");
+}
+?>
+
+<script type="text/javascript">
+	var baseurl = "<?php echo $baseurl; ?>";
+	var defaultTheme = "<?php echo Mage::helper("jmbasetheme")->getDefaultTheme(null, "frontend"); ?>";
+</script>
+
+<script type="text/javascript" src="<?php echo $this->getJsUrl('joomlart/jmbasetheme/jmbasetheme.js') ?>"></script>
+
+<?php
+$devicedetect = Mage::helper ('jmbasetheme/mobiledetect');
+$ismobile = $devicedetect->isMobile() ? 1 : 0;
+$istable = $devicedetect->isTablet() ? 1 : 0;
+$baseconfig =  Mage::helper("jmbasetheme")->getProfileContent();
+
+if ($baseconfig) :
+	$productlistimagewidth = isset($baseconfig["productlistimagewidth"]) ? $baseconfig["productlistimagewidth"]:180;
+	$productlistimageheight = isset($baseconfig["productlistimageheight"])?$baseconfig["productlistimageheight"]:180;
+	//$productgriddeslenght = isset($baseconfig["productgriddeslength"]) ? $baseconfig["productgriddeslength"] : 150;
+	$productgridimageheight = isset($baseconfig["productgridimageheight"]) ? $baseconfig["productgridimageheight"]:180;
+	$productgridimagewidth = isset($baseconfig["productgridimagewidth"]) ? $baseconfig["productgridimagewidth"]:180;
+	$productgridnumbercolumn = isset($baseconfig["productgridnumbercolumn"]) ? $baseconfig["productgridnumbercolumn"]:3;
+	if($istable){
+		$productlistimagewidth = isset($baseconfig["productlistimagewidthtablet"]) ? $baseconfig["productlistimagewidthtablet"]:298;
+		$productlistimageheight = isset($baseconfig["productlistimageheighttablet"]) ? $baseconfig["productlistimageheighttablet"]:298;
+		//$productgriddeslenght = isset($baseconfig["productgriddeslenghttablet"]) ? $baseconfig["productgriddeslenghttablet"] : 150;
+		$productgridimageheight = isset($baseconfig["productgridimageheighttablet"]) ? $baseconfig["productgridimageheighttablet"]:298;
+		$productgridimagewidth = isset($baseconfig["productgridimagewidthtablet"]) ? $baseconfig["productgridimagewidthtablet"]:298;
+		$productgridnumbercolumn = isset($baseconfig["productgridnumbercolumntablet"]) ? $baseconfig["productgridnumbercolumntablet"]:3;
+	}else if($ismobile){
+		$productlistimagewidth = isset($baseconfig["productlistimagewidthmobile"]) ? $baseconfig["productlistimagewidthmobile"]:298;
+		$productlistimageheight = isset($baseconfig["productlistimageheightmobile"]) ? $baseconfig["productlistimageheightmobile"]:298;
+		//$productgriddeslenght = isset($baseconfig["productgriddeslenghtmobile"]) ? $baseconfig["productgriddeslenghtmobile"] : 150;
+		$productgridimageheight = isset($baseconfig["productgridimageheightmobile"]) ? $baseconfig["productgridimageheightmobile"]:298;
+		$productgridimagewidth = isset($baseconfig["productgridimagewidthmobile"]) ? $baseconfig["productgridimagewidthmobile"]:298;
+		$productgridnumbercolumn = isset($baseconfig["productgridnumbercolumnmobile"]) ? $baseconfig["productgridnumbercolumnmobile"]:1;
+	}
+	$productlistimagewidthtabletportrait = isset($baseconfig["productlistimagewidthtabletportrait"])&&$baseconfig["productlistimagewidthtabletportrait"]?$baseconfig["productlistimagewidthtabletportrait"]:298;
+	$productlistimageheighttabletportrait = isset($baseconfig["productlistimageheighttabletportrait"])&&$baseconfig["productlistimageheighttabletportrait"]?$baseconfig["productlistimageheighttabletportrait"]:298;
+
+    $productgridimageheighttabletportrait = isset($baseconfig["productgridimageheighttabletportrait"])&&$baseconfig["productgridimageheighttabletportrait"]?$baseconfig["productgridimageheighttabletportrait"]:298;
+	$productgridimagewidthtabletportrait = isset($baseconfig["productgridimagewidthtabletportrait"])&&$baseconfig["productgridimagewidthtabletportrait"]?$baseconfig["productgridimagewidthtabletportrait"]:298;
+    $productgridnumbercolumntabletportrait = isset($baseconfig["productgridnumbercolumntabletportrait"])&&$baseconfig["productgridnumbercolumntabletportrait"]?$baseconfig["productgridnumbercolumntabletportrait"]:2;
+
+    $productlistimagewidthmobileportrait = isset($baseconfig["productlistimagewidthmobileportrait"])&&$baseconfig["productlistimagewidthmobileportrait"]?$baseconfig["productlistimagewidthmobileportrait"]:298;
+	$productlistimageheightmobileportrait = isset($baseconfig["productlistimageheightmobileportrait"])&&$baseconfig["productlistimageheightmobileportrait"]?$baseconfig["productlistimageheightmobileportrait"]:298;
+
+	$productgridimageheightmobileportrait = isset($baseconfig["productgridimageheightmobileportrait"])&&$baseconfig["productgridimageheightmobileportrait"]?$baseconfig["productgridimageheightmobileportrait"]:298;
+	$productgridimagewidthmobileportrait = isset($baseconfig["productgridimagewidthmobileportrait"])&&$baseconfig["productgridimagewidthmobileportrait"]?$baseconfig["productgridimagewidthmobileportrait"]:298;
+	$productgridnumbercolumnmobileportrait = isset($baseconfig["productgridnumbercolumnmobileportrait"])&&$baseconfig["productgridnumbercolumnmobileportrait"]?$baseconfig["productgridnumbercolumnmobileportrait"]:1;
+else :
+	$productlistimagewidth = 180;
+	$productlistimageheight = 180;
+	$productgridimageheight = 180;
+	$productgridimagewidth = 180;
+    $productgridnumbercolumn = 3;
+	$showlabel = 0;
+endif;
+?>
+<?php if($baseconfig): ?>
+	<script type="text/javascript">
+        var isHomePage = <?php echo (Mage::app()->getFrontController()->getRequest()->getRouteName() == 'cms') ? 1 : 0; ?>;
+		var offcanvaseffect = '<?php echo $baseconfig['offcanvaseffect']; ?>';
+		(function($){
+			$(document).ready(function() {
+				var jmbt = new $.fn.jmbasetheme({
+					ismobile:<?php echo $ismobile;  ?>,
+					istable:<?php echo $istable; ?>,
+					productgridimagewidth:<?php echo $productgridimagewidth; ?>,
+					productgridimageheight:<?php echo $productgridimageheight; ?>,
+					productlistimageheight:<?php echo $productlistimageheight; ?>,
+					productlistimagewidth:<?php echo $productlistimagewidth; ?>,
+					productgridnumbercolumn:<?php echo $productgridnumbercolumn; ?>,
+					productgridimagewidthtabletportrait:<?php echo $productgridimagewidthtabletportrait; ?>,
+					productgridimageheighttabletportrait:<?php echo $productgridimageheighttabletportrait; ?>,
+					productlistimagewidthtabletportrait:<?php echo $productlistimagewidthtabletportrait; ?>,
+					productlistimageheighttabletportrait:<?php echo $productlistimageheighttabletportrait; ?>,
+					productgridnumbercolumntabletportrait:<?php echo $productgridnumbercolumntabletportrait; ?>,
+					productlistimagewidthmobileportrait:<?php echo $productlistimagewidthmobileportrait; ?>,
+					productlistimageheightmobileportrait:<?php echo $productlistimageheightmobileportrait; ?>,
+					productgridimageheightmobileportrait:<?php echo $productgridimageheightmobileportrait; ?>,
+					productgridimagewidthmobileportrait:<?php echo $productgridimagewidthmobileportrait; ?>,
+					productgridnumbercolumnmobileportrait:<?php echo $productgridnumbercolumnmobileportrait; ?>
+				});
+
+                if (isHomePage){
+                    $('body').addClass('cms-home');
+                }
+			});
+		})(jQuery);
+	</script>
+<?php endif; ?>
+

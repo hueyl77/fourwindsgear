@@ -1,0 +1,3 @@
++ Tuning way to use Jquery
++ Tuning js for work fine with Jquery 1.9+ 
+

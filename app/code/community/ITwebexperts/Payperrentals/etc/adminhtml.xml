@@ -1,0 +1,250 @@
+<?xml version="1.0"?>
+<config>
+    <menu>
+        <sales>
+            <children>
+                <payperrentals module="payperrentals">
+                    <title>Returns</title>
+                    <sort_order>31</sort_order>
+                    <action>payperrentals_admin/adminhtml_sales_return</action>
+                    <children>
+                        <returnhistory module="payperrentals">
+                            <title>Returns History</title>
+                            <sort_order>10</sort_order>
+                            <action>payperrentals_admin/adminhtml_sales_return</action>
+                        </returnhistory>
+                        <latereturn module="payperrentals">
+                            <title>Late Returns</title>
+                            <sort_order>20</sort_order>
+                            <action>payperrentals_admin/adminhtml_sales_returnlate</action>
+                        </latereturn>
+                    </children>
+                </payperrentals>
+            </children>
+        </sales>
+        <payperrentals module="payperrentals">
+            <title>Rentals</title>
+            <sort_order>71</sort_order>
+            <children>
+                <rentalqueue module="payperrentals">
+                    <title>Rental Queue</title>
+                    <sort_order>0</sort_order>
+                    <children>
+                        <srqueuehistory module="payperrentals">
+                            <title>Send Return Queue History Report</title>
+                            <sort_order>0</sort_order>
+                            <action>payperrentals_admin/adminhtml_sendreturnqueuehistory</action>
+                        </srqueuehistory>
+                        <rentalqueuereport module="payperrentals">
+                            <title>Rental Queue Report</title>
+                            <sort_order>1</sort_order>
+                            <action>payperrentals_admin/adminhtml_rentalqueuereport</action>
+                        </rentalqueuereport>
+                        <srqueuereport module="payperrentals">
+                            <title>Send Return Queue Report</title>
+                            <sort_order>2</sort_order>
+                            <action>payperrentals_admin/adminhtml_sendreturnqueuereport</action>
+                        </srqueuereport>
+                        <queue_popularity module="payperrentals">
+                            <title><![CDATA[Queue Popularity]]></title>
+                            <sort_order>3</sort_order>
+                            <action>payperrentals_admin/adminhtml_queuepopularity</action>
+                        </queue_popularity>
+                    </children>
+                </rentalqueue>
+                <reservations module="payperrentals">
+                    <title>Reservations</title>
+                    <sort_order>1</sort_order>
+                    <children>
+                        <srreport module="payperrentals">
+                            <title>Send Return Report</title>
+                            <sort_order>0</sort_order>
+                            <action>payperrentals_admin/adminhtml_sendreturnreport</action>
+                        </srreport>
+                        <srhistory module="payperrentals">
+                            <title>Send Return History Report</title>
+                            <sort_order>0</sort_order>
+                            <action>payperrentals_admin/adminhtml_sendreturnhistory</action>
+                        </srhistory>
+                    </children>
+                </reservations>
+                <reports>
+                    <title><![CDATA[Reports]]></title>
+                    <sort_order>4</sort_order>
+                    <children>
+                        <qreport module="payperrentals">
+                            <title>Inventory Report</title>
+                            <sort_order>10</sort_order>
+                            <action>payperrentals_admin/adminhtml_quantityreport</action>
+                        </qreport>
+                        <serialreport module="payperrentals">
+                            <title>Serial Number Report</title>
+                            <sort_order>20</sort_order>
+                            <action>payperrentals_admin/adminhtml_serialreport</action>
+                        </serialreport>
+                        <most_rented>
+                            <title><![CDATA[Most Rented Products]]></title>
+                            <sort>30</sort>
+                            <action>payperrentals_admin/adminhtml_report_rented</action>
+                        </most_rented>
+                        <low_inventory>
+                            <title><![CDATA[Low Inventory]]></title>
+                            <sort>40</sort>
+                            <action>payperrentals_admin/adminhtml_report_stock</action>
+                        </low_inventory>
+                        <roi_report>
+                            <title><![CDATA[ROI Report]]></title>
+                            <sort>50</sort>
+                            <action>payperrentals_admin/adminhtml_report_roi</action>
+                        </roi_report>
+                    </children>
+                </reports>
+                <rentalcalendarmain>
+                    <title>Rental Calendar</title>
+                    <sort_order>5</sort_order>
+                    <children>
+                        <rentalcalendarbyorder module="payperrentals">
+                            <title>By Order</title>
+                            <action>payperrentals_admin/adminhtml_rentalcal/byorder/</action>
+                        </rentalcalendarbyorder>
+                        <rentalcalendarbystartend module="payperrentals">
+                            <title>By Start &amp; End Date</title>
+                            <action>payperrentals_admin/adminhtml_rentalcal/bystart</action>
+                        </rentalcalendarbystartend>
+                    </children>
+                </rentalcalendarmain>
+                <reservationpricesdates module="payperrentals">
+                    <title>Pricing By Dates &amp; Times</title>
+                    <sort_order>6</sort_order>
+                    <action>payperrentals_admin/adminhtml_reservationpricesdates</action>
+                </reservationpricesdates>
+                <manualreserve module="payperrentals">
+                    <title>Manually Reserve Inventory</title>
+                    <sort_order>7</sort_order>
+                    <action>payperrentals_admin/adminhtml_manualreserve</action>
+                </manualreserve>
+                <settings module="payperrentals">
+                    <title>Settings</title>
+                    <sort_order>20</sort_order>
+                    <action>adminhtml/system_config/edit/section/payperrentals</action>
+                </settings>
+            </children>
+        </payperrentals>
+    </menu>
+    <acl>
+        <resources>
+            <all>
+                <title>Allow Everything</title>
+            </all>
+            <admin>
+                <children>
+                    <sales>
+                        <children>
+                            <payperrentals module="payperrentals">
+                                <title>Returns</title>
+                                <children>
+                                    <returnhistory module="payperrentals">
+                                        <title>Returns History</title>
+                                        <sort_order>10</sort_order>
+                                    </returnhistory>
+                                    <latereturn module="payperrentals">
+                                        <title>Late Returns</title>
+                                        <sort_order>20</sort_order>
+                                    </latereturn>
+                                </children>
+                            </payperrentals>
+                        </children>
+                    </sales>
+                    <payperrentals>
+                        <title>PPrentals Module</title>
+                        <children>
+                            <rentalqueue>
+                                <title>Rental Queue</title>
+                                <children>
+                                    <srqueuehistory module="payperrentals">
+                                        <title>Send Return Queue History Report</title>
+                                    </srqueuehistory>
+                                    <rentalqueuereport module="payperrentals">
+                                        <title>Rental Queue Report</title>
+                                    </rentalqueuereport>
+                                    <srqueuereport module="payperrentals">
+                                        <title>Send Return Queue Report</title>
+                                    </srqueuereport>
+                                    <queue_popularity module="payperrentals">
+                                        <title><![CDATA[Queue Popularity]]></title>
+                                    </queue_popularity>
+                                </children>
+                            </rentalqueue>
+                            <reservations>
+                                <title>Reservations</title>
+                                <children>
+                                    <srreport>
+                                        <title>Send Return Report</title>
+                                    </srreport>
+                                    <srhistory>
+                                        <title>Send Return History Report</title>
+                                    </srhistory>
+                                </children>
+                            </reservations>
+                            <reports>
+                                <title><![CDATA[Reports]]></title>
+                                <children>
+                                    <qreport module="payperrentals">
+                                        <title><![CDATA[Inventory Report]]></title>
+                                    </qreport>
+                                    <serialreport module="payperrentals">
+                                        <title><![CDATA[Serial Number Report]]></title>
+                                    </serialreport>
+                                    <most_rented>
+                                        <title><![CDATA[Most Rented Products]]></title>
+                                    </most_rented>
+                                    <low_inventory>
+                                        <title><![CDATA[Low Inventory]]></title>
+                                    </low_inventory>
+                                    <roi_report>
+                                        <title><![CDATA[ROI Report]]></title>
+                                    </roi_report>
+                                </children>
+                            </reports>
+                            <rentalcalendarmain>
+                                <title>Rental Calendar</title>
+                                <sort_order>5</sort_order>
+                                <children>
+                                    <rentalcalendarbyorder module="payperrentals">
+                                        <title>By Order</title>
+                                    </rentalcalendarbyorder>
+                                    <rentalcalendarbystartend module="payperrentals">
+                                        <title>By Start &amp; End Date</title>
+                                    </rentalcalendarbystartend>
+                                </children>
+                            </rentalcalendarmain>
+                            <reservationpricesdates module="payperrentals">
+                                <title>Pricing By Dates &amp; Times</title>
+                                <sort_order>6</sort_order>
+                            </reservationpricesdates>
+                            <manualreserve module="payperrentals">
+                                <title>Manually Reserve Inventory</title>
+                                <sort_order>7</sort_order>
+                            </manualreserve>
+                            <settings>
+                                <title>Settings</title>
+                                <sort_order>20</sort_order>
+                            </settings>
+                        </children>
+                    </payperrentals>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <payperrentals>
+                                        <title><![CDATA[Rental Settings]]></title>
+                                    </payperrentals>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

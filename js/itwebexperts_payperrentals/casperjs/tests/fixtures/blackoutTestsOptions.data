@@ -1,0 +1,4 @@
+#Options are ids of the attributes followed by the value. You can see the ids of attributes by using inspect element in console
+#expected is the array of dates which should be blackout. currentdate +1, +2 days etc
+testName=checkBlackoutDates --- url=res-bundle-product1.html --- startDate=1 --- endDate=2 --- qty=3 --- expected=1,2 --- options=bundle-option-70::140
+testName=checkBlackoutDates --- url=res-bundle-product1.html --- startDate=1 --- endDate=2 --- qty=7 --- expected=disabled --- options=bundle-option-70::140

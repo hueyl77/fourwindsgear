@@ -1,0 +1,8 @@
+cd /home/magt/public_html/renttest
+ln -fs /home/magt/public_html/renttest/var/log/xunit/* ${WORKSPACE}
+/home/cristianfiles/jenkins/modupdnf
+/home/cristianfiles/jenkins/modupdrest
+/home/magt/public_html/renttest/js/itwebexperts_payperrentals/casperjs/executeshorttests.sh
+#/usr/local/bin/phpunit --log-junit var/log/xunit/xunit*.xml
+
+#upgrade jenkins replace the file with the new one : /usr/lib/jenkins/jenkins.war

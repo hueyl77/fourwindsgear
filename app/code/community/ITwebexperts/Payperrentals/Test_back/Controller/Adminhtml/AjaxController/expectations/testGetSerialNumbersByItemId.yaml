@@ -1,0 +1,31 @@
+testId1:
+  return_count: 2
+  return_values: [63e5097c280a, 02b647bc5031]
+testId2:
+  return_count: 1
+  return_values: [02b647bc5031]
+testId3:
+  return_count: 0
+testId4:
+  return_count: 0
+testId5:
+  return_count: 1
+  return_values: [66c142d55d1b]
+testId6:
+  return_count: 0
+testId7:
+  return_count: 0
+testId8:
+  return_count: 1
+  return_values: [109ca4c45ca5]
+testId9:
+  return_count: 4
+  return_values: [4443e885ff3f, 3035ef57e2bd, 69dd12d8d4e7, 69dd12fd00ef]
+testId10:
+  return_count: 2
+  return_values: [69dd12d8d4e7, 69dd12fd00ef]
+testId11:
+  return_count: 0
+testId12:
+  return_count: 3
+  return_values: [3035ef57e2bd, 69dd12d8d4e7, 69dd12fd00ef]

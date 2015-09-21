@@ -1,0 +1,117 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     default_default
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+
+
+?>
+
+<?php /* @var $this Mage_Adminhtml_Block_Catalog_Product_Composite_Fieldset_Options */ ?>
+<?php $options = Mage::helper('core')->decorateArray($this->getOptions()); ?>
+
+<?php
+$isAdmin = true;
+$quoteItemId = -1;
+if(Mage::app()->getRequest()->getActionName() == 'configureProductToAdd'){
+    $quoteItemId = (int)$this->getRequest()->getParam('id');
+}else if (Mage::app()->getRequest()->getActionName() != 'configureProductToAdd') {
+    $quoteItemId = (int)$this->getRequest()->getParam('id');
+    $quoteItem = Mage::getModel('sales/quote_item')->load($quoteItemId);
+    if ($quoteItem->getId()) {
+        $optionCollection = Mage::getModel('sales/quote_item_option')->getCollection()->addItemFilter(
+            array($quoteItemId)
+        );
+        $quoteItem->setOptions($optionCollection->getOptionsByItem($quoteItem));
+        $quoteItemId = $quoteItem->getProductId();
+    }
+}
+
+$templatePhpInitialisations = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/php_initialisations.phtml', array(
+    '_area' => 'frontend',
+    '_relative' => false
+));
+$templateFunctions = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/admin_product_func.phtml', array(
+    '_area' => 'frontend',
+    '_relative' => false
+));
+$templateGlobalCalendarFunctions = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar_functions.phtml', array(
+    '_area' => 'frontend',
+    '_relative' => false
+));
+
+$templateJsInitialisations = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/js_initialisations.phtml', array(
+    '_area' => 'frontend',
+    '_relative' => false
+));
+
+$templateStyles = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/styles.phtml', array(
+    '_area' => 'frontend',
+    '_relative' => false
+));
+
+$templateGlobalCalendar = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar.phtml', array(
+    '_area' => 'frontend',
+    '_relative' => false
+));
+?>
+<?php if(ITwebexperts_Payperrentals_Helper_Data::isReservation($this->getProduct()->getId() )) : ?>
+
+<?php require $templatePhpInitialisations; ?>
+
+
+<div id="calendarTable<?php echo $quoteItemId; ?>">
+    <?php require $templateJsInitialisations; ?>
+    <input type="hidden" name="configurate-product-id" value="<?php echo $this->getProduct()->getId() ?>">
+
+    <?php require $templateGlobalCalendar; ?>
+    <?php require $templateFunctions; ?>
+    <?php require $templateGlobalCalendarFunctions; ?>
+
+    <div class="priceList" style="margin-top:10px;"> Price List:<br/>
+        <?php echo ITwebexperts_Payperrentals_Helper_Price::getPriceListHtml($this->getProduct(), Mage::getStoreConfig(
+                ITwebexperts_Payperrentals_Helper_Config::XML_PATH_PRICING_ON_LISTING
+            )); ?>
+    </div>
+    <div class="datesPrice" style="margin-top:10px;font-weight: bold;"></div>
+</div>
+
+<?php endif; ?>
+
+<?php if (count($options)): ?>
+
+    <?php echo $this->getChildHtml('options_js') ?>
+
+    <div id="product_composite_configure_fields_options" class="<?php echo $this->getIsLastFieldset() ? 'last-fieldset' : '' ?>">
+        <h4><?php echo Mage::helper('payperrentals')->__('Custom Options') ?></h4>
+
+        <div class="product-options">
+            <dl>
+                <?php foreach ($options as $option): ?>
+                    <?php echo $this->getOptionHtml($option); ?>
+                <?php endforeach; ?>
+            </dl>
+        </div>
+    </div>
+
+<?php endif; ?>

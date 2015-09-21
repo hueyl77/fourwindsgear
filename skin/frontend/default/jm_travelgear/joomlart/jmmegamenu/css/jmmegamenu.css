@@ -1,0 +1,894 @@
+.jm-megamenu {
+	margin: 0;
+	padding: 0;
+	text-align: left;
+}
+
+ul.megamenu {
+  margin: 0;
+  height: 100%;
+}
+
+.column3 ul.megamenu {
+  border-right: 0;
+}
+
+ul.megamenu.level2 {
+	border-right: 0; 
+}
+
+ul.megamenu li {
+	overflow: visible
+}
+/* lv - 0
+-----------------------------------*/
+/* Styling ---*/
+.jm-megamenu ul.level0 {
+	margin: 0;
+	padding: 0;
+}
+
+.jm-megamenu ul.level0 li.mega {
+	display: block;
+	float: left;
+	margin: 0;
+	padding: 0;
+	position: relative;
+	width: auto;
+	background: url('../images/hr.png') no-repeat right 50%;
+}
+
+.jm-megamenu ul.level0 li.mega.last{
+	background: 0;
+}
+
+.jm-megamenu ul.level0 li.mega a.mega {
+	color: #222;
+	display: block;
+	float: left;
+	font-size: 14px;
+	line-height: 45px;
+	font-weight: 700;
+	min-height: 45px;
+	padding: 0 20px;
+	border: 1px solid #fff;
+	border-bottom: 0;
+	text-decoration: none;
+	text-transform: uppercase;
+	position: relative;
+	z-index: 99;
+}
+
+.jm-megamenu ul.level0 li.mega.last a.mega {
+	padding-right: 0;
+}
+
+.jm-megamenu ul.level0 li.mega a.mega.active,
+.jm-megamenu ul.level0 li.mega a.mega:hover,
+.jm-megamenu ul.level0 li.mega:hover > a.mega {
+	color: #d90036;
+}
+
+.jm-megamenu ul.level0 li.mega a.mega.haschild:hover,
+.jm-megamenu ul.level0 li.mega:hover > a.mega.haschild {
+	background: #fff;
+	line-height: 46px;
+	min-height: 46px;
+	border: 1px solid #ebebeb;
+	border-bottom: 0;
+}
+
+.jm-megamenu ul.level0 li.mega a.active{
+}
+
+.jm-megamenu ul.level0 li.mega .has-image {
+	background-position: left top;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	display: block;
+	padding-left: 25px
+}
+
+.jm-megamenu ul.level0 li.mega .icon-image {
+	float: left;
+	height: auto;
+	margin: 13px 5px 0 0;
+	max-width: 20px;
+	vertical-align: middle;
+}
+
+.jm-megamenu ul.level0 li.mega .menu-title{
+	
+}
+
+.jm-megamenu ul.level0 li.mega .mega-item-des {
+	float: left;
+	font-size: 11px;
+	font-weight: normal;
+	line-height: 140%;
+	margin: 0;
+	overflow: hidden;
+	padding: 0;	
+	position: relative;
+	top: -11px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
+}
+
+.jm-megamenu ul.level1 li.mega .mega-item-des {
+    margin: 0;
+	color: #333;
+}
+
+.jm-megamenu ul.level0 li.mega span.menu-desc {
+	display: block;
+	font-size: 92%;
+	font-weight: normal
+}
+
+/* lv - 1 */
+.jm-megamenu ul.level1 li.mega a.mega {
+	border-bottom: 0;
+	color: #d90036;
+	float: none;
+	display: block;
+	padding: 0;
+	margin: 0;
+	text-transform: uppercase;
+}
+
+.jm-megamenu ul.level1 li.mega a.mega.haschilds:active,
+.jm-megamenu ul.level1 li.mega a.mega.haschilds:focus,
+.jm-megamenu ul.level1 li.mega a.mega.haschilds:hover{
+	background-position: 97% -33px;
+}
+
+.jm-megamenu li.mega .childcontent{
+	display: block;
+	height: auto;
+	max-height: 0;
+	overflow: hidden;
+	position: absolute;
+	top: 46px;
+	/*box-shadow: 0 0 3px #666;
+	-box-shadow: 0 0 3px #666;
+	-moz-box-shadow: 0 0 3px #666;
+	-webkit-box-shadow: 0 0 3px #666;*/
+	-moz-transition: all .3s linear;
+	-o-transition: all .3s linear;
+	transition: all .3s linear;
+	-webkit-transition: all .3s linear;
+	/*border-radius: 0 0 5px 5px;
+	-moz-border-radius: 0 0 5px 5px; 
+	-webkit-border-radius: 0 0 5px 5px; */
+}
+
+.jm-megamenu li.mega.mnuright .childcontent{
+	/*right: 0;*/
+}
+
+.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	overflow: visible;
+	-moz-transition: all 0.8s linear;
+	-o-transition: all 0.8s linear;
+	transition: all 0.8s linear;
+	-webkit-transition: all 0.8s linear
+}
+
+.jm-megamenu ul.level1 li.haschild .childcontent {
+	-moz-transition: all 0s linear;
+	-o-transition: all 0s linear;
+	transition: all 0s linear;
+	-webkit-transition: all 0s linear
+}
+
+.jm-megamenu ul.level1 li.haschild:hover > .childcontent {
+	border-top-color: #666;
+	left: 150px;
+	-moz-transition: all 0s linear;
+	-o-transition: all 0s linear;
+	transition: all 0s linear;
+	-webkit-transition: all 0s linear
+}
+
+.jm-megamenu ul.level1 li.mega {
+  background: none !important;
+  text-align: left;
+  width: 100%;
+}
+
+.jm-megamenu ul.level1 li.mega a {
+	border-left: 0 !important;
+}
+
+.jm-megamenu ul.level1 .childcontent {
+	margin: 0 0 0 0;
+	top: 0px;
+}
+
+/*lv 2*/
+.jm-megamenu ul.level2 li.mega {
+	padding: 0;
+}
+
+.jm-megamenu ul.level2 li.mega.last {
+	border-bottom: 0 none;
+	padding: 0;
+}
+
+.jm-megamenu ul.level2 li.mega a.mega {
+  border: 0 none !important;
+  color: #aaa;
+  display: block;
+  float: none;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 30px !important;
+  margin: 0;
+  min-height: 13px;
+  padding: 0;
+  text-decoration: none;
+  text-transform: none;
+}
+
+.jm-megamenu ul.level2 li.mega li li a.mega {
+	line-height: 28px;
+}
+
+.jm-megamenu ul.level2 li.mega.active a.mega,
+.jm-megamenu ul.level2 li.mega a.mega:active,
+.jm-megamenu ul.level2 li.mega a.mega:focus,
+.jm-megamenu ul.level2 li.mega a.mega:hover {
+	color: #d90036;
+	text-decoration: none;
+}
+
+ /* Columns ---*/
+.jm-megamenu .megacol {
+	float: left;
+	margin: 0;
+}
+
+.jm-megamenu .megacol.last {
+	margin: 0
+}
+
+
+ /* CHILD CONTENT
+-----------------------------------*/
+.jm-megamenu .childcontent {
+	z-index: 88
+}
+.jm-megamenu .childcontent-inner {
+	background: #fff;
+	padding: 50px 30px 30px;
+	border: 1px solid #ebebeb;
+}
+.jm-megamenu .level1 .childcontent-inner,
+.jm-megamenu .level2 .childcontent-inner {
+	box-shadow: 0 0 10px 0 #666
+}
+.jm-megamenu .childcontent .block {
+	line-height: 1.5;
+	margin: 10px 0;
+	padding: 0
+}
+.jm-megamenu .childcontent .block h3 {
+	background: none;
+	margin-left: 10px;
+	margin-right: 10px;
+	text-indent: 5px;
+	text-transform: none
+}
+.jm-megamenu .childcontent .block .ja-box-ct {
+	padding: 0 5px
+}
+.jm-megamenu .childcontent .block a {
+	text-decoration: none
+}
+.jm-megamenu .childcontent .block a:hover,
+.jm-megamenu .childcontent .block a:focus,
+.jm-megamenu .childcontent .block a:active {
+	text-decoration: none
+}
+.jm-megamenu .childcontent .block ul:first-child {
+	margin-top: 0 !important
+}
+.jm-megamenu .childcontent .block li {
+	margin-bottom: 5px
+}
+.jm-megamenu .menu-adv {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  float: left;
+}
+/* Grouped --- */
+.jm-megamenu .group {
+}
+.jm-megamenu .group-title {
+	font-size: 14px;
+	margin: 0 0 20px;
+	padding: 0;
+	overflow: hidden
+}
+.jm-megamenu .group-content {
+  float: left;
+  padding: 0;
+  width: 100%;
+}
+
+.jm-megamenu .group-content a.link-more {
+	text-decoration: none;
+}
+.jm-megamenu .group-content a.link-more:active,
+.jm-megamenu .group-content a.link-more:focus,
+.jm-megamenu .group-content a.link-more:hover {
+	text-decoration: underline;
+}
+.jm-megamenu ul.level1 li.mega div.group-title a.mega {
+	color: #d90036;
+	height: 100% !important;
+	min-height: 100% !important;
+	line-height: 100% !important;
+	font-weight: 400;
+	border: 0 !important
+}
+.jm-megamenu .group-title .menu-desc {
+	padding-left: 0 !important
+}
+.jm-megamenu .group-content .block,
+.jm-megamenu .group-content ul.megamenu {
+	margin: 0
+}
+
+/* override --- */
+.jm-megamenu .childcontent ul.megamenu .block {
+	padding: 0
+}
+.jm-megamenu .childcontent ul.megamenu .block h3 {
+	margin-left: 0;
+	margin-right: 0
+}
+
+
+.jm-megamenu .products-grid {
+  background: none;
+  border-bottom: 0 none;
+  margin: 0 !important;
+  width: 100%;
+}
+
+.jm-megamenu .products-grid div.item {
+  border-bottom: 1px solid #ebebeb;
+  clear: both;
+  float: left;
+  margin: 0;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.jm-megamenu .products-grid div.item:last-child {
+	margin: 0;
+	border-bottom: 0;
+}
+
+.jm-megamenu .products-grid div.item .inner {
+	margin: 0;
+	min-height: 0;
+	width: auto
+}
+
+.jm-megamenu .products-grid .product-name {
+  float: left;
+  margin: 0 0 10px;
+  min-height: 100%;
+  width: 68%;
+}
+
+.jm-megamenu .products-grid .product-image {
+  float: left;
+  position: relative;
+  margin: 0 10px 0 0;
+}
+
+.jm-megamenu .products-grid .ratings {
+	float: left;
+  margin: 0 0 7px;
+  width: 68%;
+}
+
+.jm-megamenu .products-grid .ratings .rating-box { 
+	float: left;
+}
+
+.jm-megamenu .products-grid .price-box .old-price,
+.jm-megamenu .products-grid .price-box .special-price {
+	display: inline-block;
+}
+
+
+.jm-megamenu .group-content .buttons-set{
+	border: 0 none;
+	margin: 1em 0;
+}
+
+.jm-megamenu .mega-banner {
+  border-top: 2px solid #ebebeb;
+  padding: 20px 0 0;
+  margin: 20px 0 0;
+}
+
+/* Clearfix
+-------------------------------------------------------------*/
+* html .clearfix {
+	height: 1% /* IE5-6 */
+}
+.clearfix {
+	display: inline-block /* IE7xhtml*/
+}
+html[xmlns] .clearfix {
+	display: block /* O */
+}
+.clearfix:after {
+	clear: both;
+	/* FF, O, etc. */
+	content: ".";
+	display: block;
+	height: 0;
+	visibility: hidden
+}
+.clearer {
+	clear: both;
+	display: block;
+	font-size: 0;
+	height: 0;
+	line-height: 0;
+	overflow: hidden
+}
+/*menu effect*/
+/*jaws*/
+.jaws.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: rotate(90deg);
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-ms-transform: rotate(90deg);
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	opacity: 0;
+	-o-transform: rotate(90deg);
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	overflow: hidden;
+	transform: rotate(90deg);
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	-webkit-transform: rotate(90deg);
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s
+}
+.jaws.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*fence*/
+.fence.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: rotateY(-90deg);
+	-moz-transform-origin: 100% 50%;
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-ms-transform: rotateY(-90deg);
+	-ms-transform-origin: 100% 50%;
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	opacity: 0;
+	-o-transform: rotateY(-90deg);
+	-o-transform-origin: 100% 50%;
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	overflow: hidden;
+	transform: rotateY(-90deg);
+	transform-origin: 100% 50%;
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	-webkit-transform: rotateY(-90deg);
+	-webkit-transform-origin: 100% 50%;
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s
+}
+.fence.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*venitian*/
+.venitian.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: scale(1,0);
+	-moz-transform-origin: 50% 0;
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-ms-transform: scale(1,0);
+	-ms-transform-origin: 50% 0;
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	opacity: 0;
+	-o-transform: scale(1,0);
+	-o-transform-origin: 50% 0;
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	overflow: hidden;
+	transform: scale(1,0);
+	transform-origin: 50% 0;
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	-webkit-transform: scale(1,0);
+	-webkit-transform-origin: 50% 0;
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s
+}
+.venitian.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*fly*/
+.fly.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: rotateX( -180deg );
+	-moz-transform-origin: 50% 50% -50px;
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-ms-transform: rotateX( -180deg );
+	-ms-transform-origin: 50% 50% -50px;
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	opacity: 0;
+	-o-transform: rotateX( -180deg );
+	-o-transform-origin: 50% 50% -50px;
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	overflow: hidden;
+	transform: rotateX( -180deg );
+	transform-origin: 50% 50% -50px;
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	-webkit-transform: rotateX( -180deg );
+	-webkit-transform-origin: 50% 50% -50px;
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s
+}
+.fly.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*papercut*/
+.papercut.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: skewY(30deg);
+	-moz-transform-origin: 0% 0%;
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-ms-transform: skewY(30deg);
+	-ms-transform-origin: 0% 0%;
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	opacity: 0;
+	-o-transform: skewY(30deg);
+	-o-transform-origin: 0% 0%;
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	overflow: hidden;
+	transform: skewY(30deg);
+	transform-origin: 0% 0%;
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	-webkit-transform: skewY(30deg);
+	-webkit-transform-origin: 0% 0%;
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s
+}
+.papercut.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*fan*/
+.fan.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: rotate(90deg);
+	-moz-transform-origin: 0% 0%;
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-ms-transform: rotate(90deg);
+	-ms-transform-origin: 0% 0%;
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	opacity: 0;
+	-o-transform: rotate(90deg);
+	-o-transform-origin: 0% 0%;
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	overflow: hidden;
+	transform: rotate(90deg);
+	transform-origin: 0% 0%;
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	-webkit-transform: rotate(90deg);
+	-webkit-transform-origin: 0% 0%;
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s
+}
+.fan.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*wave*/
+.wave.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: skewY(-90deg);
+	-moz-transform-origin: 0% 0%;
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-ms-transform: skewY(-90deg);
+	-ms-transform-origin: 0% 0%;
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	opacity: 0;
+	-o-transform: skewY(-90deg);
+	-o-transform-origin: 0% 0%;
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	overflow: hidden;
+	transform: skewY(-90deg);
+	transform-origin: 0% 0%;
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	-webkit-transform: skewY(-90deg);
+	-webkit-transform-origin: 0% 0%;
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s
+}
+.wave.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*helix*/
+.helix.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: rotateY(90deg);
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-ms-transform: rotateY(90deg);
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	opacity: 0;
+	-o-transform: rotateY(90deg);
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	overflow: hidden;
+	transform: rotateY(90deg);
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	-webkit-transform: rotateY(90deg);
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s
+}
+.helix.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*pop*/
+.pop.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: scale(.2);
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-moz-transition-timing-function: cubic-bezier(0, .35, .5, 1.5);
+	-ms-transform: translateX(-80%);
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	-ms-transition-timing-function: cubic-bezier(0, .35, .5, 1.5);
+	opacity: 0;
+	-o-transform: translateX(-80%);
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	-o-transition-timing-function: cubic-bezier(0, .35, .5, 1.5);
+	overflow: hidden;
+	transform: translateX(-80%);
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	transition-timing-function: cubic-bezier(0, .35, .5, 1.5);
+	-webkit-transform: scale(.2);
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s;
+	-webkit-transition-timing-function: cubic-bezier(0, .35, .5, 1.5)
+}
+.pop.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*linear*/
+.linear.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: translateX(-40%);
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-moz-transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	-ms-transform: translateX(-40%);
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	-ms-transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	opacity: 0;
+	-o-transform: translateX(-40%);
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	-o-transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	overflow: hidden;
+	transform: translateX(-40%);
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	-webkit-transform: translateX(-40%);
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s;
+	-webkit-transition-timing-function: cubic-bezier(0, .35, .5, 1.7)
+}
+.linear.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*bounce*/
+.bounce.jm-megamenu li.mega .childcontent {
+	left: 0;
+	max-height: 0;
+	-moz-transform: translateX(-40%);
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-moz-transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	-ms-transform: translateX(-40%);
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	-ms-transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	opacity: 0;
+	-o-transform: translateX(-40%);
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	-o-transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	overflow: hidden;
+	transform: translateX(-40%);
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	-webkit-transform: translateX(-40%);
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s;
+	-webkit-transition-timing-function: cubic-bezier(0, .35, .5, 1.7)
+}
+.bounce.jm-megamenu li.haschild:hover > .childcontent {
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*Radial*/
+.radial.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: translateY(-120px) rotate(70deg);
+	-moz-transform-origin: 0 0;
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-ms-transform: translateY(-120px) rotate(70deg);
+	-ms-transform-origin: 0 0;
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	opacity: 0;
+	-o-transform: translateY(-120px) rotate(70deg);
+	-o-transform-origin: 0 0;
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	overflow: hidden;
+	transform: translateY(-120px) rotate(70deg);
+	transform-origin: 0 0;
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	-webkit-transform: translateY(-120px) rotate(70deg);
+	-webkit-transform-origin: 0 0;
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s
+}
+.radial.jm-megamenu li.haschild:hover > .childcontent {
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*winding*/
+.winding.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: rotateY(90deg);
+	-moz-transform-origin: 0 0;
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-ms-transform: rotateY(90deg);
+	-ms-transform-origin: 0 0;
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	opacity: 0;
+	-o-transform: rotateY(90deg);
+	-o-transform-origin: 0 0;
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	overflow: hidden;
+	transform: rotateY(90deg);
+	transform-origin: 0 0;
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	-webkit-transform: rotateY(90deg);
+	-webkit-transform-origin: 0 0;
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s
+}
+.winding.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}
+/*shield*/
+.shield.jm-megamenu li.mega .childcontent{
+	left: 0;
+	max-height: 0;
+	-moz-transform: rotateX(90deg);
+	-moz-transform-origin: 0 0;
+	-moz-transition: opacity .4s,    -moz-transform .6s, max-height .6s;
+	-moz-transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	-ms-transform: rotateX(90deg);
+	-ms-transform-origin: 0 0;
+	-ms-transition: opacity .4s,     -ms-transform .6s, max-height .6s;
+	-ms-transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	opacity: 0;
+	-o-transform: rotateX(90deg);
+	-o-transform-origin: 0 0;
+	-o-transition: opacity .4s,      -o-transform .6s, max-height .6s;
+	-o-transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	overflow: hidden;
+	transform: rotateX(90deg);
+	transform-origin: 0 0;
+	transition: opacity .4s,         transform .6s, max-height .6s;
+	transition-timing-function: cubic-bezier(0, .35, .5, 1.7);
+	-webkit-transform: rotateX(90deg);
+	-webkit-transform-origin: 0 0;
+	-webkit-transition: opacity .4s, -webkit-transform .6s, max-height .6s;
+	-webkit-transition-timing-function: cubic-bezier(0, .35, .5, 1.7)
+}
+.shield.jm-megamenu li.haschild:hover > .childcontent{
+	max-height: 1000px;
+	-moz-transform: none;
+	-ms-transform: none;
+	opacity: 1;
+	-o-transform: none;
+	overflow: hidden;
+	transform: none;
+	-webkit-transform: none
+}

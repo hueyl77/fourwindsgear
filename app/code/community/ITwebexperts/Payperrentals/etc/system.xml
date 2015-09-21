@@ -1,0 +1,1575 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <sales_igniter_tab translate="label">
+            <label><![CDATA[<div style="position: absolute;"><img id="si_block" src="" alt="" border="0" /></div>&nbsp;<script>
+            var n = SKIN_URL.indexOf("adminhtml");
+            $('si_block').src = SKIN_URL.substring(0, n) + "adminhtml/default/default/images/sales_igniter/si_system_logo.png";
+            </script>]]></label>
+            <sort_order>280</sort_order>
+        </sales_igniter_tab>
+    </tabs>
+    <sections>
+        <payperrentals translate="label" module="payperrentals">
+            <label><![CDATA[Rentals]]></label>
+            <tab>sales_igniter_tab</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>100</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <version translate="label">
+                    <label><![CDATA[Current Version Installed]]></label>
+                    <sort_order>1</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <current_version>
+                            <label><![CDATA[Current Version]]></label>
+                            <frontend_type>label</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <backend_model>payperrentals/config_version</backend_model>
+                        </current_version>
+                    </fields>
+                </version>
+                <appearance_period translate="label">
+                    <label><![CDATA[Min/Max Rental Period]]></label>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <min_period_number translate="label tooltip">
+                            <label><![CDATA[Minimum Period Number]]></label>
+                            <tooltip><![CDATA[Minimum rental period global setting. Like 2 Days means person can't rent less than 2 days. Only applies if product is set to use global setting]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </min_period_number>
+                        <min_period_type translate="label tooltip">
+                            <label><![CDATA[Minimum Period Type]]></label>
+                            <tooltip><![CDATA[Minimum rental period global setting. Like 2 Days means person can't rent less than 2 days. Only applies if product is set to use global setting]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payperrentals/source_periodoptions</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </min_period_type>
+                        <use_minimum_rental_period translate="label tooltip">
+                            <label><![CDATA[Use minimum rental period if no rental dates are selected by customer]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_minimum_rental_period>
+                        <max_period_number translate="label tooltip">
+                            <label><![CDATA[Maximum period Number]]></label>
+                            <tooltip><![CDATA[Maximum rental period global setting. 5 Days would mean maximum rental period is 5 days. Only applies if product is set to use global setting]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </max_period_number>
+                        <max_period_type translate="label tooltip">
+                            <label><![CDATA[Maximum period Type]]></label>
+                            <tooltip><![CDATA[Maximum rental period global setting. 5 Days would mean maximum rental period is 5 days. Only applies if product is set to use global setting]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payperrentals/source_periodoptions</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </max_period_type>
+                        <show_min_max_details_page>
+                            <label><![CDATA[Show minimum and maximum rental period on product details page]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </show_min_max_details_page>
+                        <min_qty_allowed translate="label tooltip">
+                            <label><![CDATA[Minimum Quantity Allowed in Shopping Cart]]></label>
+                            <tooltip><![CDATA[Minimum Quantity Allowed in Shopping Cart]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </min_qty_allowed>
+                        <max_qty_allowed translate="label tooltip">
+                            <label><![CDATA[Maximum Quantity Allowed in Shopping Cart]]></label>
+                            <tooltip><![CDATA[Maximum Quantity Allowed in Shopping Cart]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </max_qty_allowed>
+
+                    </fields>
+                </appearance_period>
+                <appearance_turnover translate="label">
+                    <label><![CDATA[Turnover Times]]></label>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <show_turnover translate="label tooltip">
+                            <label><![CDATA[Show turnovers on calendar]]></label>
+                            <tooltip><![CDATA[Show turnovers details on calendar]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>9</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </show_turnover>
+                        <turnover_before_number translate="label tooltip">
+                            <label><![CDATA[Turnover Before Number]]></label>
+                            <tooltip><![CDATA[How long before a rental is started is the inventory not available for. This is to account for cleaning, shipping, etc. For example if rental starts on May 15 and this is set to 2 days, then the inventory will not be available for May 13 and 14]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </turnover_before_number>
+                        <turnover_before_type translate="label tooltip">
+                            <label><![CDATA[Turnover Before Type]]></label>
+                            <tooltip><![CDATA[How long before a rental is started is the inventory not available for. This is to account for cleaning, shipping, etc. For example if rental starts on May 15 and this is set to 2 days, then the inventory will not be available for May 13 and 14]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payperrentals/source_periodoptions</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </turnover_before_type>
+                        <turnover_after_number translate="label tooltip">
+                            <label><![CDATA[Turnover After Number]]></label>
+                            <tooltip><![CDATA[How long after a rental is returned is it not available for. This is to account for cleaning, shipping, etc. For example if the rental ends on June 1 and turnover after is set to 2 days, then the inventory will not be available on June 2 and 3]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </turnover_after_number>
+                        <turnover_after_type translate="label tooltip">
+                            <label><![CDATA[Turnover After Type]]></label>
+                            <tooltip><![CDATA[How long after a rental is returned is it not available for. This is to account for cleaning, shipping, etc. For example if the rental ends on June 1 and turnover after is set to 2 days, then the inventory will not be available on June 2 and 3]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payperrentals/source_periodoptions</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </turnover_after_type>
+                        <exclude_disabled_from_turnover translate="label tooltip">
+                            <label><![CDATA[Exclude disabled days of week from being counted as turnover days]]></label>
+                            <tooltip><![CDATA[Exclude disabled days of week from being counted as turnover days]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </exclude_disabled_from_turnover>
+
+                    </fields>
+                </appearance_turnover>
+                <appearance_inventory translate="label">
+                    <label><![CDATA[Inventory]]></label>
+                    <sort_order>30</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <reserve_inventory_noinvoice translate="label tooltip">
+                            <label><![CDATA[Reserve inventory without any invoice]]></label>
+                            <tooltip><![CDATA[Usually Magento will not reserve inventory unless an order is invoiced. If you want inventory to be automatically reserved as soon as an order is placed, set to yes]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reserve_inventory_noinvoice>
+                        <use_reserveby_status translate="label tooltip">
+                            <label><![CDATA[Reserve inventory by status]]></label>
+                            <tooltip><![CDATA[If you only want inventory reserved for certain order statuses, set to yes]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_reserveby_status>
+                        <reservation_status translate="label">
+                            <label>Reserve status on dropdown</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payperrentals/source_reservedstatuses</source_model>
+                            <sort_order>219</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reservation_status>
+                        <reserved_statuses translate="label tooltip">
+                            <label><![CDATA[Reserve these statuses]]></label>
+                            <tooltip><![CDATA[Control + Click the statuses you want to have mean that inventory reserved. Is only active if the “Reserve inventory by status” setting is set to yes]]></tooltip>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>payperrentals/source_reservedstatuses</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                        </reserved_statuses>
+                        <use_reserve_inventory_send_return translate="label tooltip">
+                            <label><![CDATA[Override rental end date with actual return date if set]]></label>
+                            <tooltip><![CDATA[Override rental end date with actual return date if set]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_reserve_inventory_send_return>
+                        <use_reserve_inventory_dropoff_pickup translate="label tooltip">
+                            <label><![CDATA[Override rental start/end date with dropoff/pickup dates if set]]></label>
+                            <tooltip><![CDATA[Override rental start/end date with dropoff/pickup dates if set]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_reserve_inventory_dropoff_pickup>
+                        <hide_booked_inventory_grid translate="label tooltip">
+                            <label><![CDATA[Hide Available/Booked inventory in product grid]]></label>
+                            <tooltip><![CDATA[If you want to hide available/booked inventory in admin product grid, set to yes]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </hide_booked_inventory_grid>
+                    </fields>
+                </appearance_inventory>
+                <appearance_price translate="label">
+                    <label><![CDATA[Pricing]]></label>
+                    <sort_order>40</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <addtime_number translate="label tooltip">
+                            <label><![CDATA[Add to price calculation Number]]></label>
+                            <tooltip><![CDATA[Say you want a 1 day rental to give a 2 day price. If you set here 1 day then it would add this number to the calculation and do what you want]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </addtime_number>
+                        <addtime_type translate="label tooltip">
+                            <label><![CDATA[Add to price calculation Type]]></label>
+                            <tooltip><![CDATA[Say you want a 1 day rental to give a 2 day price. If you set here 1 day then it would add this number to the calculation and do what you want]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payperrentals/source_periodoptions</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </addtime_type>
+
+                        <sort_price_list translate="label tooltip">
+                            <label><![CDATA[Sort Price List by Period]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_price_list>
+                        <sort_price_list_type translate="label tooltip">
+                            <label><![CDATA[Sort Price List Type]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payperrentals/system_config_source_sortPriceType</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </sort_price_list_type>
+                    </fields>
+                </appearance_price>
+                <appearance_sso translate="label">
+                    <label><![CDATA[SSO Not Used Often]]></label>
+                    <sort_order>50</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <use_sso translate="label tooltip">
+                            <label><![CDATA[Use SSO]]></label>
+                            <tooltip><![CDATA[Only used for SSO systems, not common]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_sso>
+                        <sso_encryption_key translate="label tooltip">
+                            <label><![CDATA[SSO Encryption Key]]></label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </sso_encryption_key>
+                        <sso_rent_link translate="label tooltip">
+                            <label><![CDATA[Rent Link Webservice]]></label>
+                            <tooltip><![CDATA[Leave blank, goes with SSO not commonly used]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </sso_rent_link>
+                    </fields>
+                </appearance_sso>
+                <extend_order translate="label">
+                    <label><![CDATA[Extend Order]]></label>
+                    <sort_order>50</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enable_extend translate="label tooltip">
+                            <label><![CDATA[Allow extend Order]]></label>
+                            <tooltip><![CDATA[Enabled customer and admin to extend orders]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enable_extend>
+                        <max_extension_period_number translate="label tooltip">
+                            <label><![CDATA[Maximum extension period number]]></label>
+                            <tooltip><![CDATA[Number of days the order is allowed to be extnded over initial start date. If 1 month is selected, then the order can be extended for maximum 1 month starting with the initial start date.]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </max_extension_period_number>
+                        <max_extension_period_type translate="label tooltip">
+                            <label><![CDATA[Maximum extension Period Type]]></label>
+                            <tooltip><![CDATA[Number of days the order is allowed to be extnded over initial start date. If 1 month is selected, then the order can be extended for maximum 1 month starting with the initial start date.]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payperrentals/source_periodoptions</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </max_extension_period_type>
+                    </fields>
+                </extend_order>
+                <rental translate="label">
+                    <label><![CDATA[Rental Queue]]></label>
+                    <sort_order>60</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <category_membership translate="label tooltip">
+                            <label><![CDATA[Category ID To Show For Memberships]]></label>
+                            <tooltip><![CDATA[This is described under quick setup step 1. This is to set the category id of your rental memberships category. If you are not offering rental memberships leave blank]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </category_membership>
+                        <show_rental_link translate="label tooltip">
+                            <label><![CDATA[Show Rental Queue Link on Top Menu and Customer Account Menu]]></label>
+                            <tooltip><![CDATA[This is to turn on or off the rental queue menu link. If you are not offering rental memberships, you can set this to no]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </show_rental_link>
+                        <includeproduct translate="label tooltip">
+                            <label><![CDATA[Include product name on pdf labels]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </includeproduct>
+                        <addressfirst translate="label tooltip">
+                            <label><![CDATA[Print address before product name on pdf labels]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </addressfirst>
+                    </fields>
+                </rental>
+
+                <listing translate="label">
+                    <label><![CDATA[Listing and Info Page]]></label>
+                    <sort_order>70</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <show_price translate="label tooltip">
+                            <label><![CDATA[Number of prices points to show on product page]]></label>
+                            <tooltip><![CDATA[How many prices show on the product listing only applies to reservation type products that use rental pricing. For example if you set to 2, then the first 2 price period would show like:<br/>1 day $5<br/>1 week $10<br/>If you set to 3, then it would show 3 of the price periods.]]></tooltip>
+                            <comment>-1 means all price points</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </show_price>
+                        <prices_on_listing translate="label tooltip">
+                            <label><![CDATA[Number of prices points to show on listing]]></label>
+                            <tooltip><![CDATA[How many prices show on the product listing only applies to reservation type products that use rental pricing. For example if you set to 2, then the first 2 price period would show like:<br/>1 day $5<br/>1 week $10<br/>If you set to 3, then it would show 3 of the price periods.]]></tooltip>
+                            <comment>-1 means all price points</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </prices_on_listing>
+                        <nr_calendars translate="label tooltip">
+                            <label><![CDATA[Calendars to Show on Product Page]]></label>
+                            <tooltip><![CDATA[How many calendars popup when a person mouses in to the start and end time input fields]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </nr_calendars>
+                        <fixed_selection translate="label tooltip">
+                            <label><![CDATA[Use Fixed Dates Selection]]></label>
+                            <tooltip><![CDATA[Put here data if you don't want people to use calendar selection, rather a fixed dates selection. For example if you put here 7,14,21 that would mean you only allow 7 day, 14 day, and 21 day rentals. Important: You need To Enable Also Override Autoselect End Date. ]]></tooltip>
+                            <comment>comma separated</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </fixed_selection>
+                        <add_start_date translate="label tooltip">
+                            <label><![CDATA[Fixed Dates Selection - Start Date is counted as 1 day]]></label>
+                            <tooltip><![CDATA[For example March 21-24 is considered 4 days instead of 3. Only applies to fixed dates selection.]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </add_start_date>
+                        <no_calendar_use_today_with_fixed_selection translate="label tooltip">
+                            <label><![CDATA[No Calendar. Use Today as Start Date. End Date will be a fixed selection]]></label>
+                            <tooltip><![CDATA[Select Yes to not show any calendar and use today as start date and end date any of the fixed selection]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </no_calendar_use_today_with_fixed_selection>
+                        <hour_next_day translate="label tooltip">
+                            <label><![CDATA[Hour For Next Day]]></label>
+                            <tooltip><![CDATA[Time of day that your store closes and you no longer accept rentals for today. So if you set this to 3pm, after 3pm clients can no longer make rentals for today.<br/>Format is HH:MM:SS as in Hour, Minute, and Second in 24 hour time format. 13:15:15 would mean 1:15pm and 15 seconds.]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </hour_next_day>
+                        <allow_listing_qty translate="label tooltip">
+                            <label><![CDATA[Allow change QTY on Listing Page]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </allow_listing_qty>
+                        <hide_time_periods_numbers translate="label tooltip">
+                            <label><![CDATA[Hide time period numbers from product info page]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </hide_time_periods_numbers>
+                        <show_buyout_price translate="label tooltip">
+                            <label><![CDATA[Show buyout price on listing page]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </show_buyout_price>
+                        <keep_listing_price_after_selection translate="label tooltip">
+                            <label><![CDATA[Show price listing on product listing pages even after dates are selected]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </keep_listing_price_after_selection>
+                        <show_next_available_date_listing translate="label tooltip">
+                            <label><![CDATA[Show next available date on listing]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </show_next_available_date_listing>
+
+                        <show_next_available_date_view translate="label tooltip">
+                            <label><![CDATA[Show next available date on product view]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </show_next_available_date_view>
+                        <hide_end_date_product translate="label tooltip">
+                            <label><![CDATA[Hide End Date on Product Page]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </hide_end_date_product>
+                    </fields>
+                </listing>
+
+
+                <store translate="label">
+                    <label><![CDATA[Store Hours & Closed / Holidays]]></label>
+                    <sort_order>100</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <hotel_mode translate="label tooltip">
+                            <label><![CDATA[Hotel / Property Rental Mode]]></label>
+                            <tooltip><![CDATA[Enabling this means that you accept reservations for the same start/end day. This is because hotel/property rentals allow one person to checkout and another person to checkin on the same day. This is different than rental products that don't allow overlaps]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </hotel_mode>
+                        <store_open_time translate="label tooltip">
+                            <label><![CDATA[Store Open Time]]></label>
+                            <tooltip><![CDATA[What time your store opens. This is used for the time of day drop down for rental start time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_open_time>
+                        <store_close_time translate="label tooltip">
+                            <label><![CDATA[Store Close Time]]></label>
+                            <tooltip><![CDATA[What time your store closes. This is used for the time of day drop down for the rental end time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_close_time>
+                        <store_open_time_monday translate="label tooltip">
+                            <label><![CDATA[Store Open Time For Monday]]></label>
+                            <tooltip><![CDATA[What time your store opens on Monday. This is used for the time of day drop down for rental start time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <sort_order>22</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_open_time_monday>
+                        <store_close_time_monday translate="label tooltip">
+                            <label><![CDATA[Store Close Time Monday]]></label>
+                            <tooltip><![CDATA[What time your store closes. This is used for the time of day drop down for the rental end time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>23</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_close_time_monday>
+
+                        <store_open_time_tuesday translate="label tooltip">
+                            <label><![CDATA[Store Open Time For Tuesday]]></label>
+                            <tooltip><![CDATA[What time your store opens on Tuesday. This is used for the time of day drop down for rental start time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <sort_order>24</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_open_time_tuesday>
+                        <store_close_time_tuesday translate="label tooltip">
+                            <label><![CDATA[Store Close Time Tuesday]]></label>
+                            <tooltip><![CDATA[What time your store closes. This is used for the time of day drop down for the rental end time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_close_time_tuesday>
+
+                        <store_open_time_wednesday translate="label tooltip">
+                            <label><![CDATA[Store Open Time For Wednesday]]></label>
+                            <tooltip><![CDATA[What time your store opens on Tuesday. This is used for the time of day drop down for rental start time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <sort_order>26</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_open_time_wednesday>
+                        <store_close_time_wednesday translate="label tooltip">
+                            <label><![CDATA[Store Close Time Wednesday]]></label>
+                            <tooltip><![CDATA[What time your store closes. This is used for the time of day drop down for the rental end time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>27</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_close_time_wednesday>
+
+                        <store_open_time_thursday translate="label tooltip">
+                            <label><![CDATA[Store Open Time For Thursday]]></label>
+                            <tooltip><![CDATA[What time your store opens on Tuesday. This is used for the time of day drop down for rental start time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <sort_order>28</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_open_time_thursday>
+                        <store_close_time_thursday translate="label tooltip">
+                            <label><![CDATA[Store Close Time Thursday]]></label>
+                            <tooltip><![CDATA[What time your store closes. This is used for the time of day drop down for the rental end time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>29</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_close_time_thursday>
+
+                        <store_open_time_friday translate="label tooltip">
+                            <label><![CDATA[Store Open Time For Friday]]></label>
+                            <tooltip><![CDATA[What time your store opens on Tuesday. This is used for the time of day drop down for rental start time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_open_time_friday>
+                        <store_close_time_friday translate="label tooltip">
+                            <label><![CDATA[Store Close Time Friday]]></label>
+                            <tooltip><![CDATA[What time your store closes. This is used for the time of day drop down for the rental end time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_close_time_friday>
+
+                        <store_open_time_saturday translate="label tooltip">
+                            <label><![CDATA[Store Open Time For Saturday]]></label>
+                            <tooltip><![CDATA[What time your store opens on Tuesday. This is used for the time of day drop down for rental start time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <sort_order>32</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_open_time_saturday>
+                        <store_close_time_saturday translate="label tooltip">
+                            <label><![CDATA[Store Close Time Saturday]]></label>
+                            <tooltip><![CDATA[What time your store closes. This is used for the time of day drop down for the rental end time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>33</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_close_time_saturday>
+
+                        <store_open_time_sunday translate="label tooltip">
+                            <label><![CDATA[Store Open Time For Sunday]]></label>
+                            <tooltip><![CDATA[What time your store opens on Tuesday. This is used for the time of day drop down for rental start time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <sort_order>34</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_open_time_sunday>
+                        <store_close_time_sunday translate="label tooltip">
+                            <label><![CDATA[Store Close Time Sunday]]></label>
+                            <tooltip><![CDATA[What time your store closes. This is used for the time of day drop down for the rental end time if enabled]]></tooltip>
+                            <comment><![CDATA[In hh:mm format]]></comment>
+                            <frontend_model>payperrentals/adminhtml_system_renderer_storeTime</frontend_model>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>35</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </store_close_time_sunday>
+
+                        <global_dates_excluded translate="label tooltip">
+                            <label><![CDATA[Global Dates Excluded]]></label>
+                            <frontend_model>payperrentals/adminhtml_global_dates_excluded</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <source_model>payperrentals/source_globalExclude</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </global_dates_excluded>
+                        <disabled_days_week_start translate="label tooltip">
+                            <label><![CDATA[Disabled days of week for start date]]></label>
+                            <tooltip><![CDATA[Days of week when you can't start renting something]]></tooltip>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>payperrentals/source_excludedaysoptions</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                        </disabled_days_week_start>
+                        <disabled_days_week_end translate="label tooltip">
+                            <label><![CDATA[Disabled days of week for end date]]></label>
+                            <tooltip><![CDATA[Days of week when you can't end the rental]]></tooltip>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>payperrentals/source_excludedaysoptions</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                        </disabled_days_week_end>
+                        <disabled_days_week translate="label tooltip">
+                            <label><![CDATA[Disabled days of week for both start/end date]]></label>
+                            <tooltip><![CDATA[Days of week you can't rent something. These are considered when you want or not count price for disabled days]]></tooltip>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>payperrentals/source_excludedaysoptions</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                        </disabled_days_week>
+                        <disabled_days_week_from translate="label tooltip">
+                            <label><![CDATA[Exclude disabled days from]]></label>
+                            <tooltip><![CDATA[Exclude disbled days from price or calendar or both]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payperrentals/source_excludedaysfrom</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                        </disabled_days_week_from>
+
+                        <!--<price_no_disabled_days translate="label tooltip">
+                            <label><![CDATA[Don't count price for disabled dates and days]]></label>
+                            <tooltip><![CDATA[If enabled it won't count disabled date and days in price quotes]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </price_no_disabled_days>-->
+                        <time_format translate="label">
+                            <label>Time Format</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_catalog_timeFormat</source_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </time_format>
+                    </fields>
+                </store>
+                <advanced_not_used translate="label">
+                    <label><![CDATA[Advanced Settings Not Commonly Used]]></label>
+                    <sort_order>91</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <use_modified_order_creator translate="label tooltip">
+                            <label><![CDATA[Use Modified Version Of Order Creator]]></label>
+                            <tooltip><![CDATA[Set to no, not commonly used]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_modified_order_creator>
+                        <show_start_end_text_on_editor translate="label tooltip">
+                            <label><![CDATA[Show Start / End Dates as Text on Order Editor]]></label>
+                            <tooltip><![CDATA[By default is yes, is useful usually for admins to see this]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </show_start_end_text_on_editor>
+                        <show_start_end_columns_on_editor translate="label tooltip">
+                            <label><![CDATA[Show Start / End Dates as Columns on Order Editor]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </show_start_end_columns_on_editor>
+                        <hide_addresses>
+                            <label><![CDATA[Do not show addresses on admin]]></label>
+                            <tooltip><![CDATA[When creating order on admin use a generic customer and hide the addresses. If customer is new it shouldn't work ok]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </hide_addresses>
+                    </fields>
+                </advanced_not_used>
+                <create_order_admin translate="label">
+                <label><![CDATA[Admin create order options]]></label>
+                <sort_order>92</sort_order>
+                <show_in_default>1</show_in_default>
+                <show_in_website>1</show_in_website>
+                <show_in_store>1</show_in_store>
+                <fields>
+                    <admin_time_dropdown>
+                        <label><![CDATA[Show time of day drop downs in admin]]></label>
+                        <tooltip><![CDATA[When disabled time of day drop downs won't show in admin]]></tooltip>
+                        <frontend_type>select</frontend_type>
+                        <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                        <sort_order>50</sort_order>
+                        <show_in_default>1</show_in_default>
+                        <show_in_website>1</show_in_website>
+                        <show_in_store>1</show_in_store>
+                    </admin_time_dropdown>
+                </fields>
+                </create_order_admin>
+                <overbooking_admin translate="label">
+                    <label><![CDATA[Admin Overbooking]]></label>
+                    <sort_order>92</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <allow_admin_overbook>
+                            <label><![CDATA[Allow admin orders to overbook]]></label>
+                            <tooltip><![CDATA[Allow admin orders to overbook]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allow_admin_overbook>
+                        <show_admin_overbook_warning>
+                            <label><![CDATA[Show warning on admin orders when adding to order a product not in stock]]></label>
+                            <tooltip><![CDATA[Show warning on admin orders when adding to order a product not in stock]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </show_admin_overbook_warning>
+                    </fields>
+                </overbooking_admin>
+                <calendar_options translate="label">
+                    <label><![CDATA[Calendar Options]]></label>
+                    <sort_order>92</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <time_increment translate="label tooltip">
+                            <label><![CDATA[Time Increment]]></label>
+                            <tooltip><![CDATA[The period of time used for the time of day drop down if enabled for a product. If set to 60 minutes it would mean the drop down would show 12am, 1am, 2am, etc. If set to 30 minutes, drop down would have 12am, 12:30am, 1am, etc.]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payperrentals/source_timeincrementoptions</source_model>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </time_increment>
+                        <show_day_grid translate="label tooltip">
+                            <label><![CDATA[Show time of day details]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </show_day_grid>
+                        <enforce_same_dates translate="label tooltip">
+                            <label><![CDATA[All products in order must use same start &amp; end date]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enforce_same_dates>
+                        <use_global_days translate="label tooltip">
+                            <label><![CDATA[Keep Selected Days Automatically For Other Products]]></label>
+                            <tooltip><![CDATA[Say a customer rents a product for June 1 - 5. When they go to rent other products it will remember that they had June 1 - 5 and have these dates pre-filled for them. If this is set to no, then each product the customer will have to select the dates start/end]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_global_days>
+                        <product_calendar_padding_days translate="label tooltip">
+                            <label><![CDATA[Padding days]]></label>
+                            <tooltip><![CDATA[How many days before today's date are not available. For example if you set 2, and today is July 1, first available date would be July 3]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </product_calendar_padding_days>
+                        <theme_calendar_style translate="label tooltip">
+                            <label><![CDATA[Calendar Style]]></label>
+                            <comment><![CDATA[For style previews and info on how to roll your own theme, please visit our <a href="">Calendar Style</a> documentation.]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>payperrentals/source_themestyle</source_model>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </theme_calendar_style>
+                    </fields>
+                </calendar_options>
+
+                <global translate="label">
+                    <label><![CDATA[Global Dates]]></label>
+                    <sort_order>110</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <use_global_calendar_time translate="label tooltip">
+                            <label><![CDATA[Show Times On Global Calendar]]></label>
+                            <tooltip><![CDATA[For future use, leave set to no]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_global_calendar_time>
+                        <show_midnight_global_calendar translate="label tooltip">
+                            <label><![CDATA[Show Midnight when rendering dates]]></label>
+                            <tooltip><![CDATA[12 AM time will be showed ]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </show_midnight_global_calendar>
+                        <!--<use_nonsequential_dates translate="label tooltip">
+                            <label><![CDATA[User can select nonsequential dates]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_nonsequential_dates>-->
+                        <show_calendar_product_info translate="label">
+                            <label>Show product calendar when on product page</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </show_calendar_product_info>
+                        <global_calendar_padding_days translate="label tooltip">
+                            <label><![CDATA[Global Calendar Reservation Padding Day's]]></label>
+                            <tooltip><![CDATA[If using global calendar, how many days before today's date are not available. For example if you set 2, and today is July 1, first available date would be July 3]]></tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </global_calendar_padding_days>
+			            <use_pprbox_left translate="label">
+                            <label>Show global calendar on left sidebar</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_pprbox_left>
+                        <use_pprbox_right translate="label">
+                            <label>Show global calendar on right sidebar</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_pprbox_right>
+                        <use_pprbox_header translate="label">
+                            <label>Show global calendar on header</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_pprbox_header>
+                        <use_pprbox_homepage translate="label">
+                            <label>Show global calendar on homepage only</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>131</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_pprbox_homepage>
+                        <use_pprbox_shopping_cart translate="label">
+                            <label>Show global calendar on Shopping Cart</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>136</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_pprbox_shopping_cart>
+                        <use_categories_box translate="label">
+                            <label>Show categories under the dates selector</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>137</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_categories_box>
+                        <use_pprbox_shopping_cart_time translate="label">
+                            <label>Show global calendar on Shopping Cart with Time</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>137</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_pprbox_shopping_cart_time>
+                        <use_list_buttons translate="label tooltip">
+                            <label>Use list buttons</label>
+                            <tooltip>If you put yes, then the product listing will show customer rent buttons for fixed dates selections. Fixed date selections are set under the heading Listing and Info Page > Use Fixed Dates Selection</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_list_buttons>
+                        <disable_clicking_rent_if_dates_not_selected translate="label tooltip">
+                            <label><![CDATA[Disable clicking rent on product listing if dates are not selected]]></label>
+                            <tooltip><![CDATA[]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </disable_clicking_rent_if_dates_not_selected>
+                        <hide_products_not_available>
+                            <label>Hide (filter out) products not available for selected dates</label>
+                            <tooltip>If you put yes, then the product listing won't show the products not available for the selected dates</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </hide_products_not_available>
+
+                        <show_availability_on_listing>
+                            <label>Show whether product is available or not for selected dates on product listing pages when global dates are selected</label>
+                            <tooltip>Show whether product is available or not for selected dates on product listing pages when global dates are selected</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </show_availability_on_listing>
+
+                    </fields>
+                </global>
+                <calendar_widget>
+                    <label><![CDATA[Calendar Widget]]></label>
+                    <sort_order>120</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <use_pprbox_style translate="label">
+                            <label>Use RTRW styling on homepage widget</label>
+                            <tooltip>This setting is when you enable global calendar on homepage. The styling of the calendar will be exactly like on RTRW. If set to no global calendar will still appear but will use the default styling.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>132</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_pprbox_style>
+                        <attrib_name translate="label">
+                            <label>Attribute name</label>
+                            <tooltip>Atribute name to show in the frontend widget in RTRW style</tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>133</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </attrib_name>
+                        <cat_names translate="label">
+                            <label>Categories names</label>
+                            <tooltip>Categories to show in the bottom of widget</tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>134</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </cat_names>
+                        <catid_name translate="label">
+                            <label>Category to go if no attribute</label>
+                            <tooltip>Category to go if no attribute in the widget</tooltip>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>135</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </catid_name>
+                    </fields>
+                </calendar_widget>
+                <checkout_options>
+                    <label><![CDATA[Checkout Options]]></label>
+                    <sort_order>130</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <remove_shipping>
+                            <label><![CDATA[Remove Shipping Address from checkout]]></label>
+                            <tooltip><![CDATA[Is useful when using events]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>91</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </remove_shipping>
+                        <deposit_type>
+                            <label><![CDATA[Charge Deposit]]></label>
+                            <tooltip><![CDATA[If this is set to enabled deposit is authorized and charged and cannot be refunded. If set to disabled deposit is only authorized and can be captured at a later time]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>91</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </deposit_type>
+                    </fields>
+                </checkout_options>
+                <!--<contract>-->
+                    <!--<label><![CDATA[Rental Contracts]]></label>-->
+                    <!--<sort_order>140</sort_order>-->
+                    <!--<show_in_default>1</show_in_default>-->
+                    <!--<show_in_website>1</show_in_website>-->
+                    <!--<show_in_store>1</show_in_store>-->
+                    <!--<fields>-->
+                        <!--<contract_title>-->
+                        <!--<label><![CDATA[Rental Contract Title]]></label>-->
+                        <!--<frontend_type>text</frontend_type>-->
+                        <!--<sort_order>10</sort_order>-->
+                        <!--<show_in_default>1</show_in_default>-->
+                        <!--<show_in_website>1</show_in_website>-->
+                        <!--<show_in_store>1</show_in_store>-->
+                        <!--<can_be_empty>0</can_be_empty>-->
+                        <!--</contract_title>-->
+                        <!--<terms>-->
+                            <!--<label><![CDATA[Terms and conditions to include in rental contract]]></label>-->
+                            <!--<frontend_type>textarea</frontend_type>-->
+                            <!--<sort_order>20</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<can_be_empty>0</can_be_empty>-->
+                        <!--</terms>-->
+                        <!--<headertext>-->
+                            <!--<label><![CDATA[Customer header text to include in contract]]></label>-->
+                            <!--<frontend_type>textarea</frontend_type>-->
+                            <!--<sort_order>30</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<can_be_empty>0</can_be_empty>-->
+                        <!--</headertext>-->
+                        <!--<footertext>-->
+                            <!--<label><![CDATA[Customer footer text to include in contract]]></label>-->
+                            <!--<frontend_type>textarea</frontend_type>-->
+                            <!--<sort_order>40</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<can_be_empty>0</can_be_empty>-->
+                        <!--</footertext>-->
+                        <!--<items>-->
+                            <!--<label><![CDATA[Include list of items in the contract]]></label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<source_model>adminhtml/system_config_source_enabledisable</source_model>-->
+                            <!--<sort_order>50</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                        <!--</items>-->
+                        <!--<signature>-->
+                            <!--<label><![CDATA[Include signature field]]></label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<source_model>adminhtml/system_config_source_enabledisable</source_model>-->
+                            <!--<sort_order>60</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                        <!--</signature>-->
+                        <!--<attachorder>-->
+                            <!--<label><![CDATA[Attach Contract PDF to order emails?]]></label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<source_model>adminhtml/system_config_source_enabledisable</source_model>-->
+                            <!--<sort_order>70</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                        <!--</attachorder>-->
+                    <!--</fields>-->
+                <!--</contract>-->
+                <admin_calendarreport>
+                    <label><![CDATA[Report Options]]></label>
+                    <sort_order>140</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enddate>
+                        <label><![CDATA[Use end date with turnover or without for admin calendar reports]]></label>
+                        <frontend_type>select</frontend_type>
+                        <source_model>payperrentals/source_turnover</source_model>
+                        <sort_order>120</sort_order>
+                        <show_in_default>1</show_in_default>
+                        <show_in_website>1</show_in_website>
+                        <show_in_store>1</show_in_store>
+                        </enddate>
+                    </fields>
+                </admin_calendarreport>
+                <notificationemails translate="label">
+                    <label><![CDATA[Notification Emails]]></label>
+                    <sort_order>150</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <return_reminder translate="label tooltip">
+                            <label><![CDATA[Return Reminder Template]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_template</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </return_reminder>
+                        <return_email translate="label tooltip">
+                            <label><![CDATA[Received Item Email Template]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_template</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </return_email>
+                        <send_email translate="label tooltip">
+                            <label><![CDATA[Send Email Template]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_template</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </send_email>
+                        <send_queue_email translate="label tooltip">
+                            <label><![CDATA[Send Queue Email Template]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_template</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </send_queue_email>
+                        <return_reminder_auto translate="label tooltip">
+                            <label><![CDATA[Admin Return Reminder Template]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_template</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </return_reminder_auto>
+                        <tobebilled_email translate="label tooltip">
+                            <label><![CDATA[Email Template with a list of users to be billed the day]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_template</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </tobebilled_email>
+                        <extend_reminder_email translate="label tooltip">
+                            <label><![CDATA[Email Template with a list of orders to be extended]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_template</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </extend_reminder_email>
+                        <reminder_days translate="label tooltip">
+                            <label><![CDATA[Number of days before to start sending return reminders]]></label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </reminder_days>
+                        <admin_reminder_emails translate="label tooltip">
+                            <label><![CDATA[Admin Reminder Emails as comma separated list]]></label>
+                            <comment><![CDATA[Mandatory format: Name;Email]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </admin_reminder_emails>
+                        <use_send_return_auto_email translate="label tooltip">
+                            <label><![CDATA[Send automatically emails to Admin users defined in "Admin Reminder Emails" on start of day with products to be sent and returned]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>208</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_send_return_auto_email>
+                        <use_send_email translate="label tooltip">
+                            <label><![CDATA[Send email to user when items are shipped]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>208</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_send_email>
+                        <use_send_queue_email translate="label tooltip">
+                            <label><![CDATA[Send queue email to user when items are shipped]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>208</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_send_queue_email>
+                        <use_return_email translate="label tooltip">
+                            <label><![CDATA[Send email to user when items are received]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>208</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_return_email>
+                        <use_return_reminder_email translate="label tooltip">
+                            <label><![CDATA[Send email to remind user when to return the item]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>208</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_return_reminder_email>
+                        <use_tobebilled_members_email translate="label tooltip">
+                            <label><![CDATA[Send email with a list of members to be billed every day]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>208</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_tobebilled_members_email>
+                        <use_extend_reminder_email translate="label">
+                            <label>Send email to remind user when to extend the item</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>290</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </use_extend_reminder_email>
+                        <extend_reminder_days translate="label">
+                            <label>Number of days before to start sending extend reminders</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>300</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>0</can_be_empty>
+                        </extend_reminder_days>
+                    </fields>
+                </notificationemails>
+                <update_database>
+                    <label><![CDATA[Update Database]]></label>
+                    <sort_order>160</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <extension_database_update>
+                            <label><![CDATA[If upgrading from versions < 1.3 run this once by clicking <a href="#" id="updLink">Update Database</a> <script>
+            var baseLinkPos = BASE_URL.indexOf("admin/");
+            $('updLink').href= BASE_URL.substring(0, baseLinkPos) + "payperrentals_admin/adminhtml_updateextension";
+            </script> ]]></label>
+                            <tooltip><![CDATA[]]></tooltip>
+                            <frontend_type>label</frontend_type>
+                            <sort_order>91</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </extension_database_update>
+                    </fields>
+                </update_database>
+            </groups>
+        </payperrentals>
+    </sections>
+</config>

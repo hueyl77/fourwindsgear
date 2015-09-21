@@ -1,0 +1,177 @@
+<style>
+    .notavailable {
+        background-color:#ff7272 !important;
+    }
+    .hor-scroll {
+        overflow: visible;
+    }
+</style>
+<script>
+    $jppr(document).ready(function() {
+
+        $jppr("#global_end_date, #global_start_date, .startdate, .enddate").datetimepicker({
+            showOn: "both",
+            buttonImage: "<?php echo ITwebexperts_Payperrentals_Helper_Html::getCalendarPopupImage(); ?>",
+            buttonImageOnly: true,
+            buttonText: "Select date",
+            timeFormat: 'HH:mm:ss',
+            stepHour: 1,
+            stepMinute: 30,
+            showSecond: false,
+            showButtonPanel: false,
+            /* Keep JS Date Picker same format as MySQL */
+            dateFormat: 'yy-mm-dd'
+        });
+
+
+        /** global start & end date change all dates button */
+        var globalElement = $jppr('#global_end_date');
+        if(globalElement.length > 0) {
+            var globalPosition = globalElement.position();
+            var updateButton = $jppr('<div><button id="updateall">Update All Dates</button></div>');
+            updateButton.insertAfter(globalElement);
+            updateButton.css({
+                position: 'absolute',
+                top: globalPosition.top ,
+                left: globalPosition.left + 320
+            });
+            $jppr('#updateall').click(function (event) {
+                event.preventDefault();
+                var globalStart = $jppr('#global_start_date').val();
+                var globalEnd = $jppr('#global_end_date').val();
+                $jppr('.startdate').val(globalStart);
+                $jppr('.enddate').val(globalEnd);
+            });
+        }
+
+
+        /** initiate chosen for product drop down **/
+    $jppr('.productdrop').chosen();
+
+    var numberofproducts = $jppr('#number_of_products').val();
+    $jppr('button.save').attr('onClick','');
+        /**
+         * Add hidden Quantity Available: next to each Qty input
+         * which we will use to show the quantity available for start/end date
+         */
+        $jppr('.enddate').each(function(index){
+            var $quantityElement = $jppr('#qty'+ index);
+            var quantityPosition = $quantityElement.position();
+            var quantityAvailable = $jppr('#available_qty' + index).val();
+            if(quantityAvailable != undefined){
+            var $quantityAvailable = $jppr('<div class="qty" id="quantity' + index + '">Quantity Available: '+ quantityAvailable + '</div>').insertAfter($quantityElement);} else
+            {var $quantityAvailable = $jppr('<div class="qty" id="quantity' + index + '"></div>').insertAfter($quantityElement);}
+
+            $quantityAvailable.css({
+                //display: 'none',
+                position: 'absolute',
+                top: quantityPosition.top,
+                left: quantityPosition.left + 70
+            });
+        });
+
+
+    $jppr('.enddate,.startdate,.productdrop').on("change", updateQuantity);
+
+    /**
+     * Updates quantity available: text with new quantity available
+     * and updates qty input box to red if not enough quantity
+     */
+    function updateQuantity(event) {
+        /**
+         * title attribute of date holds the index because data-index attribute not allowed
+         * in mage forms add &index= to mimic form serialize and send with data:
+         */
+        var dateIndex = $jppr(this).attr('title');
+        var dateend = new Date($jppr('#end_date' + dateIndex).val()).getTime()
+        var datestart = new Date($jppr('#start_date' + dateIndex).val()).getTime()
+        if( dateend < datestart ){
+            alert("Start Date must be before End Date")
+            return false;
+        }
+        var dateIndexSerialized = '&index=' + dateIndex;
+        var datatosend = $jppr('#edit_form').serialize() + dateIndexSerialized;
+            $jppr.ajax({
+            data: datatosend,
+            cache: false,
+            dataType: 'json',
+            type: 'POST',
+            url: '<?php echo $this->getQtyUrl();?>',
+            success: function (data) {
+                //$jppr('#quantity' + dateIndex).fadeOut();
+                $jppr('#quantity' + dateIndex).html(data.quantity);
+                //$jppr('#quantity' + dateIndex).fadeIn();
+                /** update hidden available qty field with available qty */
+                $jppr('#available_qty' + dateIndex).val(data.quantityonly);
+                var quantityinput = $jppr('#qty' + dateIndex);
+                /**
+                 * if quantity requested is less than available quantity
+                 * make quantity box red with notavailable css class
+                 */
+                if(data.quantityonly < quantityinput.val()){
+                quantityinput.addClass('notavailable');
+                } else {
+                    quantityinput.removeClass('notavailable');
+                }
+            }
+        });
+        }
+
+        /**
+         * Changes qty input background color based on quantity available
+         */
+        $jppr('.qty').on("change", function(){
+            var qty = $jppr(this);
+            var index = qty.attr('title');
+            var availablequantity = $jppr('#available_qty' + index);
+            if(qty.hasClass('notavailable') && qty.val() <= availablequantity.val()){
+                qty.removeClass('notavailable')
+            }
+            if(qty.val() > availablequantity.val())
+                qty.addClass('notavailable')
+        });
+
+        /**
+         * Checks form for errors
+         */
+        $jppr('button.save').click(function(event){
+            event.preventDefault();
+            /**
+             * Check that product ID is not blank
+             */
+            var exit = false;
+            $jppr('.productdrop').each(function(){
+                if($jppr(this).val() == -1){
+                    exit = true;
+                    alert("Product must be selected");
+                    return false;
+                }
+            });
+            if(exit == true){
+                return false;
+            }
+            for($i=0;$i<=numberofproducts-1;$i++){
+                /**
+                 * Check that all start & end dates are ok
+                 */
+                var dateend = new Date($jppr('#end_date' + $i).val()).getTime()
+                var datestart = new Date($jppr('#start_date' + $i).val()).getTime()
+                if( dateend < datestart ){
+                    alert("Start Date must be before End Date");
+                    return false;
+                }
+                /**
+                 * Check that no qty has class notavailable if they do
+                 * it means they are overbooking
+                 */
+                if($jppr('#qty' + $i).hasClass('notavailable'))
+                {
+                    if(confirm('Some products on this reservation do not have enough inventory. Would you still like to save and overbook these products?')){
+                        editForm.submit();
+                }
+                }
+                editForm.submit();
+            }
+        });
+    });
+</script>

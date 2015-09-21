@@ -1,0 +1,8 @@
+#here bundle options needs to be updated after product import they are different. maybe do a check by name?
+testName=changeSettingsGeneral --- section=payperrentals --- group=calendar_options --- field=product_calendar_padding_days --- value=0
+testName=addToCart --- url=res-bundle-1.html --- startDate=1 --- endDate=2 --- qty=4 --- expected=The requested quantity for "Res bundle 1" is not available.
+testName=updateCart --- pos=0 --- qty=1 --- expected=
+testName=removeFromCart --- pos=0 --- expected=
+testName=addToCart --- url=res-bundle-2.html --- startDate=1 --- endDate=2 --- qty=3 --- expected=
+testName=loginCustomer --- expected=
+testName=checkoutCart --- expected=

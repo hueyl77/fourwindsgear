@@ -1,0 +1,6 @@
+testName=changeSettingsGeneral --- section=payperrentals --- group=calendar_options --- field=product_calendar_padding_days --- value=0
+testName=loginAdmin --- expected=
+testName=deleteAllOrders --- expected=
+testName=addToCart --- url=res-config-1.html --- startDate=1 --- endDate=2 --- qty=1 --- buyout=1 --- expected=
+testName=loginCustomer --- expected=
+testName=checkoutCart --- expected=

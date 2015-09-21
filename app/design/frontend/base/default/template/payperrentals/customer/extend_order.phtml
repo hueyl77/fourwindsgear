@@ -1,0 +1,112 @@
+<div id="eventContent">
+
+</div>
+<?php
+
+$_currentTimeStamp = Mage::getSingleton('core/date')->timestamp(time());
+$_productId = null;
+
+$_disabledDays = ITwebexperts_Payperrentals_Helper_Data::getDisabledDays($_productId);
+
+$_paddingDays = ITwebexperts_Payperrentals_Helper_Data::getProductPaddingDays($_productId, $_currentTimeStamp);
+$_paddingDays = ITwebexperts_Payperrentals_Helper_Data::toFormattedDateArray($_paddingDays);
+
+$_blockedDates = ITwebexperts_Payperrentals_Helper_Data::getDisabledDates($_productId);
+$_blockedDates = ITwebexperts_Payperrentals_Helper_Data::toFormattedDateArray($_blockedDates);
+
+?>
+<script type="text/javascript">
+    //<![CDATA[
+    var oldVal = '';
+    dayShortNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    disabledDatesPadding = [<?php echo implode(',', $_paddingDays);?>];
+    blockedDates = [<?php echo implode(',', $_blockedDates);?>];
+    disabledDays = ["<?php echo implode('","', $_disabledDays);?>"];
+    function extendOrder(id){
+        new Ajax.Request('<?php echo Mage::getUrl("payperrentals_front/ajax/getExtendPopup/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>', {
+            method: 'post',
+            parameters: {
+                order_id:id
+
+            },
+            onSuccess: function (response) {
+                var data = response.responseText.evalJSON();
+
+                $('eventContent').update(data.content);
+                $jppr.ajax({
+                    url: "<?php echo ITwebexperts_Payperrentals_Helper_Html::getDatepickerLocalePath();?>",
+                    dataType: "script",
+                    cache: true
+                }).done(function() {
+                    $jppr.datepicker.regional['<?php echo ITwebexperts_Payperrentals_Helper_Html::getLocaleCodeForHtml();?>'];
+                });
+                $jppr.ajax({
+                    url: "<?php echo ITwebexperts_Payperrentals_Helper_Html::getDatetimepickerLocalePath();?>",
+                    dataType: "script",
+                    cache: true
+                }).done(function() {
+                    $jppr.timepicker.regional['<?php echo ITwebexperts_Payperrentals_Helper_Html::getLocaleCodeForHtml();?>'];
+                });
+
+                $jppr( "#new_date" ).datetimepicker({
+                    showOn: "both",
+                    buttonImage: "<?php echo ITwebexperts_Payperrentals_Helper_Html::getCalendarPopupImage(); ?>",
+                    buttonImageOnly: true,
+                    buttonText: "Select date",
+                    timeFormat: 'HH:mm:ss',
+                    stepHour: 1,
+                    stepMinute: 30,
+                    showSecond: false,
+                    showButtonPanel: false,
+                    minDate: new Date(data.minDate),
+                    beforeShowDay: function (dateObj) {
+                        dateObj.setHours(0, 0, 0, 0);
+                        var dateFormatted = $jppr.datepicker.formatDate('yy-m-d', dateObj);
+
+                        if ($jppr.inArray(dayShortNames[dateObj.getDay()], disabledDays) > -1) {
+                            return [false, 'ui-datepicker-disabled manualadded disabledday', '<?php echo $this->__('Not Available'); ?>'];
+                        }
+                        else if ($jppr.inArray(dateFormatted, disabledDatesPadding) > -1) {
+                            return [false, 'ui-datepicker-disabled manualadded disabledpadding', '<?php echo $this->__('Not Available'); ?>'];
+                        } else if ($jppr.inArray(dateFormatted, blockedDates) > -1) {
+                            return [false, 'ui-datepicker-disabled manualadded blockeddate', '<?php echo $this->__('Not Available'); ?>'];
+                        }
+                        return [true, 'availabledate', '<?php echo $this->__('Available'); ?>'];
+                    },
+                    onSelect:function(){
+                        $jppr( "#extendProducts" ).html('Waiting for updated list of products for the date...');
+                        new Ajax.Request('<?php echo Mage::getUrl("payperrentals_front/ajax/getExtendProducts/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>', {
+                                method: 'post',
+                                parameters: {
+                                    order_id: id,
+                                    date: $jppr(this).val()
+                                },
+                                onSuccess: function (response) {
+                                    var data = response.responseText.evalJSON();
+                                    if(data.content != '') {
+                                        $jppr("#extendProducts").html(data.content)
+                                    }else{
+                                        $jppr("#extendProducts").html('No products available for extension!');
+                                    }
+                                }
+                            }
+                        );
+                    }
+                });
+
+                $jppr('.selectAll').click(function() {
+                    var $checkboxes = $jppr(this).parent().find('input[type=checkbox]');
+                    $checkboxes.prop('checked', $jppr(this).is(':checked'));
+                });
+
+            }
+        });
+
+
+
+    }
+    $jppr(document).ready(function(){
+       extendOrder(<?php echo Mage::app()->getRequest()->getParam('order_id');?>);
+    });
+    //]]>
+</script>

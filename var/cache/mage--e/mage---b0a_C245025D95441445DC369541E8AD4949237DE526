@@ -1,0 +1,33 @@
+<div class="block block-layered-nav">
+    <div class="block-title">
+        <strong><span>Browse By</span></strong>
+    </div>
+    <div class="block-content">
+        <dl id="narrow-by-list2">
+            <dt>Category</dt>
+            <dd>
+                <ol>
+                                                        <li>
+                        <a href="http://fourwindsgear.com/index.php/camping-gears/tents.html?___SID=U">Tents</a> (6)
+                    </li>
+                                                                            <li>
+                        <a href="http://fourwindsgear.com/index.php/camping-gears/sleeping-bags.html?___SID=U">Sleeping Bags</a> (3)
+                    </li>
+                                                                            <li>
+                        <a href="http://fourwindsgear.com/index.php/camping-gears/sleeping-pad.html?___SID=U">Sleeping Pad</a> (1)
+                    </li>
+                                                                            <li>
+                        <a href="http://fourwindsgear.com/index.php/camping-gears/backpacks.html?___SID=U">Backpacks</a> (2)
+                    </li>
+                                                                            <li>
+                        <a href="http://fourwindsgear.com/index.php/camping-gears/stoves.html?___SID=U">Stoves</a> (2)
+                    </li>
+                                                                            <li>
+                        <a href="http://fourwindsgear.com/index.php/camping-gears/cookware.html?___SID=U">Cookware</a> (3)
+                    </li>
+                                                    </ol>
+            </dd>
+        </dl>
+        <script type="text/javascript">decorateDataList('narrow-by-list2')</script>
+    </div>
+</div>

@@ -1,0 +1,59 @@
+eav:
+  catalog_product:
+    - entity_id: 1
+      type_id: reservation
+      sku: book1
+      name: Book
+      short_description: Book
+      description: Book
+      url_key: book
+      tax_class_id: 1 # Taxable Goods
+      status: 1 # Enabled
+      visibility: 4 # Visible in Catalog & Search
+      weight: 1
+      is_reservation: 1 #Reservation
+      payperrentals_quantity: 1
+      payperrentals_pricingtype: 2 #Non-prorated
+    - entity_id: 2
+      type_id: reservation
+      sku: book2
+      name: Book
+      short_description: Book
+      description: Book
+      url_key: book
+      tax_class_id: 1 # Taxable Goods
+      status: 1 # Enabled
+      visibility: 4 # Visible in Catalog & Search
+      weight: 1
+      is_reservation: 1 #Reservation
+      payperrentals_quantity: 1
+      payperrentals_pricingtype: 1 #Prorated
+
+tables:
+  payperrentals/reservationprices:
+    - id: 1
+      entity_id: 1
+      numberof: 1
+      ptype: 3
+      price: 1
+    - id: 2
+      entity_id: 1
+      numberof: 1
+      ptype: 4
+      price: 5
+    - id: 3
+      entity_id: 2
+      numberof: 1
+      ptype: 3
+      price: 1
+    - id: 4
+      entity_id: 2
+      numberof: 1
+      ptype: 4
+      price: 5
+
+config:
+  payperrentals/appearance_price/addtime_number: 1
+  payperrentals/appearance_price/addtime_type: 3
+  default/dev/template/allow_symlink: 1
+  default/dev/log/active: 1

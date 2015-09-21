@@ -1,0 +1,73 @@
+<?php if (Mage::helper('jmquickview')->get('show', array())): ?>
+
+    <?php
+    $currentUrl = Mage::helper('core/url')->getCurrentUrl();
+    if(strpos($currentUrl,"https") === false){
+        $baseUrl = Mage::getBaseUrl();
+    }else{
+        $baseUrl = Mage::getStoreConfig("web/secure/base_url");
+    }
+    ?>
+
+    <script type="text/javascript">
+        if(typeof baseurl == "undefined"){
+            var baseurl = "<?php echo $baseUrl; ?>";
+            if(baseurl.indexOf("index.php") == -1){
+                baseurl = baseurl + "index.php/";
+            }
+        }
+
+        //Initial Quick view
+        (function($){
+            $(document).ready(function($){
+                var options = {
+                    itemClassToFind: ".link-compare",
+                    miniCartId: "#jm-mycart",
+                    loadingClass: ".jm-mycart-loading",
+                    quickViewText: "<?php echo $this->__("Quick view"); ?>",
+                    quickViewTextTitle: "<?php echo $this->__("Product quick view"); ?>",
+                    currentText: "<?php echo $this->__("Product {current} of {total}"); ?>",
+                    previousText: "<?php echo $this->__("Previous"); ?>",
+                    nextText: "<?php echo $this->__("Next"); ?>",
+                    closeText: "<?php echo $this->__("Close"); ?>",
+                    deleteConfirmMessage: "<?php echo $this->__("Are you sure you would like to remove this item from the shopping cart?"); ?>"
+                }
+
+                if($("ul.products-grid").length){
+                    $("ul.products-grid").jmquickview(options);
+                }
+                if($("div.products-grid").length){
+                    $("div.products-grid").jmquickview(options);
+                }
+
+                if($("table.products-grid").length){
+                    $("table.products-grid").jmquickview(options);
+                }
+
+                if($("ol.products-list").length){
+                    $("ol.products-list").jmquickview(options);
+                }
+
+                //We comment because we are not apply for default of this extension.
+//                if($("ul.jm-slider-ul").length){
+//                    $("ul.jm-slider-ul").jmquickview(options);
+//                }
+
+                //Bind event toggle for JM mini cart
+                $(document).delegate("#jm-mycart", "mouseenter", function(e){
+                    if (!$(this).hasClass("active")) {
+                        $(this).addClass("active").children('.btn-toggle').addClass("active");
+                        $(this).children('.inner-toggle').addClass("active");
+                    }
+                });
+                $(document).delegate("#jm-mycart", "mouseleave", function(e){
+                    $(this).removeClass("active").children('.btn-toggle').removeClass("active");
+                    $(this).children('.inner-toggle').removeClass("active");
+                });
+
+            });
+        })(jQuery);
+
+    </script>
+
+<?php endif; ?>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+	<default>
+        <reference name="head">
+            <action method="addCss">
+                <name>jmbasetheme.css</name>
+            </action>
+        </reference>
+		<reference name="content">
+			<block type="core/template" name="jmbasethemehead" template="jmbasetheme/jmbasethemehead.phtml"/>
+		</reference>
+	</default>
+</layout>

@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+        <layout>
+    <adminhtml_maintenance_index>
+        <reference name="head">
+        <action method="addJs">
+            <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
+        </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jquery/jquery.noconflict.js</script>
+            </action>
+        </reference>
+        <reference name="content">
+            <block type="itwebexperts_maintenance/adminhtml_maintenance" name="maintenance_grid"/>
+            <block type="itwebexperts_maintenance/adminhtml_js_grid" name="grid" template="itwebexperts_maintenance/grid.phtml"/>
+        </reference>
+    </adminhtml_maintenance_index>
+    <adminhtml_maintenance_edit>
+        <reference name="head">
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jquery/jquery-ui.min.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/chosen/chosen.jquery.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/utils/generalFunctions.js</script>
+            </action>
+            <action method="addItem">
+                <type>js_css</type>
+                <name>itwebexperts_payperrentals/chosen/chosen.css</name>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jquery/jquery.noconflict.js</script>
+            </action>
+            <action method="addItem">
+                <type>js_css</type>
+                <name>itwebexperts_payperrentals/jquery/jquery-ui.min.css</name>
+            </action>
+        </reference>
+        <reference name="content">
+        <block type="itwebexperts_maintenance/adminhtml_maintenance_edit" name="maintenance_edit"/>
+            <block type="itwebexperts_maintenance/adminhtml_js_productjs" name="productjs" template="itwebexperts_maintenance/chosen.phtml"/>
+        </reference>
+    </adminhtml_maintenance_edit>
+    <adminhtml_snippets_index>
+        <reference name="content">
+            <block type="itwebexperts_maintenance/adminhtml_snippets" name="snippet_grid"/>
+        </reference>
+    </adminhtml_snippets_index>
+    <adminhtml_snippets_edit>
+        <reference name="content">
+            <block type="itwebexperts_maintenance/adminhtml_snippets_edit" name="snippet_edit"/>
+        </reference>
+    </adminhtml_snippets_edit>
+    <adminhtml_periodic_index>
+        <reference name="content">
+            <block type="itwebexperts_maintenance/adminhtml_periodic" name="periodic_grid"/>
+        </reference>
+    </adminhtml_periodic_index>
+    <adminhtml_periodic_edit>
+        <reference name="head">
+        <action method="addJs">
+            <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
+        </action>
+        <action method="addJs">
+            <script>itwebexperts_payperrentals/chosen/chosen.jquery.js</script>
+        </action>
+        <action method="addJs">
+            <script>itwebexperts_payperrentals/utils/generalFunctions.js</script>
+        </action>
+        <action method="addItem">
+            <type>js_css</type>
+            <name>itwebexperts_payperrentals/chosen/chosen.css</name>
+        </action>
+        <action method="addJs">
+            <script>itwebexperts_payperrentals/jquery/jquery.noconflict.js</script>
+        </action>
+    </reference>
+        <reference name="content">
+            <block type="itwebexperts_maintenance/adminhtml_periodic_edit" name="periodic_edit"/>
+            <block type="itwebexperts_maintenance/adminhtml_js_productjs" name="productjs" template="itwebexperts_maintenance/chosen2.phtml"/>
+        </reference>
+    </adminhtml_periodic_edit>
+    <adminhtml_maintainers_index>
+        <reference name="content">
+            <block type="itwebexperts_maintenance/adminhtml_maintainers" name="maintainers_grid"/>
+        </reference>
+    </adminhtml_maintainers_index>
+    <adminhtml_maintainers_edit>
+        <reference name="content">
+            <block type="itwebexperts_maintenance/adminhtml_maintainers_edit" name="maintainers_edit"/>
+        </reference>
+    </adminhtml_maintainers_edit>
+    <adminhtml_status_index>
+        <reference name="content">
+            <block type="itwebexperts_maintenance/adminhtml_status" name="status_grid"/>
+        </reference>
+    </adminhtml_status_index>
+    <adminhtml_status_edit>
+        <reference name="content">
+            <block type="itwebexperts_maintenance/adminhtml_status_edit" name="status_edit"/>
+        </reference>
+    </adminhtml_status_edit>
+        </layout>

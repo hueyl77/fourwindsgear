@@ -1,0 +1,5 @@
+testName=checkPrices --- url=product-4.html --- startDate=2016,4,4 --- endDate=2016,4,12 --- qty=1 --- expected=105
+testName=checkPrices --- url=product-4.html --- startDate=2016,4,6 --- endDate=2016,4,8 --- qty=1 --- expected=20
+testName=checkPrices --- url=product-4.html --- startDate=2016,4,6 --- endDate=2016,4,14 --- qty=1 --- expected=25
+testName=checkPrices --- url=product-4.html --- startDate=2016,4,3 --- endDate=2016,4,4 --- qty=1 --- expected=100
+testName=checkPrices --- url=product-4.html --- startDate=2016,3,26 --- endDate=2016,4,4 --- qty=1 --- expected=105

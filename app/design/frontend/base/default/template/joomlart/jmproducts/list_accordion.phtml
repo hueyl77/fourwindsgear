@@ -1,0 +1,220 @@
+<?php
+/*!
+ * http://www.ubertheme.com/
+ * Version: 1.0
+ * Description:
+ * Author: Uber theme team
+ * Author URI: http://www.ubertheme.com/
+ *
+ * Powered by Magento
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+?>
+
+<?php
+$profileConfigs = null;
+if (Mage::helper('core')->isModuleEnabled('Wavethemes_Jmbasetheme')) {
+	$profileConfigs = Mage::helper("jmbasetheme")->getProfileContent();
+}
+
+if ($profileConfigs) :
+	$productListImageWidth = isset($profileConfigs["productlistimagewidth"]) ? $profileConfigs["productlistimagewidth"] : 180;
+	$productListImageHeight = isset($profileConfigs["productlistimageheight"]) ? $profileConfigs["productlistimageheight"] : 180;
+	$productGridDesLength = isset($profileConfigs["productgriddeslength"]) ? $profileConfigs["productgriddeslength"] : 0;
+	$productGridImageHeight = isset($profileConfigs["productgridimageheight"]) ? $profileConfigs["productgridimageheight"] : 180;
+	$productGridImageWidth = isset($profileConfigs["productgridimagewidth"]) ? $profileConfigs["productgridimagewidth"] : 180;
+	$showLabel = isset($profileConfigs["showlabel"]) ? $profileConfigs["showlabel"] : 0;
+else :
+	$productListImageWidth = 180;
+	$productListImageHeight = 180;
+	$productGridDesLength = 0;
+	$productGridImageHeight = 180;
+	$productGridImageWidth = 180;
+	$showLabel = 0;
+endif;
+
+$thumbWidth = $config['width'];
+$thumbHeight = $config['height'];
+$maxChar = $config['max'];
+$listId = uniqid();
+
+// Calculator with
+if ($config['perrow']) {
+	$perrow = $config['perrow'];
+	$width = 100 / $config['perrow'];
+}
+
+// Tablet
+$perrowtablet = $config["perrowtablet"];
+$widthtablet = 100 / $config["perrowtablet"];
+if (isset($config["perrowtabletportrait"]) && $config["perrowtabletportrait"]) {
+	$perrowtabletportrait = $config["perrowtabletportrait"];
+	$widthtabletportrait = 100 / $config["perrowtabletportrait"];
+} else {
+	$perrowtabletportrait = $perrowtablet;
+	$widthtabletportrait = $widthtablet;
+}
+
+// Mobile
+$perrowmobile = $config["perrowmobile"];
+$widthmobile = 100 / $config["perrowmobile"];
+if (isset($config["perrowmobileportrait"]) && $config["perrowmobileportrait"]) {
+	$perrowmobileportrait = $config["perrowmobileportrait"];
+	$widthmobiletportrait = 100 / $config["perrowmobileportrait"];
+} else {
+	$perrowmobileportrait = $perrowmobile;
+	$widthmobiletportrait = $widthmobile;
+}
+?>
+
+<script type="text/javascript">
+    //<![CDATA[
+	(function ($) {
+			$(document).ready(function ($) {
+				var isMobile = navigator.userAgent.match(/(android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini)/);
+				$("#jm_product_grid_<?php echo $listId; ?>").children('li').each(function () {
+					if (!isMobile) {
+						if ($(this).hasClass("last")) {
+							$(this).on("mouseenter", function () {
+								$(this).parent().find("li:first").stop(true).animate({"width": "0%"}, 800);
+								$(this).stop(true).animate({width: "<?php echo (2*$width); ?>%"}, 800).css('overflow', 'visible');
+							});
+							$(this).on("mouseleave", function () {
+								$(this).parent().find("li").stop(true).animate({"width": "<?php echo $width ?>%"}, 800);
+							});
+						} else {
+							$(this).on("mouseenter", function () {
+								$(this).parent().find(">li:last").stop(true).animate({"width": "0%"}, 800);
+								$(this).stop(true).animate({width: "<?php echo (2*$width); ?>%"}, 800).css('overflow', 'visible');
+							});
+							$(this).on("mouseleave", function () {
+								$(this).parent().find("li").stop(true).animate({"width": "<?php echo $width ?>%"}, 800);
+							});
+						}
+					}
+				});
+			});
+	})(jQuery);
+    //]]>
+</script>
+<!-- Jm Products with accordion slider-->
+<div class="jm-product-list <?php echo $config['mode']; ?> jm-products-accordion clearfix">
+
+	<?php if (($config['title'])): ?>
+		<div class="page-title category-title"> <h2><?php echo $config['title']; ?></h2></div>
+	<?php endif; ?>
+
+	<div class="listing-type-grid ">
+		<?php
+		$collection = $this->getCollection();
+		$collectionSize = $collection ? $collection->count() : 0;
+		$i = 0;
+		?>
+		<?php if ($collectionSize): ?>
+			<ul id="jm_product_grid_<?php echo $listId; ?>" class="products-grid">
+				<?php
+				$j = 0;
+				$rowCount = ceil($collectionSize / $config['perrow']);
+				foreach ($collection->getItems() as $product):
+					if ($i % $config['perrow'] == 0) {
+						$j++;
+					}
+					$i++;
+
+					$product = Mage::getModel('catalog/product')->load($product->getId());
+					$attribute = $product->getResource()->getAttribute('label');
+					if (is_object($attribute)) {
+						$options = $attribute->getSource()->getAllOptions(true, true);
+						foreach ($options as $option) {
+							if ($option['value'] == $product->getData("label")) {
+								$class = $option['label'];
+							}
+						}
+						$attDefaultValue = $attribute->getDefaultValue();
+						$attributeValue = Mage::getModel('catalog/product')->load($product->getId())->getlabel();
+						$attributeValueName = Mage::getModel('catalog/product')->load($product->getId())->getAttributeText('label');
+						if (strlen($attributeValue) && ($attDefaultValue !== $attributeValue)) {
+							$labelType = $class;
+							$labelName = $attributeValueName;
+						} else {
+							$labelType = "";
+						}
+					}
+					?>
+					<li class="item <?php if ($j == $rowCount) : echo "item-row-last"; endif; ?> <?php if (($i - 1) % $config['perrow'] == 0): ?> first<?php elseif ($i % $config['perrow'] == 0): ?> last<?php endif; ?>">
+						<div class="inner clearfix">
+							<div class="basic-info">
+								<div class="product-image">
+									<a title="<?php echo $this->htmlEscape($product->getName()) ?>"
+									   href="<?php echo $product->getProductUrl() ?>">
+										<img
+											src="<?php echo $this->helper('catalog/image')->init($product, 'thumbnail')->resize($thumbWidth, $thumbHeight)->setWatermarkSize('30x10'); ?>"
+											alt="<?php echo $this->htmlEscape($product->getName()) ?>"/>
+									</a>
+								</div>
+								<div class="product-rating-review">
+
+									<?php echo $this->getFirstCategoryName($product); ?>
+
+									<?php if (isset($labelType) && $showLabel): ?>
+										<span
+											class="<?php echo $labelType; ?>-label label"><?php echo $labelName; ?></span>
+									<?php endif; ?>
+
+								</div>
+								<div class="product-information">
+									<h5 class="product-name">
+										<a title="<?php echo $this->htmlEscape($product->getName()) ?>"
+										   href="<?php echo $product->getProductUrl() ?>"><?php echo $product->getName() ?></a>
+									</h5>
+
+									<?php echo $this->getPriceHtml($product, true, '_jmproduct_' . uniqid()); ?>
+
+									<?php echo $this->getReviewsSummaryHtml($product, true, true) ?>
+
+									<a class="overlayview" title="<?php echo $this->htmlEscape($product->getName()) ?>"
+									   href="<?php echo $product->getProductUrl() ?>">
+								   </a>
+								</div>
+							</div>
+							<div class="more-info">
+								<div class="pdescription">
+									<p><?php echo $product->getShortDescription(); ?></p>
+								</div>
+
+								<?php if ($product->isSaleable()): ?>
+									<button class="button form-button btn-cart"
+											onclick="setLocation('<?php echo $this->getAddToCartUrl($product) ?>')">
+										<span><?php echo $this->helper("catalog")->__('Add to Cart') ?></span>
+									</button>
+								<?php else: ?>
+									<div class="out-of-stock"><?php echo $this->helper("catalog")->__('Out of stock') ?></div>
+								<?php endif; ?>
+
+								<?php if ($this->helper('wishlist')->isAllow()) : ?>
+									<button class="button blue btn-wishlist"
+											onclick="setLocation('<?php echo $this->helper('wishlist')->getAddUrl($product) ?>')">
+										<span><?php echo $this->helper("catalog")->__('Wishlist') ?></span>
+									</button>
+								<?php endif; ?>
+
+								<?php if ($compareUrl = $this->getAddToCompareUrl($product)): ?>
+									<button class="button blue btn-compare"
+											onclick="setLocation('<?php echo $compareUrl ?>')">
+										<span><?php echo $this->helper("catalog")->__('Compare') ?></span>
+									</button>
+								<?php endif; ?>
+							</div>
+						</div>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+			<script
+				type="text/javascript">decorateGeneric($$('ul.products-grid'), ['odd', 'even', 'first', 'last'])</script>
+		<?php else: ?>
+			<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>
+		<?php endif; ?>
+	</div>
+</div>
+<!--// Jm Products with accordion slider-->

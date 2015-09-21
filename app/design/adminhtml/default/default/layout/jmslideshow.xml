@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+
+    <default>
+        <reference name="head">
+            <action method="addCss">
+                <stylesheet>jmslideshow.css</stylesheet>
+            </action>
+        </reference>
+
+        <reference name="content">
+            <block type="core/template" name="jmslideshow.head" template="jmslideshow/head.phtml"/>
+        </reference>
+    </default>
+
+    <jmslideshow_adminhtml_index_listImages>
+        <reference name="content">
+            <block type="core/template" name="jmslideshow.listimages" template="jmslideshow/listImages.phtml" />
+        </reference>
+    </jmslideshow_adminhtml_index_listImages>
+
+</layout>

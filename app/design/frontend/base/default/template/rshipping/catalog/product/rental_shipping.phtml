@@ -1,0 +1,159 @@
+<?php /**
+ * @var $_configHelper ITwebexperts_Rshipping_Helper_Config
+ * @var $this ITwebexperts_Payperrentals_Block_Catalog_Product_View
+ * @var $_row ITwebexperts_Rshipping_Model_Rshipping
+ */
+?>
+<?php $_jsContainerPrefix = $this->getJsContainerPostfix(); ?>
+<?php $_jsFunctionPrefix = $this->getJsFunctionPostfix(); ?>
+<?php $_rentalShipping = (Mage::getSingleton('checkout/session')->hasData('rental_shipping')) ? Mage::getSingleton('checkout/session')->getData('rental_shipping') : null ?>
+<?php $_configHelper = Mage::helper('rshipping/config'); ?>
+<?php $_storeId = Mage::app()->getStore()->getId(); ?>
+
+<?php if ($_configHelper->isEnabled($_storeId) && ($_configHelper->isShippingGlobalConfiguration($_storeId) || $this->getProduct()->getAllowShipping())): ?>
+    <?php $_lastUsedMethod = Mage::helper('rshipping')->getLastAddedMethod(); ?>
+    <?php /*if ($_lastUsedMethod && !is_null($_rentalShipping)) return; */ ?>
+    <?php $_lastUsedZip = Mage::helper('rshipping')->getLastAddedZip(); ?>
+    <?php $_rshipping = Mage::getModel('rshipping/rshipping')->getCollection()->addFilter('status', 1); ?>
+    <?php $_shippingMethod = $this->getProduct()->getShippingMethod(); ?>
+
+    <div class="shipMethods">
+        <label for="shipping_method_select_box"><b><?php echo $this->__('Shipping Method'); ?>:</b></label>
+        <?php $_isLocalAvail = false; ?>
+        <?php $_methodAvailFlag = false; ?>
+        <?php /*if ($_shippingMethod || $_configHelper->isAllowAllMethods($_storeId)): */ ?>
+
+        <?php if ($_configHelper->isAllowAllMethods($_storeId)): ?>
+            <?php $_shippingMethodArr = $_rshipping->getAllIds(); ?>
+        <?php else: ?>
+            <?php $_shippingMethodArr = explode(',', $_shippingMethod); ?>
+        <?php endif; ?>
+
+        <?php if ($_lastUsedMethod === false): ?>
+            <?php $_shippingMethodsCount = count($_shippingMethodArr) ?>
+            <?php if ($_shippingMethodsCount): ?>
+                <?php $_methodAvailFlag = true; ?>
+                <input type="hidden" id="shipping_method" name="shipping_method" value=""/>
+                <select class="input-box shipping_method_select_box" name="shipping_method_select_box"
+                        id="shipping_method_select_box">
+                    <?php foreach ($_rshipping as $_i => $_row): ?>
+                        <?php if ($_row->getIsLocalPickup() && ($_configHelper->isAllowAllMethods($_storeId) || in_array($_row->getRshippingId(), $_shippingMethodArr))): ?>
+                            <option value="<?php echo $_row->getShippingMethod(); ?>"<?php if ($_row->getIsDefaultMethod()): ?> selected<?php endif; ?>>
+                                <?php echo $_row->getShippingTitle(); ?>
+                            </option>
+                            <?php $_isLocalAvail = true; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    <?php if ($_shippingMethodsCount > 1 || !$_isLocalAvail): ?>
+                        <option value="null"><?php echo $this->__('Ship It To Me'); ?></option>
+                    <?php endif; ?>
+                </select>
+
+                <div class="additional-shipping" <?php if ($_isLocalAvail) echo 'style="display:none;"' ?>>
+                    <div class="additional-zip">
+                        <label for="zip_code" class="shipping-zip-code"><b>
+                                <?php echo $this->__('Zip Code') ?> :
+                            </b></label>
+                        <input type="text" id="zip_code" class="zip-code" name="zip_code"/>
+                        <button type="button" id="zip-submit" class="button zip-submit">
+                            <span><span><?php echo $this->__('Update Zip Code') ?></span></span></button>
+                    </div>
+                    <div class="additional-shipping-methods" style="display: none;">
+                        <label for="shipping_method_select_box_additional"><b>
+                                <?php echo $this->__('Shipping Speed'); ?> :
+                            </b></label>
+                        <select class="input-box shipping_method_select_box_additional"
+                                name="shipping_method_select_box_additional"
+                                id="shipping_method_select_box_additional">
+                            <?php foreach ($_rshipping as $_i => $_row): ?>
+                                <?php if (!$_row->getIsLocalPickup() && ($_configHelper->isAllowAllMethods($_storeId) || in_array($_row->getRshippingId(), $_shippingMethodArr))) : ?>
+                                    <option
+                                        value="<?php echo $_row->getShippingMethod(); ?>"><?php echo $_row->getShippingTitle(); ?></option>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <?php else: ?>
+            <?php /** @var $_usedShippingMethodObject ITwebexperts_Rshipping_Model_Rshipping */ ?>
+            <?php $_usedShippingMethodObject = Mage::getModel('rshipping/rshipping')->load($_lastUsedMethod, 'shipping_method') ?>
+            <?php $_methodAvailFlag = true; ?>
+            <span class="shipping-method-value"><?php echo $_usedShippingMethodObject->getShippingTitle() ?></span>
+            <input type="hidden" id="shipping_method" name="shipping_method" value="<?php echo $_lastUsedMethod ?>"/>
+            <input type="hidden" id="zip_code" class="zip-code" name="zip_code" value="<?php echo $_lastUsedZip ?>"/>
+        <?php endif; ?>
+
+        <?php /*endif; */ ?>
+        <?php if (!$_methodAvailFlag): ?>
+            <span class="not-available">
+                    <?php echo $this->__('Shipping methods not available for this product') ?>
+                </span>
+            <?php Mage::register('ship_not_avail', true); ?>
+        <?php endif; ?>
+
+        <script type="text/javascript">
+            //<![CDATA[
+            document.observe("dom:loaded", function () {
+                /* observe shipping method select box change*/
+                if (typeof $selfID<?php echo $_jsFunctionPrefix ?> == 'undefined') {
+                    $selfID<?php echo $_jsFunctionPrefix ?> = $jppr('<?php echo $_jsContainerPrefix ?>');
+                }
+
+                if ($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box]').val() == 'flatrate_flatrate') {
+                    $jppr('<?php echo $_jsContainerPrefix ?> input[name=shipping_method]').val($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box]').val());
+                }
+
+                $jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box_additional]').change(function () {
+                    $jppr('.btn-resfreshCalendar').trigger('click');
+                    $jppr('<?php echo $_jsContainerPrefix ?> input[name=shipping_method]').val($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box_additional]').val());
+                    updateBookedDates<?php echo $_jsFunctionPrefix ?>($selfID<?php echo $_jsFunctionPrefix ?>);
+                });
+                $jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box]').change(function () {
+                    $jppr('.btn-resfreshCalendar').trigger('click');
+                    if ($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box]').val() == 'null') {
+                        $jppr('<?php echo $_jsContainerPrefix ?> input[name=shipping_method]').val($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box_additional]').val());
+                        $jppr('<?php echo $_jsContainerPrefix ?> .additional-shipping').show();
+                        if ($jppr('<?php echo $_jsContainerPrefix ?> #zip_code').val() == '') {
+                            $jppr('<?php echo $_jsContainerPrefix ?> .readStartDate, <?php echo $_jsContainerPrefix ?> .readEndDate').attr('disabled', true);
+                            if($jppr('.datesblock .calendarSelector .datesSelector').length == 0) {
+                                $jppr('.dateSelectedCalendar').hide();
+                                $jppr('.zip-select-panel').show();
+                            }
+                        }
+                        //updateBookedDates($selfID);
+                    } else {
+                        $jppr('<?php echo $_jsContainerPrefix ?> input[name=shipping_method]').val($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box]').val());
+                        $jppr('<?php echo $_jsContainerPrefix ?> .additional-shipping').hide();
+                        $jppr('<?php echo $_jsContainerPrefix ?> .additional-shipping-methods').hide();
+                        updateBookedDates<?php echo $_jsFunctionPrefix ?>($selfID<?php echo $_jsFunctionPrefix ?>);
+                    }
+                });
+
+                $jppr('<?php echo $_jsContainerPrefix ?> #zip-submit').click(function () {
+                    $jppr('<?php echo $_jsContainerPrefix ?> .errorShow').html('').hide();
+                    if ($jppr('<?php echo $_jsContainerPrefix ?> #zip_code').val() == '' || $jppr('<?php echo $_jsContainerPrefix ?> #zip_code').val() == undefined) {
+                        if($jppr('.datesblock .calendarSelector .datesSelector').length == 0) {
+                            $jppr('.dateSelectedCalendar').hide();
+                            $jppr('.zip-select-panel').show();
+                        }
+                        $jppr('<?php echo $_jsContainerPrefix ?> .errorShow').html('<?php echo $this->__("Please specify zip code") ?>').show();
+                    } else {
+                        /*TODO add ajax save zip code*/
+                        $jppr('<?php echo $_jsContainerPrefix ?> input[name=shipping_method]').val($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box_additional]').val());
+                        $jppr('<?php echo $_jsContainerPrefix ?> .additional-shipping-methods').show();
+                        updateBookedDates<?php echo $_jsFunctionPrefix ?>($selfID<?php echo $_jsFunctionPrefix ?>);
+                        if($jppr('.datesblock .calendarSelector .datesSelector').length == 0) {
+                            $jppr('.dateSelectedCalendar').show();
+                            $jppr('.zip-select-panel').hide();
+                        }
+                        $jppr('<?php echo $_jsContainerPrefix ?> .readStartDate, <?php echo $_jsContainerPrefix ?> .readEndDate').attr('disabled', false);
+
+                        $jppr('<?php echo $_jsContainerPrefix ?> .selectedDayRadio:checked').trigger('click');
+                    }
+                });
+            });
+            //]]>
+        </script>
+    </div>
+<?php endif; ?>

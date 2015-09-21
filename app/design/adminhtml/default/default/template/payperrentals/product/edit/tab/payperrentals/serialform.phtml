@@ -1,0 +1,28 @@
+<?php $_htmlId      = $this->getParentBlock()->getElement()->getHtmlId() ?>
+<?php $_htmlClass   = $this->getParentBlock()->getElement()->getClass() ?>
+<?php $_htmlName    = $this->getParentBlock()->getElement()->getName() ?>
+<?php $_readonly    = $this->getParentBlock()->getElement()->getReadonly() ?>
+
+
+        <table cellspacing="0" class="data border" id="serialnumbers_table" warehouseid="<?php echo $this->getData('warehouseid') ?>">
+            <col width="120" />
+            <col width="95" />
+            <col />
+            <col />
+            <col width="1" />
+            <thead>
+            <tr class="headings">
+                <th><?php echo Mage::helper('payperrentals')->__('SN') ?></th>
+                <th><?php echo Mage::helper('payperrentals')->__('Status') ?></th>
+                <th><?php echo Mage::helper('payperrentals')->__('Date Acquired') ?></th>
+                <th class="last"><?php echo Mage::helper('payperrentals')->__('Action') ?></th>
+            </tr>
+            </thead>
+            <tbody id="res_serialnumbers_<?php echo $this->getData('warehouseid') ?>_container"></tbody>
+            <tfoot>
+            <tr>
+                <td colspan="3" class="a-left"><?php echo Mage::helper('payperrentals')->__('Number of SN: ') ?><input type="text" id="genInput" name="generate_input" value="1" /> &nbsp;<?php echo $this->getChildHtml('generate_button'); ?></td>
+                <td class="a-right"><?php echo $this->getChildHtml('add_button'); ?></td>
+            </tr>
+            </tfoot>
+        </table>

@@ -1,0 +1,14 @@
+#here bundle options needs to be updated after product import they are different. maybe do a check by name?
+testName=changeSettingsGeneral --- section=payperrentals --- group=calendar_options --- field=product_calendar_padding_days --- value=0
+testName=loginAdmin --- expected=
+testName=deleteAllOrders --- expected=
+testName=addToCart --- url=res-configurable-product.html --- startDate=1 --- endDate=2 --- qty=3 --- expected= --- options=Res bundle 1::red
+testName=loginCustomer --- expected=
+testName=checkoutCart --- expected=
+#expected is the array of dates which should be blackout. currentdate +1, +2 days etc
+#testName=loginAdmin --- expected=
+testName=checkBlackoutDates --- url=res-configurable-product.html --- startDate=1 --- endDate=2 --- qty=3 --- expected=1,2 --- options=Res bundle 1::red
+testName=checkBlackoutDates --- url=res-configurable-product.html --- startDate=1 --- endDate=2 --- qty=7 --- expected=disabled --- options=Res bundle 1::red
+testName=openAdmin --- expected=
+testName=checkInventoryReport --- product=Res config 1 --- startDate=1 --- expected=3/0
+#testName=checkInventoryReport --- product=Res config 1 --- startDate=2 --- expected=1/2

@@ -1,0 +1,243 @@
+<div class="calendarSelector" <?php
+
+if (($_selectedArray !== false) && Mage::registry('current_product')): ?>showLegend="1" <?php endif; ?>>
+<div class="datePickerDiv">
+    <div class="datePicker"></div>
+</div>
+<div class="date-select-panel" style="display: none;color:red;font-size:14px;"><?php echo $this->__('Please choose an option below to enable reservation dates selection');?></div>
+<div class="date-select-panel-disabled" style="display: none;color:red;font-size:14px;"><?php echo $this->__('Calendar is disabled for the option and the quantity selected');?></div>
+<div class="zip-select-panel" style="display: none;color:red;font-size:14px;"><?php echo $this->__('Please first enter your zip code to choose reservation dates');?></div>
+
+<div class="dateSelectedCalendar" style="display: block;">
+    <div class="dateView" style="display: inline-block;width:80%;">
+        <div class="ajax-panel"></div>
+        <?php
+        $resultObject = new Varien_Object();
+        Mage::dispatchEvent('calendar_newelements', array('js_container_prefix' => $_jsContainerPrefix, 'js_function_prefix' => $_jsFunctionPrefix, 'is_admin_global' => (isset($isAdminGlobal) ? $isAdminGlobal : false), 'is_admin' => (isset($isAdmin) ? $isAdmin : false), 'quote_item_id' => isset($quoteItemId) ? $quoteItemId : -1, 'quote_item' => isset($quoteItem) ? $quoteItem : null, 'result' => $resultObject));
+        echo $resultObject->getReturn();
+
+        ?>
+        <div class="datesInputs">
+            <div style="display: inline-block;margin-right:30px;">
+                <?php echo $this->__('From'); ?>
+                <input type="text" name="start_date" class="start_date"
+                       value="<?php echo(isset($_rInfo) ? $_rInfo['reservationInfo']['start_date'] : ''); ?>"
+                       readonly="readonly">
+            </div>
+            <div style="display: inline-block;">
+                <?php echo $this->__('To'); ?>
+                <input type="text" name="end_date" class="end_date"
+                       value="<?php echo((isset($_rInfo)) ? $_rInfo['reservationInfo']['end_date'] : ''); ?>"
+                       readonly="readonly">
+            </div>
+        </div>
+        <?php $_hourStart = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('start_time', $_storeOpen, $_storeClose, $_excludeHoursStart, false, $this->__('Start Time'), null); ?>
+        <?php $_hourEnd = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('end_time', $_storeOpen, $_storeClose, $_excludeHoursEnd, false, $this->__('End Time'), null); ?>
+
+        <?php $_hourStartMonday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('start_time_monday', $_storeOpen, $_storeClose, $_excludeHoursStart, false, $this->__('Start Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::MONDAY); ?>
+        <?php $_hourEndMonday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('end_time_monday', $_storeOpen, $_storeClose, $_excludeHoursEnd, false, $this->__('End Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::MONDAY); ?>
+
+        <?php $_hourStartTuesday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('start_time_tuesday', $_storeOpen, $_storeClose, $_excludeHoursStart, false, $this->__('Start Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::TUESDAY); ?>
+        <?php $_hourEndTuesday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('end_time_tuesday', $_storeOpen, $_storeClose, $_excludeHoursEnd, false, $this->__('End Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::TUESDAY); ?>
+
+        <?php $_hourStartWednesday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('start_time_wednesday', $_storeOpen, $_storeClose, $_excludeHoursStart, false, $this->__('Start Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::WEDNESDAY); ?>
+        <?php $_hourEndWednesday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('end_time_wednesday', $_storeOpen, $_storeClose, $_excludeHoursEnd, false, $this->__('End Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::WEDNESDAY); ?>
+
+        <?php $_hourStartThursday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('start_time_thursday', $_storeOpen, $_storeClose, $_excludeHoursStart, false, $this->__('Start Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::THURSDAY); ?>
+        <?php $_hourEndThursday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('end_time_thursday', $_storeOpen, $_storeClose, $_excludeHoursEnd, false, $this->__('End Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::THURSDAY); ?>
+
+        <?php $_hourStartFriday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('start_time_friday', $_storeOpen, $_storeClose, $_excludeHoursStart, false, $this->__('Start Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::FRIDAY); ?>
+        <?php $_hourEndFriday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('end_time_friday', $_storeOpen, $_storeClose, $_excludeHoursEnd, false, $this->__('End Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::FRIDAY); ?>
+
+        <?php $_hourStartSaturday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('start_time_saturday', $_storeOpen, $_storeClose, $_excludeHoursStart, false, $this->__('Start Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::SATURDAY); ?>
+        <?php $_hourEndSaturday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('end_time_saturday', $_storeOpen, $_storeClose, $_excludeHoursEnd, false, $this->__('End Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::SATURDAY); ?>
+
+        <?php $_hourStartSunday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('start_time_sunday', $_storeOpen, $_storeClose, $_excludeHoursStart, false, $this->__('Start Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::SUNDAY); ?>
+        <?php $_hourEndSunday = ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('end_time_sunday', $_storeOpen, $_storeClose, $_excludeHoursEnd, false, $this->__('End Time'), ITwebexperts_Payperrentals_Model_Product_Excludedaysweek::SUNDAY); ?>
+
+
+        <div class="datesSelector">
+            <div class="dateStartLine">
+                <div class="dateSelectorStart">
+                    <label for="readStartDate"><?php echo $this->__('Start Date'); ?></label>
+                    <input type="text" name="read_start_date" readonly="true" class="readStartDate"/>
+                </div>
+                <?php if ($_useTimes > 0): ?>
+                    <div class="timeSelector">
+                        <div class="timesInputs">
+                            <label for="start_time"><?php echo $this->__('Start Time:'); ?></label>
+                            <?php echo $_hourStart; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <div class="dateEndLine">
+                <div class="dateSelectorEnd"
+                     class="<?php if ($_product && $_product->getHideEndDate() || Mage::getStoreConfig('payperrentals/listing/hide_end_date_product')) echo 'no-show'; ?>">
+                    <label for="readEndDate"><?php echo $this->__('End Date:'); ?></label>
+                    <input type="text" name="read_end_date" readonly="true"
+                           class="readEndDate" <?php if ($_autoSelectEndDate) echo 'readonly="readonly"'; ?> />
+                </div>
+                <?php if ($_useTimes > 0): ?>
+                    <div class="timeSelector">
+                        <div class="timesInputs">
+                            <label for="end_time"><?php echo $this->__('End Time:'); ?></label>
+                            <?php echo $_hourEnd; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <div class="datesShow"></div>
+        <div class="errorShow"></div>
+    </div>
+    <div style="display: inline-block;margin-right: 10px;">
+        <button name="refreshCalendar" type="button" class="button btn-resfreshCalendar">
+                        <span>
+                            <span>
+                                <?php echo $this->__('Reset Calendar'); ?>
+                            </span>
+                        </span>
+        </button>
+    </div>
+    <?php if(ITwebexperts_Payperrentals_Helper_Config::showTurnovers() && ($_selectedArray !== false)): ?>
+        <div class="legend-detail-container">
+            <div class="legend-detail-header"><?php echo $this->__('Legend') ?></div>
+
+            <table class="legend-detail-description">
+                <tbody>
+                <tr>
+                    <td class="turnover_before"></td>
+                    <td class="description"><?php echo $this->__('Turnover Before') ?></td>
+                    <td class="turnover_after"></td>
+                    <td class="description"><?php echo $this->__('Turnover After') ?></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+    <?php if ($_useTimes > 0): ?>
+        <?php if ($_product && $_product->getShowTimeGrid() || $_configHelper->isShowTimeGrid(Mage::app()->getStore()->getId())): ?>
+            <?php echo ITwebexperts_Payperrentals_Helper_Timebox::getTimeDetails()?>
+            <?php echo $_hourStartMonday.$_hourEndMonday.$_hourStartTuesday.$_hourEndTuesday.$_hourStartWednesday.$_hourEndWednesday.$_hourStartThursday.$_hourEndThursday.$_hourStartFriday.$_hourEndFriday.$_hourStartSaturday.$_hourEndSaturday.$_hourStartSunday.$_hourEndSunday; ?>
+                <script type="text/javascript">
+                    //<![CDATA[
+                    enableAllTime<?php echo $_jsFunctionPrefix ?> = function (type) {
+                        if (type == 'start') {
+                            $jppr('<?php echo $_jsContainerPrefix ?> [name=start_time]').find('option').removeAttr('disabled');
+                            $jppr('<?php echo $_jsContainerPrefix ?> [name=start_time]').find('option').removeAttr('selected');
+                        } else if (type == 'end') {
+                            $jppr('<?php echo $_jsContainerPrefix ?> [name=end_time]').find('option').removeAttr('disabled');
+                            $jppr('<?php echo $_jsContainerPrefix ?> [name=end_time]').find('option').removeAttr('selected');
+                        }
+                    };
+
+                    deselectAll<?php echo $_jsFunctionPrefix ?> = function () {
+                        $jppr('<?php echo $_jsContainerPrefix ?> .day-detail tbody td').each(function () {
+                            $jppr(this).removeClass('busy');
+                            $jppr(this).removeClass('selected-time');
+                            $jppr(this).removeClass('available');
+                            $jppr(this).addClass('available');
+                        })
+                    };
+
+                    selectTimeByValue<?php echo $_jsFunctionPrefix ?> = function (value) {
+                        $jppr('<?php echo $_jsContainerPrefix ?> .day-detail tbody td').each(function () {
+                            if (/*$jppr(this).attr('timeendvalue') == value || */$jppr(this).attr('timestartvalue') == value) {
+                                $jppr(this).removeClass('available');
+                                $jppr(this).addClass('busy');
+                            }
+                        });
+                    };
+                    //TODO this needs to be rewriten to use Date.parseExact.
+                    selectByRange<?php echo $_jsFunctionPrefix ?> = function (startValue, endValue) {
+                        deselectAll<?php echo $_jsFunctionPrefix ?>();
+                        var busyTime = checkBusyTime<?php echo $_jsFunctionPrefix ?>($jppr('<?php echo $_jsContainerPrefix ?> [name=read_start_date]').val());
+                        <?php /** No need revert day detail to start date if start date != end date*/ ?>
+                        if (busyTime.length > 0 && $jppr('<?php echo $_jsContainerPrefix ?> [name=read_start_date]').val() == $jppr('<?php echo $_jsContainerPrefix ?> [name=read_end_date]').val()) {
+                            $jppr.each(busyTime, function (elIndex, excludeTime) {
+                                selectTimeByValue<?php echo $_jsFunctionPrefix ?>(excludeTime);
+                            });
+                        }
+                        if ($jppr('<?php echo $_jsContainerPrefix ?> [name=read_start_date]').val() == $jppr('<?php echo $_jsContainerPrefix ?> [name=read_end_date]').val() && startValue != endValue) {
+                            $jppr('<?php echo $_jsContainerPrefix ?> .day-detail tbody td').each(function () {
+                                var startDateValue = Date.parseExact($jppr('<?php echo $_jsContainerPrefix ?> [name=read_start_date]').val(), '<?php echo $_locDateFormat;?>');
+                                var startDateFormated = $jppr.formatDateTime('yy-mm-dd', startDateValue);
+                                if (new Date(startDateFormated + ' ' + $jppr(this).attr('timestartvalue')) <  new Date(startDateFormated + ' ' + endValue)
+                                    && new Date(startDateFormated + ' ' + $jppr(this).attr('timeendvalue')) > new Date(startDateFormated + ' ' + startValue)) {
+                                    $jppr(this).removeClass('available');
+                                    $jppr(this).addClass('selected-time');
+                                }
+                            });
+                        }
+                    };
+
+                    checkBusyTime<?php echo $_jsFunctionPrefix ?> = function (selectedDate) {
+                        var busyTime = [];
+                        $jppr.each(partiallyBooked, function (index, element) {
+                            if (element == 0 && $jppr.formatDateTime(dateFormat, new Date(index.replace(/-/g,'/'))) == selectedDate) {
+                                busyTime.push($jppr.formatDateTime('hh:ii:ss', new Date(index.replace(/-/g,'/'))));
+                            }
+                        });
+                        return busyTime;
+                    };
+
+                    createBusyTime<?php echo $_jsFunctionPrefix ?> = function (selected) {
+
+                        var d_names = ["sunday","monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+                        $jppr('.timeinputcls').hide();
+                        if(selected == 'start' && ($jppr('<?php echo $_jsContainerPrefix ?> [name=read_start_date]').val() != '')){
+                            startDateVal = Date.parseExact($jppr('<?php echo $_jsContainerPrefix ?> [name=read_start_date]').val(), '<?php echo $_locDateFormat;?>');
+                            $startTimeDropdown = $jppr('#start_time_'+d_names[startDateVal.getDay()]);
+                            selectedText = $jppr('#start_time :selected').text();
+                            $jppr('#start_time').empty(); // remove old options
+                            $startTimeDropdown.find('option').each(function() {
+                                if($jppr(this).text() == selectedText) {
+
+                                    $jppr('#start_time').append($jppr("<option></option>")
+                                        .attr("value", $jppr(this).val()).text($jppr(this).text()).attr('selected','selected'));
+                                }else{
+                                    $jppr('#start_time').append($jppr("<option></option>")
+                                        .attr("value", $jppr(this).val()).text($jppr(this).text()));
+                                }
+                            });
+
+
+                        }else if(selected == 'end' && ($jppr('<?php echo $_jsContainerPrefix ?> [name=read_end_date]').val() != '')){
+                            endDateVal = Date.parseExact($jppr('<?php echo $_jsContainerPrefix ?> [name=read_end_date]').val(), '<?php echo $_locDateFormat;?>');
+                            $endTimeDropdown = $jppr('#end_time_'+d_names[endDateVal.getDay()]);
+                            selectedEndText = $jppr('#end_time :selected').text();
+                            $jppr('#end_time').empty(); // remove old options
+                            $endTimeDropdown.find('option').each(function() {
+                                if($jppr(this).text() == selectedEndText) {
+                                    $jppr('#end_time').append($jppr("<option></option>")
+                                        .attr("value", $jppr(this).val()).text($jppr(this).text()).attr('selected','selected'));
+                                }else {
+                                    $jppr('#end_time').append($jppr("<option></option>")
+                                        .attr("value", $jppr(this).val()).text($jppr(this).text()));
+                                }
+                            });
+                        }
+                        if ( selected != 'end') return;
+                        deselectAll<?php echo $_jsFunctionPrefix ?>();
+                        enableAllTime<?php echo $_jsFunctionPrefix ?>(selected);
+                        if ($jppr('<?php echo $_jsContainerPrefix ?> [name=read_' + selected + '_date]').val() != '') {
+                            var selectedDate = $jppr('<?php echo $_jsContainerPrefix ?> [name=read_' + selected + '_date]').val();
+                            var busyTime = checkBusyTime<?php echo $_jsFunctionPrefix ?>(selectedDate);
+                            if (busyTime.length > 0) {
+                                $jppr.each(busyTime, function (elIndex, excludeTime) {
+                                    $jppr('<?php echo $_jsContainerPrefix ?> [name=' + selected + '_time] option[value="' + excludeTime + '"]').attr('disabled', 'disabled');
+                                    $jppr('<?php echo $_jsContainerPrefix ?> [name=' + selected + '_time_'+d_names[endDateVal.getDay()]+'] option[value="' + excludeTime + '"]').attr('disabled', 'disabled');
+                                    selectTimeByValue<?php echo $_jsFunctionPrefix ?>(excludeTime);
+                                });
+                            }
+                            $jppr('<?php echo $_jsContainerPrefix ?> [name=' + selected + '_time_'+d_names[endDateVal.getDay()]+']').children('option:not(:disabled):first').attr('selected', 'selected');
+                        }
+                    };
+                    //]]>
+                </script>
+            <?php endif; ?>
+        <?php endif; ?>
+</div>
+
+</div>

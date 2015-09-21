@@ -1,0 +1,99 @@
+<div class="content-header">
+	<table cellspacing="0" class="grid-header">
+		<tr>
+			<td><h3><?php echo $this->__('Send Return History Report')?></h3></td>
+		</tr>
+	</table>
+</div>
+<?php if(count(Mage::app()->getWebsites())): ?>
+    <?php echo $this->getChildHtml('store_switcher') ?>
+<?php endif; ?>
+<div class="entry-edit" style="margin-bottom:20px;">
+	<form id="edit_form" method="get" name="edit_form" action="<?php echo  Mage::getUrl("payperrentals_admin/adminhtml_sendreturnhistory/index",array('key'=> $this->getRequest()->getParam('key')))?>">
+		<div style="">
+			<table cellspacing="0" class="form-list-s">
+				<!--<tr>
+
+					<td class="label"><?php echo $this->__('Start date')?></td>
+					<td>
+						<?php
+						$startDate = '';
+						if(urldecode($this->getRequest()->getParam('startDate'))){
+							$startDate = date('m/d/Y', strtotime(urldecode($this->getRequest()->getParam('startDate'))));
+						}
+						echo $this->getLayout()->createBlock('core/html_date')
+								//->setTime('true')
+								->setImage(Mage::getDesign()->getSkinUrl('images/grid-cal.gif'))
+								->setFormat(Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT))
+								->setName('startDate')
+								->setValue($startDate)
+								->setId('startDate')
+								->setClass('datetime-picker input-text startDate')
+								->toHtml();
+
+						?>
+					</td>
+
+					<td class="label"><?php echo $this->__('End Date:') ?></td>
+					<td>
+						<?php
+						$endDate = '';
+						if(urldecode($this->getRequest()->getParam('endDate'))){
+							$endDate = date('m/d/Y', strtotime(urldecode($this->getRequest()->getParam('endDate'))));
+						}
+						echo $this->getLayout()->createBlock('core/html_date')
+						//->setTime('true')
+								->setImage(Mage::getDesign()->getSkinUrl('images/grid-cal.gif'))
+								->setFormat(Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT))
+								->setName('endDate')
+								->setValue($endDate)
+								->setId('endDate')
+								->setClass('datetime-picker input-text endDate')
+								->toHtml();
+
+						?>
+					</td>
+					<td>&nbsp;</td>
+				</tr>-->
+				<tr>
+					<td>
+						<label for="include_not_sent"><?php echo $this->__('Include Not Sent (Also includes not returned)');?></label>
+						<input type="checkbox" name="include_not_sent" id="include_not_sent" <?php echo $this->checkboxCheck('include_not_sent')?>/>
+					</td>
+<!--					<td>-->
+<!--						<label for="include_sent">Include Sent</label>-->
+<!--						<input type="checkbox" name="include_sent" id="include_sent" value="1"/>-->
+<!--					</td>-->
+				</tr>
+				<tr>
+					<td>
+						<label for="include_not_returned"><?php echo $this->__('Include Not Returned');?></label>
+						<input type="checkbox" name="include_not_returned" id="include_not_returned" <?php echo $this->checkboxCheck('include_not_returned')?>/>
+					</td>
+<!--					<td>-->
+<!--						<label for="include_returned">Include Returned</label>-->
+<!--						<input type="checkbox" name="include_returned" id="include_returned" value="1"/>-->
+<!--					</td>-->
+				</tr>
+<!--				<tr>-->
+<!--					<td colspan="2">-->
+<!--						<label for="include_all">Include Non Reservation Products</label>-->
+<!--						<input type="checkbox" name="include_all" id="include_all" value="1"/>-->
+<!--					</td>-->
+<!--				</tr>-->
+				<tr>
+					<td colspan="4" class="a-right" style="padding-top: 10px;">
+						<button class="searchAll" type="submit" style="display: inline-block;"><span>Search</span></button>
+					</td>
+				</tr>
+			</table>
+			</div>
+
+	</form>
+</div>
+
+<div id="sendreturnTable">
+	<?php
+	echo $this->getGridHtml();
+	?>
+</div>

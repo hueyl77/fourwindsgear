@@ -1,0 +1,30 @@
+testName=checkPrices --- url=product-4.html --- startDate=2016,4,4 --- endDate=2016,4,12 --- qty=1 --- expected=105
+testName=checkPrices --- url=product-4.html --- startDate=2016,4,6 --- endDate=2016,4,8 --- qty=1 --- expected=20
+testName=checkPrices --- url=product-4.html --- startDate=2016,4,6 --- endDate=2016,4,14 --- qty=1 --- expected=25
+testName=checkPrices --- url=product-4.html --- startDate=2016,4,3 --- endDate=2016,4,4 --- qty=1 --- expected=100
+testName=checkPrices --- url=product-4.html --- startDate=2016,3,26 --- endDate=2016,4,4 --- qty=1 --- expected=105
+#
+testName=checkPrices --- url=product-5.html --- startDate=2016,3,8 --- endDate=2016,3,9 --- qty=1 --- expected=50
+testName=checkPrices --- url=product-5.html --- startDate=2016,4,7 --- endDate=2016,4,8 --- qty=1 --- expected=50
+testName=checkPrices --- url=product-5.html --- startDate=2016,3,6 --- endDate=2016,3,9 --- qty=1 --- expected=60
+testName=checkPrices --- url=product-5.html --- startDate=2016,3,6 --- endDate=2016,3,13 --- qty=1 --- expected=80
+#
+testName=checkPrices --- url=product-6.html --- startDate=2016,3,1 --- endDate=2016,3,2 --- qty=1 --- expected=20
+testName=checkPrices --- url=product-6.html --- startDate=2016,3,2 --- endDate=2016,3,4 --- qty=1 --- expected=30
+#Product 7 must have defined a non special price.
+testName=checkPrices --- url=product-7.html --- startDate=2016,3,1 --- endDate=2016,3,2 --- qty=1 --- expected=20
+testName=checkPrices --- url=product-7.html --- startDate=2016,3,2 --- endDate=2016,3,4 --- qty=1 --- expected=20
+#testName=checkPrices --- url=product-7.html --- startDate=2016,3,4 --- endDate=2016,3,10 --- qty=1 --- expected=100
+#
+testName=checkPrices --- url=product-8.html --- startDate=2016,3,1 --- endDate=2016,3,4 --- qty=1 --- expected=95
+testName=checkPrices --- url=product-8.html --- startDate=2016,3,1 --- endDate=2016,3,5 --- qty=1 --- expected=190
+testName=checkPrices --- url=product-8.html --- startDate=2016,2,2 --- endDate=2016,2,4 --- qty=1 --- expected=95
+testName=checkPrices --- url=product-8.html --- startDate=2016,3,2 --- endDate=2016,3,7 --- qty=1 --- expected=285
+#
+#testName=checkPrices --- url=product-9.html --- startDate=2016,3,5 --- endDate=2016,3,8 --- qty=1 --- expected=10
+#testName=checkPrices --- url=product-9.html --- startDate=2016,3,4 --- endDate=2016,3,8 --- qty=1 --- expected=40
+#testName=checkPrices --- url=product-9.html --- startDate=2016,3,4 --- endDate=2016,3,10 --- qty=1 --- expected=100
+
+testName=checkPrices --- url=product-10.html --- startDate=2016,3,15;;10:00:00 --- endDate=2016,3,15;;12:00:00 --- qty=1 --- expected=15
+testName=checkPrices --- url=product-10.html --- startDate=2016,3,15;;15:00:00 --- endDate=2016,3,15;;17:00:00 --- qty=1 --- expected=150
+testName=checkPrices --- url=product-10.html --- startDate=2016,3,15;;15:00:00 --- endDate=2016,3,15;;18:00:00 --- qty=1 --- expected=155

@@ -1,0 +1,48 @@
+-
+  - 1 # test id
+  - 1 # product id
+  - 1 # reserve inventory for send/return date
+  - 2014-03-11 00:00:00 #start date
+  - 2014-03-15 00:00:00 #end date
+-
+  - 2 # test id
+  - 1 # product id
+  - 0 # reserve inventory for send/return date
+  - 2014-03-11 00:00:00 #start date
+  - 2014-03-15 00:00:00 #end date
+-
+  - 3 # test id
+  - 1 # product id
+  - 1 # reserve inventory for send/return date
+  - 2014-03-02 00:00:00 #start date
+  - 2014-03-04 00:00:00 #end date
+-
+  - 4 # test id
+  - 1 # product id
+  - 0 # reserve inventory for send/return date
+  - 2014-03-02 00:00:00 #start date
+  - 2014-03-04 00:00:00 #end date
+-
+  - 5 # test id
+  - 1 # product id
+  - 1 # reserve inventory for send/return date
+  - 2014-11-02 00:00:00 #start date
+  - 2014-11-05 00:00:00 #end date
+-
+  - 6 # test id
+  - 1 # product id
+  - 0 # reserve inventory for send/return date
+  - 2014-11-02 00:00:00 #start date
+  - 2014-11-05 00:00:00 #end date
+-
+  - 7 # test id
+  - 1 # product id
+  - 1 # reserve inventory for send/return date
+  - 2014-11-04 00:00:00 #start date
+  - 2014-11-05 00:00:00 #end date
+-
+  - 8 # test id
+  - 1 # product id
+  - 0 # reserve inventory for send/return date
+  - 2014-11-04 00:00:00 #start date
+  - 2014-11-05 00:00:00 #end date

@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Wavethemes_Jmquickview>
+            <version>0.1.1</version>
+        </Wavethemes_Jmquickview>
+    </modules>
+
+    <frontend>
+        <routers>
+            <jmquickview>
+                <use>standard</use>
+                <args>
+                    <module>Wavethemes_Jmquickview</module>
+                    <frontName>quickview</frontName>
+                </args>
+            </jmquickview>
+        </routers>
+        <layout>
+            <updates>
+                <jmquickview>
+                    <file>jmquickview.xml</file>
+                </jmquickview>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <Wavethemes_Jmquickview>
+                    <files>
+                        <default>Wavethemes_Jmquickview.csv</default>
+                    </files>
+                </Wavethemes_Jmquickview>
+            </modules>
+        </translate>
+    </frontend>
+
+    <global>
+        <helpers>
+            <jmquickview>
+                <class>Wavethemes_Jmquickview_Helper</class>
+            </jmquickview>
+        </helpers>
+        <blocks>
+            <jmquickview>
+                <class>Wavethemes_Jmquickview_Block</class>
+            </jmquickview>
+        </blocks>
+    </global>
+
+    <admin>
+        <routers>
+            <jmquickview>
+                <use>admin</use>
+                <args>
+                    <module>Wavethemes_Jmquickview</module>
+                    <frontName>jmquickview</frontName>
+                </args>
+            </jmquickview>
+        </routers>
+    </admin>
+
+    <adminhtml>
+        <menu>
+            <joomlart>
+                <title>JoomlArt</title>
+                <sort_order>100</sort_order>
+                <children>
+                    <jmquickview module="jmquickview">
+                        <title>JM Quickview</title>
+                        <sort_order>4</sort_order>
+                        <action>adminhtml/system_config/edit/section/wavethemes_jmquickview</action>
+                    </jmquickview>
+                </children>
+            </joomlart>
+        </menu>
+        <acl>
+            <resources>
+                <all>
+                    <title>Allow Everything</title>
+                </all>
+            </resources>
+        </acl>
+        <layout>
+            <updates>
+                <jmquickview>
+                    <file>jmquickview.xml</file>
+                </jmquickview>
+            </updates>
+        </layout>
+        <translate>
+            <modules>
+                <Wavethemes_Jmquickview>
+                    <files>
+                        <default>Wavethemes_Jmquickview.csv</default>
+                    </files>
+                </Wavethemes_Jmquickview>
+            </modules>
+        </translate>
+    </adminhtml>
+
+    <default>
+        <wavethemes_jmquickview>
+            <wavethemes_jmquickview>
+                <show>1</show>
+            </wavethemes_jmquickview>
+        </wavethemes_jmquickview>
+    </default>
+</config> 

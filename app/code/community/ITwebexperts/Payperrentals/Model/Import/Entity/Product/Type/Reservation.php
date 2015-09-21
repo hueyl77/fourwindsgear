@@ -1,0 +1,67 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    Mage
+ * @package     Mage_ImportExport
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
+ * Import entity simple product type
+ *
+ * @category    Mage
+ * @package     Mage_ImportExport
+ * @author      Magento Core Team <core@magentocommerce.com>
+ */
+class ITwebexperts_Payperrentals_Model_Import_Entity_Product_Type_Reservation
+    extends Mage_ImportExport_Model_Import_Entity_Product_Type_Abstract
+{
+    /**
+     * Attributes' codes which will be allowed anyway, independently from its visibility property.
+     *
+     * @var array
+     */
+    protected $_forcedAttributesCodes = array(
+        'related_tgtr_position_behavior', 'related_tgtr_position_limit',
+        'upsell_tgtr_position_behavior', 'upsell_tgtr_position_limit'
+    );
+    // 2013-02-22 Kenneth Roy
+	public function prepareAttributesForSave(array $rowData, $withDefaultValue = true)
+    {
+        $resultAttrs = array();
+        foreach ($this->_getProductAttributes($rowData) as $attrCode => $attrParams) {
+            if (!$attrParams['is_static']) {
+                if (isset($rowData[$attrCode]) && strlen($rowData[$attrCode])) {
+					// 2013-02-20 Kenneth Roy
+                    $resultAttrs[$attrCode] =
+                        ('select' == $attrParams['type'])
+                        ? $attrParams['options'][strtolower($rowData[$attrCode])]
+                        : $rowData[$attrCode];
+                } elseif (array_key_exists($attrCode, $rowData)) {
+                    $resultAttrs[$attrCode] = $rowData[$attrCode];
+                } elseif (null !== $attrParams['default_value']) {
+                    $resultAttrs[$attrCode] = $attrParams['default_value'];
+                }
+            }
+        }
+        return $resultAttrs;
+    }
+}

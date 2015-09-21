@@ -1,0 +1,185 @@
+<?php
+/**
+ * Mojo Creative & Technical Solutions LLC
+ *
+ * @category   GetSomeMojo
+ * @package    GetSomeMojo_Bundledmojo
+ * @copyright  Copyright (c) 2011-2013 Mojo Creative & Technical Solutions LLC (http://GetSome.MojoMage.com)
+ * @license    http://getsome.mojomage.com/license/
+ * @author     Mojo Creative & Technical Solutions LLC <info@MojoMage.com>
+ *
+ * @var $this Mage_Bundle_Block_Catalog_Product_View_Type_Bundle_Option_Select
+ */
+?>
+<?php $_option      = $this->getOption() ?>
+<?php $_selections  = $_option->getSelections() ?>
+<?php $_default     = $_option->getDefaultSelection() ?>
+<?php $_showSingle  = (count($_selections) == 1) ?>
+<?php list($_defaultQty, $_canChangeQty) = $this->_getDefaultValues() ?>
+
+<div id="title-<?php echo $_option->getId() ?>">
+
+<dt>
+    <label<?php if ($_option->getRequired()) echo ' class="required"'; ?>><?php echo $this->htmlEscape($_option->getTitle()) ?><?php if ($_option->getRequired()) echo '<em>*</em>'; ?></label>
+</dt>
+
+<dd<?php if ($_option->decoratedIsLast) echo ' class="last"'; ?>>
+    <?php if ($_showSingle): ?>
+        <?php echo $this->getSelectionTitlePrice($_selections[0]); ?>
+        <input type="hidden" name="bundle_option[<?php echo $_option->getId(); ?>]" value="<?php echo $_selections[0]->getSelectionId(); ?>" />
+    <?php else: ?>
+        <select onchange="bundle.changeSelection(this)" id="bundle-option-<?php echo $_option->getId(); ?>" name="bundle_option[<?php echo $_option->getId(); ?>]" class="bundle-option-<?php echo $_option->getId(); ?><?php if ($_option->getRequired()) echo ' required-entry'; ?> bundle-option-select">
+            <option value=""><?php echo $this->__('Choose a selection...'); ?></option>
+            <?php foreach ($_selections as $_selection): ?>
+                <option value="<?php echo $_selection->getSelectionId(); ?>"<?php echo ($_selection->getIsDefault() && $_selection->isSaleable())?' selected="selected" ':''; ?><?php echo !$_selection->isSaleable()?' disabled="disabled" ':''; ?>>
+                    <?php if ($this->getProdPrice()): ?>
+                        <?php echo $this->getSelectionTitlePrice($_selection, false); ?>
+                    <?php else: ?>
+                        <?php $_productName = str_replace('"', '&nbsp;', $_selection->getName()); ?>
+                        <?php echo $_productName; ?>
+                    <?php endif; ?>
+                </option>
+            <?php endforeach;?>
+        </select>
+    <?php endif; ?>
+
+<?php foreach ($_selections as $_selection): ?>
+<?php $_productName = str_replace('"', '&nbsp;', $_selection->getName()); ?>
+<div style="<?php echo ($_showSingle) ? '':'display: none;'; ?>" class="bundledmojo_selected_option" id="bundledmojo_select_option-<?php echo $_selection->getSelectionId(); ?>">
+    <div<?php if ($this->getYeaH4yeaH() && $this->getYeaH4select()) echo ' class="bundledmojo_wrapper-'.$_selection->getSelectionId().'" id="bundledmojo_wrapper"'; ?>>
+    <?php if ($this->getBaseImage() || $this->getWishlist() || $this->getCompare()) : ?>
+    <?php /* The Following DIV dictates the float position of the Image and Layout */ ?>
+        <div style="float:<?php if (!strpos($this->helper('catalog/image')->init($_selection, 'small_image'), 'placeholder')) echo $this->getImageFloat(); else echo 'right'; ?>;" class="bundledmojo_image_wrapper">
+        <?php /* Thumbnail Image */ ?>
+        <?php if ($this->getBaseImage() && !strpos($this->helper('catalog/image')->init($_selection, 'small_image'),'placeholder')): ?>
+            <div class="bundledmojo_image" style="padding-<?php echo ($this->getImageFloat() == 'right' ? 'left' : 'right'); ?>:10px; padding-top: 5px;">
+                <a href="<?php echo $this->helper('catalog/image')->init($_selection, 'small_image')->constrainOnly(TRUE)->keepAspectRatio(TRUE)->keepFrame(FALSE)->resize($this->getZoomWidth()); ?>" class="mojoSelectZoom" title="<?php echo $_productName; ?>" onclick="return false"><img width="<?php echo $this->getThumbSize(); ?>" src="<?php echo $this->helper('catalog/image')->init($_selection, 'small_image')->constrainOnly(TRUE)->keepAspectRatio(TRUE)->keepFrame(FALSE)->resize($this->getThumbSize()); ?>" alt="<?php echo $_productName; ?>" class="resize-<?php echo $_selection->getSelectionId(); ?> resize" id="imageZoom_toggle-<?php echo $_selection->getSelectionId(); ?>" /></a>
+            </div>
+            <?php endif; /* End Thumbnail Image */ ?>
+            <?php /* If Wishlist or Add to Compare is Enabled Display Link(s) */ ?>
+            <?php if ($this->getWishlist() || $this->getCompare()) : ?> 
+            <div style="<?php echo $this->getImageFloat().": 0; text-align:".$this->getImageFloat().";"; ?>" class="mojowishcompare_wrapper imageZoom_toggle-<?php echo $_selection->getSelectionId();?>">
+                <?php if ($this->helper('wishlist')->isAllow() && $this->getWishlist()): ?> 
+                <a href="<?php echo $this->helper('wishlist')->getAddUrl($_selection); ?>" class="link-compare"><?php echo $this->__('Add To Wishlist'); ?></a>
+                <?php endif; ?>
+                <?php if ($this->helper('wishlist')->isAllow() && $this->getWishlist() && $this->getCompare()): ?>
+                <br />
+                <?php endif; ?>
+                <?php if ($this->getCompare()): ?> 
+                <a href="<?php echo $this->helper('catalog/product_compare')->getAddUrl($_selection); ?>" class="link-compare"><?php echo $this->__('Add to Compare'); ?></a>
+                <?php endif; ?>
+            </div>
+            <?php endif; /* End $this->getWishlist() || $this->getCompare()*/ ?>
+        </div> <?php /* End .bundledmojo_image_wrapper*/ ?>
+    <?php endif; ?>
+                
+        <div<?php if($this->getYeaH4yeaH() && $this->getYeaH4select()) echo ' id="bundledmojo_desc_wrapper"'; ?> style="<?php if ($this->getImageFloat() == 'left') echo $this->getImageFloat() . ": 175px;"; else echo "margin-right: 145px"; ?>">
+            <?php /* Check if Bundled Mojo is Enabled and if it is Begin Product Description */ ?>
+            <?php if ($this->getYeaH4yeaH() && $this->getYeaH4select()): ?>
+            <br />
+            <?php /* Begin Product Description */ ?>
+            <div>
+                <?php /* Text To Display */ ?>
+                <?php if ($this->getShortDescInit() == 0 && $this->getShortDesc()): ?>
+                <div id="<?php echo $_selection->getSelectionId(); ?>">
+                    <a id="<?php echo $_selection->getSelectionId(); ?>" class="prodDescToggle">
+                        <?php echo ($this->getShortDescText() ? $this->getShortDescText() : $this->getShortDescTextDefault()); ?>
+                    </a>
+                </div>
+                <?php endif; ?>
+                <?php if ($this->getShortDesc()): ?>
+                <div class="<?php echo $_selection->getSelectionId(); ?> std" id="bundleDescUl"<?php if ($this->getShortDesc() && $this->getShortDescInit() == 0) echo ' style="display: none;"'; ?>>
+                    <?php /* Product Description */ ?>
+                    <?php $_productDesc = Mage::getSingleton('catalog/product')->load($_selection->getId()); ?>
+                    <?php echo $_productDesc->getShortDescription(); ?>
+                </div>
+                <?php endif; ?>
+            </div>
+            <?php /* End Product Description */ ?>
+            <?php endif; /* if ($this->getYeaH4yeaH()) */ ?>
+                </div> <?php /* End .bundledmojo_desc_wrapper */ ?>
+            </div>  <?php /* End .bundledmojo_wrapper */ ?> 
+        <?php /* Added for Bundled Mojo Layout */ ?>
+        <div style="clear: both;">&nbsp;</div>
+</div>
+<?php endforeach; ?>
+<div class="bundle-qty-container" style="padding-top: 10px;">
+    <span class="qty-holder">
+        <?php if ($_default = $_option->getDefaultSelection()): ?>
+            <?php $_defaultQty = $_default->getSelectionQty() * 1; ?>
+            <?php $_canChangeQty = $_default->getSelectionCanChangeQty(); ?>
+        <?php else: ?>
+            <?php if (!$_showSingle): ?>
+                <?php $_defaultQty = '0'; ?>
+                <?php $_canChangeQty = false; ?>
+            <?php else: ?>
+                <?php $_defaultQty = $_selections[0]->getSelectionQty() * 1; ?>
+                <?php $_canChangeQty = $_selections[0]->getSelectionCanChangeQty(); ?>
+            <?php endif; ?>
+        <?php endif; ?>
+        <label for="bundle-option-<?php echo $_option->getId(); ?>-qty-input"><?php echo $this->__('Qty:'); ?>&nbsp;</label><input onblur="bundle.changeOptionQty(this, event)" <?php echo $_canChangeQty?'':'disabled="disabled"'; ?> id="bundle-option-<?php echo $_option->getId(); ?>-qty-input" class="input-text qty<?php echo $_canChangeQty?'':' qty-disabled'; ?>" type="text" name="bundle_option_qty[<?php echo $_option->getId(); ?>]" value="<?php echo $_defaultQty; ?>" />
+    </span>
+</div>
+</dd> 
+</div>
+<style type="text/css">
+#mojoSelectZoom {
+    position:absolute;
+    border: <?php echo $this->getZoomBorderSize(); ?>px solid #<?php echo $this->getZoomBorderColor(); ?>;
+    background:#<?php echo $this->getZoomBgColor(); ?>;
+    padding:<?php echo $this->getZoomImagePadding(); ?>px;
+    display:none;
+    color:#<?php echo $this->getZoomFontColor(); ?>;
+    z-index: 420;
+}
+</style>
+
+<script type="text/javascript">
+<?php if ($this->getShortDescInit() == 0): ?>
+<?php foreach ($_selections as $_selection): ?>   
+jQuery("#<?php echo $_selection->getSelectionId(); ?>").click(function () {
+    jQuery(".<?php echo $_selection->getSelectionId(); ?>").slideToggle('slow', 'linear');
+});
+<?php endforeach; ?>
+<?php endif; ?>
+jQuery("#bundle-option-<?php echo $_option->getId(); ?>").change(function () {
+    jQuery("select option:selected").each(function () {
+        // find all available option values and if they dont = current value loop through fade out... of all other values or any elemenst visible
+        jQuery("#title-<?php echo $_option->getId(); ?> .bundledmojo_selected_option").css('display', 'none');
+        var mojoselectVal = '';
+        mojoselectVal += jQuery(this).val();
+        jQuery("#bundledmojo_select_option-"+mojoselectVal).delay(500).fadeIn(750);
+    });
+});
+<?php if ($this->getImageZoom()): ?>
+jQuery("a.mojoSelectZoom").hover(function(e) {
+<?php
+if ($this->getImageFloat() == 'left') {
+    $mojoY = $this->getZoomWidth() / 4;
+    echo 'mojoX = 50;';
+    echo 'mojoY = '.$mojoY.';';
+} else {
+    $mojoX = ($this->getZoomWidth() + $this->getZoomCaptionPadding()) + ($this->getZoomImagePadding() + $this->getZoomBorderSize()) + 50;
+    $mojoY = $this->getZoomWidth() / 4;
+    echo 'mojoX = -'.$mojoX.';';
+    echo 'mojoY = '.$mojoY.';';
+}
+?>
+    this.mojoTitle = this.title;
+    var mojoCaption = (this.mojoTitle != "") ? this.mojoTitle : "";
+    jQuery("body").append("<div id='mojoSelectZoom'><img src='" + this.href + "' alt='" + mojoCaption + "' /><?php if ($this->getZoomCaption() == 1): ?><div style='font-size:<?php echo $this->getZoomCaptionSize(); ?>px; margin:<?php echo $this->getZoomCaptionPadding(); ?>px; max-width:<?php echo ($this->getZoomWidth() + $this->getZoomCaptionPadding()) + ($this->getZoomImagePadding() + $this->getZoomBorderSize()); ?>px;'>" + mojoCaption + "</div><?php endif; ?></div>");
+    jQuery("#mojoSelectZoom")
+        .css("top",(e.pageY - mojoY) + "px")
+        .css("left",(e.pageX + mojoX) + "px")
+        .fadeIn("slow");                        
+    }, function() {
+        this.title = this.mojoTitle;    
+        jQuery("#mojoSelectZoom").remove();
+}); 
+jQuery("a.mojoSelectZoom").mousemove(function(e) {
+    jQuery("#mojoSelectZoom")
+        .css("top",(e.pageY - mojoY) + "px")
+        .css("left",(e.pageX + mojoX) + "px");
+});
+<?php endif; ?>
+</script>

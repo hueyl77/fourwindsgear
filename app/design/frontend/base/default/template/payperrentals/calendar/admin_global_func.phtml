@@ -1,0 +1,217 @@
+
+<script type="text/javascript">
+/**
+ * Function used to update the selected dates in admin
+ */
+function updateInitials() {
+    if($jppr('#topDates .readStartDate').val() != '' && $jppr('#topDates .readEndDate').val() != ''){
+        Element.show('loading-mask');
+        if(typeof $jppr('<?php echo $_jsContainerPrefix ?>').data('wait_initials') === 'undefined'){
+            $jppr('<?php echo $_jsContainerPrefix ?>').data('wait_initials', 1);
+            $jppr.ajax({
+                cache: false,
+                dataType: 'json',
+                type: 'post',
+                url: '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/updateinitials/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>',
+                data: $jppr('#topDates').find('*').serialize(),
+                success: function (data) {
+                    Element.hide('loading-mask');
+                    if($jppr('<?php echo $_jsContainerPrefix ?>').data('loaded')) {
+                    order.loadArea(['search'], true);
+                    }
+                    $jppr('<?php echo $_jsContainerPrefix ?>').data('loaded', true);
+                    $jppr('<?php echo $_jsContainerPrefix ?>').removeData('wait_initials');
+                }
+            });
+        }
+    }
+}
+/**
+ * Function used when change all button is pushed to update all dates in an order
+ */
+function updateInputValsAll() {
+    Element.show('loading-mask');
+    $jppr.ajax({
+            cache: false,
+            dataType: 'json',
+            type: 'post',
+            url: '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/getupdatealldates/", array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>',
+            data: $jppr('#topDates').find('*').serialize(),
+            success: function (data) {
+                Element.hide('loading-mask');
+                if (data.itemId) {
+                    var fields = [];
+                    $jppr.each(data.itemId, function (key1, item) {
+                        fields.push(new Element('input', {type: 'hidden', name: 'item[' + item + '][configured]', value: 1}));
+                        $jppr.each(data.itemConfigs[item], function (keyConfig, itemConfig) {
+
+                            if (Object.prototype.toString.call(itemConfig) === '[object Object]') {
+                                for (var key in itemConfig) {
+                                    if(Object.prototype.toString.call(itemConfig[key]) === '[object Array]' || Object.prototype.toString.call(itemConfig[key]) === '[object Object]') {
+                                        $jppr.each(itemConfig[key], function(bpKey, bpItem){
+                                            fields.push(new Element('input', {type: 'hidden', name: 'item[' + item + '][' + keyConfig + '][' + key + '][' + bpKey + ']', value: bpItem}));
+                                        });
+                                    } else {
+                                        fields.push(new Element('input', {type: 'hidden', name: 'item[' + item + '][' + keyConfig + '][' + key + ']', value: itemConfig[key]}));
+                                    }
+                                }
+                            } else {
+                                fields.push(new Element('input', {type: 'hidden', name: 'item[' + item + '][' + keyConfig + ']', value: itemConfig}));
+                            }
+                        });
+                    });
+                    productConfigure.addFields(fields);
+                    order.itemsUpdate();
+                }
+                order.loadArea(['items'], true);
+            }}
+    );
+}
+
+$jppr('#select-new-customer').change(function () {
+    Element.show('loading-mask');
+    $jppr.ajax({
+        cache: false,
+        dataType: 'json',
+        type: 'post',
+        url: '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/getupdatecustomer/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>',
+        data: 'customer_id=' + $jppr('#select-new-customer').val(),
+        success: function (data) {
+            Element.hide('loading-mask');
+            order.customerId = $jppr('#select-new-customer').val();
+            order.loadArea(['header', 'shipping_method', 'billing_method', 'totals','search', 'items', 'giftmessage', 'shipping_address', 'billing_address', 'data'], true);
+        }
+    });
+});
+
+<?php if(isset($_startTimeInit) && $_startTimeInit != ''):	?>
+$jppr('#topDates').find('.start_time option[value="<?php echo $_startTimeInit;?>"]').attr("selected", "selected");
+$jppr('#topDates').find('.end_time option[value="<?php echo $_endTimeInit;?>"]').attr("selected", "selected");
+<?php endif; ?>
+
+$jppr(document).ready(function () {
+    $jppr("#buttonDropoff").click(function () {
+        $jppr("#dialogDates").css('display', '');
+    });
+    $jppr("#cancelBut").click(function () {
+        $jppr("#dialogDates").css('display', 'none');
+    });
+    $jppr("#okBut").click(function () {
+        Element.show('loading-mask');
+        $jppr.ajax({
+            cache: false,
+            dataType: 'json',
+            type: 'post',
+            url: '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/setEstimatedCreate/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>',
+            data: {
+                'startDate': $jppr('.estimateSend').val(),
+                'endDate': $jppr('.estimateReturn').val(),
+                'startTime': $jppr('.estimateSendTime').val(),
+                'endTime': $jppr('.estimateReturnTime').val()
+
+            },
+            success: function (data) {
+                Element.hide('loading-mask');
+                Element.hide('loading-mask');
+                $jppr("#estimatedDates").html(data.html);
+                $jppr("#dialogDates").css('display', 'none');
+            }});
+
+    });
+
+    $jppr("#dialogDates").css('display', 'none');
+    $jppr('#changeButton').click(function () {
+        updateInputValsAll();
+    });
+});
+
+/**
+ * Function used to show the qty avail/price/etc when popup configuration window appears in admin
+ * @param itemId
+ * @param wind
+ */
+
+function calculatePriceGeneral(itemId, wind) {
+    var needConfigure = ($jppr('a[product_id="' + itemId + '"]').parent().parent().attr('is_pressed') == '0');
+
+    if (wind && needConfigure) {
+        wind._showWindow();
+    }
+}
+
+ProductConfigure.prototype._requestItemConfiguration = ProductConfigure.prototype._requestItemConfiguration.wrap(function (parentMethod, listType, itemId) {
+        if (!this.listTypes[listType].urlFetch) {
+            return false;
+        }
+        var url = this.listTypes[listType].urlFetch;
+        if (url) {
+            new Ajax.Request(url, {
+                parameters: {id: itemId},
+                onSuccess: function (transport) {
+                    var response = transport.responseText;
+                    if (response.isJSON()) {
+                        response = response.evalJSON();
+                        if (response.error) {
+                            this.blockMsg.show();
+                            this.blockMsgError.innerHTML = response.message;
+                            this.blockCancelBtn.hide();
+                            this.setConfirmCallback(listType, null);
+                            if (listType == 'product_to_add') {
+                                calculatePriceGeneral(itemId, this);//todo check if we can replace this call with some data attribute from getprice and availability
+                            } else {
+                                this._showWindow();
+                            }
+
+                        }
+                    } else if (response) {
+                        response = response + '';
+                        this.blockFormFields.update(response);
+
+                        // Add special div to hold mage data, e.g. scripts to execute on every popup show
+                        var mageData = {};
+                        var scripts = response.extractScripts();
+                        mageData.scripts = scripts;
+
+                        var scriptHolder = new Element('div', {'style': 'display:none'});
+                        scriptHolder.mageData = mageData;
+                        this.blockFormFields.insert(scriptHolder);
+                        if (listType == 'product_to_add') {
+                            calculatePriceGeneral(itemId, this);
+                        } else {
+                            this._showWindow();
+                        }
+
+                    }
+                }.bind(this)
+            });
+        }
+
+    }
+);
+
+AdminOrder.prototype.accountGroupChange = AdminOrder.prototype.accountGroupChange.wrap(function (parentMethod) {
+    this.loadArea(['data, search'], true, this.serializeData('order-form_account').toObject());
+});
+AdminOrder.prototype.showQuoteItemConfiguration = AdminOrder.prototype.showQuoteItemConfiguration.wrap(function(parentMethod, itemId){
+    var listType = 'quote_items';
+    var qtyElement = $('order-items_grid').select('input[name="item\['+itemId+'\]\[qty\]"]')[0];
+    productConfigure.setConfirmCallback(listType, function() {
+        // sync qty of popup and qty of grid
+        var confirmedCurrentQty = productConfigure.getCurrentConfirmedQtyElement();
+        if (qtyElement && confirmedCurrentQty && !isNaN(confirmedCurrentQty.value)) {
+            qtyElement.value = confirmedCurrentQty.value;
+        }
+        this.productConfigureAddFields['item['+itemId+'][configured]'] = 1;
+        this.itemsUpdate();//
+    }.bind(this));
+    productConfigure.setShowWindowCallback(listType, function() {
+        // sync qty of grid and qty of popup
+        var formCurrentQty = productConfigure.getCurrentFormQtyElement();
+        if (formCurrentQty && qtyElement && !isNaN(qtyElement.value)) {
+            formCurrentQty.value = qtyElement.value;
+        }
+    }.bind(this));
+    productConfigure.showItemConfiguration(listType, itemId);
+});
+
+</script>

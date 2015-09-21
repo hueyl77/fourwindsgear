@@ -1,0 +1,72 @@
+<div class="jm-home-slideshow">
+
+		<script type="text/javascript">
+        (function($){
+            $(document).ready(function($){
+                $('#jm-slide-55fd0d4e6922f').jmSlider({
+                    animation: 'hrzslide', 						//[slide, fade, slice], slide and fade for old compactible
+                    interval: 8000,								//interval - time for between animation
+                    duration: 500,								//duration - time for animation
+                    repeat: 1,								//animation repeat or not
+                    autoPlay: 1,							//auto play
+                    mainWidth: 1300,								//width of main item
+                    mainHeight: 600,							//height of main item
+                    rtl: null,									//rtl
+                    thumbType: '', 						//false - no thumb, other [number, thumb], thumb will animate
+                    thumbItems: 3,								//number of thumb item will be show
+                    thumbWidth: 400,								//width of thumbnail item
+                    thumbHeight: 209,							//width of thumbnail item
+                    thumbSpaces: [0,0,0,0],					//space between thumbnails
+                    thumbTrigger: 'click',						//thumb trigger event, [click, mouseenter]
+                    thumbDirection: 'horizontal',				//thumb orientation
+                    thumbPosition: 'bottom',						//[0%, 50%, 100%]
+                    showThumbDesc: '0',
+                    showDesc: 'desc',								//show description or not
+                    descTrigger: 'always',						//[always, mouseover, load]
+                    maskAnim: 'fade',						//mask transition style [fade, slide, slide-fade], slide - will use the maskAlign to slide
+                    maskWidth: 300,								//mask - a div over the the main item - used to hold descriptions
+                    maskHeight: 200,							//mask height
+                    maskOpacity: 0.8,							//mask opacity
+                    maskPosition: 'bl',						//[0%, 50%, 100%]
+                    controlBox: 0,							//show navigation controller [next, prev, play, playback] - JM does not have a config
+                    controlPosition: 'tr',							//show navigation controller [next, prev, play, playback] - JM does not have a config
+                    navButtons: '0',							//main next/prev navigation buttons mode, [false, auto, fillspace]
+                    showProgress: 0,							//show the progress bar
+                    urls: ['#','#','#','#'], 								// [] array of url of main items
+                    targets: ['_self','_self','_self','_self'] // [] same as urls, an array of target value such as, '_blank', 'parent', '' - default
+                });
+            });
+        })(jQuery);
+	</script>
+
+<div class="block jm-slideshow jm-slideshow-horizontal">
+        <div class="jm-slidewrap" id="jm-slide-55fd0d4e6922f" style="visibility:hidden;">
+            <div class="jm-slide-main-wrap">
+                <div class="jm-slide-main">
+                                                        <div class="jm-slide-item"><img src="http://fourwindsgear.com/media/jmslideshow/1.jpg" alt="" width="1300" height="600"/>                                                                        </div>
+                                                        <div class="jm-slide-item"><img src="http://fourwindsgear.com/media/jmslideshow/2.jpg" alt="" width="1300" height="600"/>                                                                        </div>
+                                                        <div class="jm-slide-item"><img src="http://fourwindsgear.com/media/jmslideshow/3.jpg" alt="" width="1300" height="600"/>                                                                        </div>
+                                                        <div class="jm-slide-item"><img src="http://fourwindsgear.com/media/jmslideshow/4.jpg" alt="" width="1300" height="600"/>                                                                        </div>
+                                        </div>
+                <div class="jm-slide-loader"></div>
+                                                            </div>
+
+            
+                            <div class="jm-mask-desc">
+                    <div class="jm-slide-desc"></div>
+                    <div class="jm-slide-mask"></div>
+
+                </div>
+            
+                            <div class="jm-slide-descs">
+                                            <div class="jm-slide-desc">
+                            <div class="desc-slide"><span class="text-title">Rent Camping Gears</span><span class="text-desc">Rent quality camping gears cheaply</span><a href="#" class="readmore">Rent now</a></div>                                                    </div>
+                                            <div class="jm-slide-desc">
+                            <div class="desc-slide"><span class="text-title">Convenient  Shipping</span><span class="text-desc">Ship directly to your home or destination</span><a href="#" class="readmore">Rent now</a></div>                                                    </div>
+                                            <div class="jm-slide-desc">
+                            <div class="desc-slide"><span class="text-title">Go Camping!</span><span class="text-desc">Enjoy your trip without worrying about buying the right gears</span><a href="#" class="readmore">Rent now</a></div>                                                    </div>
+                                            <div class="jm-slide-desc">
+                            <div class="desc-slide"><span class="text-title">Ship it back</span><span class="text-desc">Ship back your gear in the provided shipping label</span><a href="#" class="readmore">Rent now</a></div>                                                    </div>
+                                    </div>
+                </div>
+</div></div>

@@ -1,0 +1,115 @@
+eav:
+  customer:
+    - entity_id: 1
+      attribute_set_id: 0 # Fix issue with customer entity load
+      website_id: 1
+      store_id: 1
+      created_in: Default Store
+      group_id: 1
+      firstname: John
+      lastname: Doe
+      email: john@doe.com
+
+  catalog_category:
+    - entity_id: 2
+      entity_type_id: 3
+      attribute_set_id: 3
+      parent_id: 1
+      level: 1
+      path: 1/2
+      name: Reservation
+      url_key: reservation
+      display_mode: PRODUCTS
+      url_path: reservation.html
+      is_active: 1
+      include_in_menu: 1
+      path_ids:
+        - 1
+          2
+  catalog_product:
+    - entity_id: 1
+      type_id: reservation
+      sku: day_rental_2
+      name: Product Daily Rental
+      short_description: Test
+      description: test
+      url_key: day-rental
+      tax_class_id: 1 # Taxable Goods
+      status: 1 # Enabled
+      visibility: 4 # Visible in Catalog & Search
+      weight: 1
+      is_reservation: 1 # Reservation
+      payperrentals_quantity: 5
+      payperrentals_pricingtype: 2 # Non-prorated
+      payperrentals_use_times: 0 # Disabled
+      show_time_grid: 1 # Enabled
+      global_min_period: 1 # Global
+      global_max_period: 1 # Global
+      global_turnover_after: 1
+      global_turnover_before: 1
+      store_id: 1
+      website_ids:
+        - 1
+      category_ids:
+        - 2 # Default Category
+      stock:
+        qty: 5
+        min_qty: 0
+        is_in_stock: 1
+
+config:
+  default/payperrentals/calendar_options/time_increment: 60
+  default/payperrentals/store/store_open_time: 09:00
+  default/payperrentals/store/store_close_time: 17:00
+  default/dev/template/allow_symlink: 1
+  default/dev/log/active: 1
+  default/payperrentals/appearance_turnover/turnover_before_number: 1
+  default/payperrentals/appearance_turnover/turnover_before_type: 3 # days
+  default/payperrentals/appearance_turnover/turnover_after_number: 2
+  default/payperrentals/appearance_turnover/turnover_after_type: 3 # days
+
+tables:
+  sales/order:
+    - entity_id: 1
+      customer_id: 1
+      state: closed
+      status: closed
+      store_id: 1
+      created_at: 2013-09-28
+    - entity_id: 2
+      customer_id: 1
+      state: closed
+      status: closed
+      store_id: 1
+      created_at: 2013-10-28
+
+  sales/order_item:
+    - item_id: 1
+      order_id: 1
+      product_id: 1
+    - item_id: 2
+      order_id: 2
+      product_id: 1
+
+  payperrentals/reservationorders:
+    - id: 1
+      product_id: 1
+      order_id: 1
+      order_item_id: 1
+      qty: 5
+      start_date: 2014-01-01 00:00:00
+      end_date: 2014-01-05 00:00:00
+    - id: 2
+      product_id: 1
+      order_id: 2
+      order_item_id: 2
+      qty: 3
+      start_date: 2014-03-05 00:00:00
+      end_date: 2014-03-10 00:00:00
+
+  payperrentals/reservationprices:
+    - id: 1
+      entity_id: 1
+      numberof: 1
+      ptype: 3
+      price: 400

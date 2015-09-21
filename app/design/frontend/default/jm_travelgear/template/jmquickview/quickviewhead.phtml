@@ -1,0 +1,52 @@
+<?php if(Mage::helper('jmquickview')->get('show',array())) { ?>
+<?php
+$curenturl = Mage::helper('core/url')->getCurrentUrl();
+if(strpos($curenturl,"https") === False){
+            $baseurl = Mage::getBaseUrl();
+                    
+ }else{
+            $baseurl = Mage::getStoreConfig("web/secure/base_url");  
+ }
+?>
+
+<script type="text/javascript">
+  var baseurl = "<?php echo $baseurl; ?>"
+</script>
+
+<?php if(!defined('JM_ADD_JQUERY')): ?>
+	<?php $jquery_url= $this->getSkinUrl('js/jquery/jquery.js');?>
+	<?php if (@fopen($jquery_url,"r")==true):?>
+		<script type="text/javascript" src="<?php echo $jquery_url ?>"></script>
+	<?php define('JM_ADD_JQUERY', true); ?>
+<?php endif; ?>
+<?php endif; ?>
+<?php if(!defined('JM_ADD_COLORBOX')): ?>
+	<script type="text/javascript" src="<?php echo $this->getSkinUrl('js/jquery/plugins/colorbox/jquery.colorbox.js') ?>"></script>
+	<?php define('JM_ADD_COLORBOX', true); ?>
+<?php endif; ?>
+<script type="text/javascript" src="<?php echo $this->getSkinUrl('joomlart/jmquickview/js/jmquickview.js') ?>"></script>
+
+<script type="text/javascript">
+	(function($){
+		options= {
+			quickviewtext: "<?php echo $this->__("Quick view"); ?>",
+			currenttext: "<?php echo $this->__("Product quick view"); ?>",
+			previoustext: "<?php echo $this->__("Previous"); ?>",
+			nexttext: "<?php echo $this->__("Next"); ?>"
+		}
+
+		$(document).ready(function($) {
+			if($("ul.products-grid").length)
+				$("ul.products-grid").jmquickview(options);
+			if($("div.products-grid").length)
+				$("div.products-grid").jmquickview(options);
+			if($("table.products-grid").length)
+				$("table.products-grid").jmquickview(options);
+			if($("ol.products-list").length)
+				$("ol.products-list").jmquickview(options);
+		});
+
+	})(jQuery);
+
+</script> 
+<?php } ?>

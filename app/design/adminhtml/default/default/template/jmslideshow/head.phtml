@@ -1,0 +1,18 @@
+<?php
+$websiteCode = Mage::app()->getRequest()->getParam("website", null);
+$storeCode = Mage::app()->getRequest()->getParam("store", null);
+
+if (Mage::getStoreConfig("web/secure/use_in_adminhtml")) {
+    $baseUrl = Mage::getStoreConfig("web/secure/base_url");
+} else {
+    $baseUrl = Mage::getBaseUrl();
+}
+?>
+
+<!--initial for jm slideshow -->
+<script type="text/javascript">
+    var baseUrl ='<?php echo $baseUrl; ?>';
+    var websiteCode = '<?php echo $websiteCode ?>';
+    var storeCode = '<?php echo $storeCode ?>';
+    var loadImagesUrl = '<?php echo Mage::helper('adminhtml')->getUrl('jmslideshow/adminhtml_index/listImages'); ?>'
+</script>

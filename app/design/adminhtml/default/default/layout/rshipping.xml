@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <rshipping_adminhtml_rshipping_index>
+        <reference name="content">
+            <block type="rshipping/adminhtml_rshipping" name="rshipping" />
+        </reference>
+    </rshipping_adminhtml_rshipping_index>
+    <rshipping_adminhtml_rshipping_edit>
+        <reference name="head">
+            <action method="addJs">
+                <scrypt>itwebexpert_rshipping/prototype.maskedinput.js</scrypt>
+            </action>
+        </reference>
+    </rshipping_adminhtml_rshipping_edit>
+    <adminhtml_catalog_product_edit>
+        <!--<reference name="product_tabs">
+            <action method="addTab">
+                <name>my_custom_tab</name>
+                <block>rshipping/adminhtml_catalog_product_tab</block>
+            </action>
+        </reference>-->
+    </adminhtml_catalog_product_edit>
+</layout>

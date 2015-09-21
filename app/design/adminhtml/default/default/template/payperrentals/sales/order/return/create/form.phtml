@@ -1,0 +1,135 @@
+<?php /* @var $this ITwebexperts_Payperrentals_Block_Adminhtml_Sales_Order_Return_Create_Form */
+
+
+?>
+<form id="edit_form" method="post" action="<?php echo $this->getSaveUrl() ?>">
+    <?php echo $this->getBlockHtml('formkey') ?>
+    <?php $_order = $this->getOrder() ?>
+    <?php echo $this->getChildHtml('order_info') ?>
+
+
+    <div class="box-left">
+        <!--Billing Address-->
+        <div class="entry-edit">
+            <div class="entry-edit-head">
+                <h4 class="icon-head head-payment-method"><?php echo Mage::helper('payperrentals')->__('Payment Information') ?></h4>
+            </div>
+            <fieldset>
+                <div><?php echo $this->getPaymentHtml() ?></div>
+                <div><?php echo Mage::helper('payperrentals')->__('The order was placed using %s', $_order->getOrderCurrencyCode()) ?></div>
+            </fieldset>
+        </div>
+    </div>
+    <div class="box-right">
+        <!--Shipping Address-->
+        <div class="entry-edit">
+            <div class="entry-edit-head">
+                <h4 class="icon-head head-shipping-method"><?php echo Mage::helper('payperrentals')->__('Shipping Information') ?></h4>
+            </div>
+            <fieldset>
+                <div>
+                    <strong><?php echo $this->escapeHtml($_order->getShippingDescription()) ?></strong>
+                    <?php echo $this->helper('payperrentals')->__('Total Shipping Charges'); ?>:
+
+                    <?php if ($this->helper('tax')->displayShippingPriceIncludingTax()): ?>
+                        <?php $_excl = $this->displayShippingPriceInclTax($_order); ?>
+                    <?php else: ?>
+                        <?php $_excl = $this->displayPriceAttribute('shipping_amount', false, ' '); ?>
+                    <?php endif; ?>
+                    <?php $_incl = $this->displayShippingPriceInclTax($_order); ?>
+
+                    <?php echo $_excl; ?>
+                    <?php if ($this->helper('tax')->displayShippingBothPrices() && $_incl != $_excl): ?>
+                        (<?php echo $this->__('Incl. Tax:'); ?> <?php echo $_incl; ?>)
+                    <?php endif; ?>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div class="clear"></div>
+
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-products"><?php echo Mage::helper('payperrentals')->__('Shipments to Return') ?></h4>
+        </div>
+    </div>
+    <div id="shipment_items_container">
+        <div class="grid">
+            <table cellspacing="0" class="data order-tables">
+                <colgroup>
+                    <col width="1">
+                    <col>
+                    <col>
+                    <col width="1">
+                    <col width="1">
+                </colgroup>
+                <thead>
+                <tr class="headings">
+                    <th>Return</th>
+                    <th>Product</th>
+                    <th class="a-center">Sent Date</th>
+                    <th class="a-center">Qty</th>
+                    <?php foreach ($this->getSentItems() as $sentItem): ?>
+                        <?php $_serialNumbers = $sentItem->getSn() ? explode(',', $sentItem->getSn()) : array() ?>
+                        <?php $_needSnColumn = (bool)(count($_serialNumbers)); ?>
+                        <?php if($_needSnColumn) break; ?>
+                    <?php endforeach; ?>
+                    <?php if ($_needSnColumn): ?>
+                        <th class="last"><span class="nobr"><?php echo $this->__('Serial Numbers') ?></span></th>
+                    <?php endif; ?>
+                </tr>
+                </thead>
+                <tbody class="odd">
+                <?php foreach ($this->getSentItems() as $sentItem): ?>
+                    <?php $_serialNumbers = $sentItem->getSn() ? explode(',', $sentItem->getSn()) : array() ?>
+                    <?php /** @var $_product Mage_Catalog_Model_Product */ ?>
+                    <?php $_product = $this->getProductFromSentItem($sentItem) ?>
+                    <tr class="border">
+                        <td>
+                            <input type="checkbox" name="send_items[]" value="<?php echo $sentItem->getId() ?>"/>
+                        </td>
+                        <td>
+                            <h5 class="title"><span><?php echo $this->escapeHtml($_product->getName()) ?></span></h5>
+
+                            <div>
+                                <strong><?php echo $this->__('SKU:'); ?></strong><?php echo $this->escapeHtml($_product->getSku()) ?>
+                            </div>
+                        </td>
+
+                        <td>
+                            <?php echo ITwebexperts_Payperrentals_Helper_Date::formatDbDate(
+                                $sentItem->getSendDate(), false, true
+                            ); ?>
+                        </td>
+
+                        <td>
+                            <?php echo $sentItem->getQty() ?>
+                        </td>
+                        <?php if ($_needSnColumn): ?>
+                        <td class="last a-center">
+                            <?php endif; ?>
+                            <?php if (count($_serialNumbers)): ?>
+                                <table cellspacing="0" class="qty-table">
+                                    <tbody>
+                                    <?php foreach ($_serialNumbers as $_sn): ?>
+                                        <tr>
+                                            <td><?php echo $this->escapeHtml($_sn) ?></td>
+                                        </tr>
+                                    <?php endforeach ?>
+                                    </tbody>
+                                </table>
+                            <?php endif; ?>
+                            <?php if ($_needSnColumn): ?>
+                        </td>
+                    <?php endif; ?>
+                    </tr>
+                <?php endforeach ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="a-right">
+            <button title="Submit Shipment" type="submit" class="scalable save submit-button" style=""><span><span><span>Submit Return</span></span></span></button>
+        </div>
+    </div>
+</form>
+

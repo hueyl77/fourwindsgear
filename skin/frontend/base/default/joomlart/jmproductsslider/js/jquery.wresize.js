@@ -1,0 +1,83 @@
+/*  
+===============================================================================
+WResize is the jQuery plugin for fixing the IE window resize bug
+...............................................................................
+                                               Copyright 2007 / Andrea Ercolino
+-------------------------------------------------------------------------------
+LICENSE: http://www.opensource.org/licenses/mit-license.php
+WEBSITE: http://noteslog.com/
+===============================================================================
+*/
+
+( function( $ ) 
+{
+    // legacy for $.browser to detect IE
+    if ($.browser == undefined || $.browser.msie == undefined) {
+        $.browser={msie:false,version:0};
+        if (match = navigator.userAgent.match (/MSIE ([0-9]{1,}[\.0-9]{0,})/) || navigator.userAgent.match (/Trident.*rv:([0-9]{1,}[\.0-9]{0,})/)) {
+            $.browser.msie=true;
+            $.browser.version=match[1];
+        }
+    }
+
+	$.fn.wresize = function( f ) 
+	{
+		version = '1.1';
+		wresize = {fired: false, width: 0};
+
+		function resizeOnce() 
+		{
+			if ( $.browser.msie )
+			{
+				if ( ! wresize.fired )
+				{
+					wresize.fired = true;
+				}
+				else 
+				{
+					var version = parseInt( $.browser.version, 10 );
+					wresize.fired = false;
+					if ( version < 7 )
+					{
+						return false;
+					}
+					else if ( version == 7 )
+					{
+						//a vertical resize is fired once, an horizontal resize twice
+						var width = $( window ).width();
+						if ( width != wresize.width )
+						{
+							wresize.width = width;
+							return false;
+						}
+					}
+				}
+			}
+
+			return true;
+		}
+
+		function handleWResize( e ) 
+		{
+			if ( resizeOnce() )
+			{
+				return f.apply(this, [e]);
+			}
+		}
+
+		this.each( function() 
+		{
+			if ( this == window )
+			{
+				$( this ).resize( handleWResize );
+			}
+			else
+			{
+				$( this ).resize( f );
+			}
+		} );
+
+		return this;
+	};
+
+} ) ( jQuery );

@@ -1,0 +1,25 @@
+testId1:
+  is_contain: true
+  search_key: <div class="day-detail-container">
+  is_not_found: false
+testId2:
+  is_not_found: true
+testId3:
+  is_contain: true
+  search_key: <div class="day-detail-container">
+  is_not_found: false
+testId4:
+  is_not_found: true
+testId5:
+  search_key: <div class="day-detail-container">
+  is_not_found: false
+testId6:
+  search_key: <div class="day-detail-container">
+  is_not_found: false
+testId7:
+  is_contain: true
+  search_key: <div class="day-detail-container">
+  is_not_found: false
+testId8:
+  search_key: <div class="day-detail-container">
+  is_not_found: false

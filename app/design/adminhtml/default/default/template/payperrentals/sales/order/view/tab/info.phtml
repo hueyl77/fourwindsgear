@@ -1,0 +1,256 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     default_default
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+
+
+?>
+<?php /** @var $this Mage_Adminhtml_Block_Sales_Order_View_Tab_Info */ ?>
+<?php $_order = $this->getOrder() ?>
+<div>
+    <div id="order-messages">
+        <?php echo $this->getChildHtml('order_messages') ?>
+    </div>
+    <?php echo $this->getChildHtml('order_info') ?>
+    <input type="hidden" name="order_id" value="<?php echo $_order->getId() ?>"/>
+    <?php if ($_order->getIsVirtual()): ?>
+    <div class="box-right">
+        <?php else: ?>
+        <div class="box-left">
+            <?php endif; ?>
+            <!--Payment Method-->
+            <div class="entry-edit">
+                <div class="entry-edit-head">
+                    <h4 class="icon-head head-payment-method"><?php echo Mage::helper('payperrentals')->__('Payment Information') ?></h4>
+                </div>
+                <fieldset>
+                    <?php echo $this->getPaymentHtml() ?>
+                    <div><?php echo Mage::helper('payperrentals')->__('Order was placed using %s', $_order->getOrderCurrencyCode()) ?></div>
+                </fieldset>
+            </div>
+        </div>
+        <?php if (!$_order->getIsVirtual()): ?>
+            <div class="box-right">
+                <!--Shipping Method-->
+                <div class="entry-edit">
+                    <div class="entry-edit-head">
+                        <h4 class="icon-head head-shipping-method"><?php echo Mage::helper('payperrentals')->__('Shipping &amp; Handling Information') ?></h4>
+                        <button style="margin-left: 10px;" id="buttonDropoff" type="button" name="buttonDropoff"><span><span><?php echo $this->__('Update Dropoff and Pickup Dates') ?></span></span></button>
+                    </div>
+                    <fieldset>
+
+                        <div style="" id="dialogDates">
+                            <table cellspacing="0" class="form-list-s">
+                                <tr>
+
+                                    <td class="label"><?php echo $this->__('Dropoff Date:') ?>&nbsp;</td>
+                                    <td>
+                                        <?php if ($_order->getEstimateSend() != ''): ?>
+                                            <?php $startDate = date('m/d/Y', strtotime($_order->getEstimateSend())); ?>
+                                        <?php else: ?>
+                                            <?php $startDate = ''; ?>
+                                        <?php endif; ?>
+                                        <?php echo $this->getLayout()->createBlock('core/html_date')
+                                            //->setTime('true')
+                                            ->setImage(Mage::getDesign()->getSkinUrl('images/grid-cal.gif'))
+                                            ->setFormat(Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT))
+                                            ->setName('estimateSend')
+                                            ->setValue($startDate)
+                                            ->setId('estimateSend')
+                                            ->setClass('datetime-picker input-text estimateSend')
+                                            ->toHtml();    ?>
+                                        <?php $storeOpen = Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_STORE_OPEN_TIME); ?>
+                                        <?php $storeClose = Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_STORE_CLOSE_TIME); ?>
+                                        <?php $excludeHoursStart = array(); ?>
+                                        <?php $excludeHoursEnd = array(); ?>
+
+                                    </td>
+                                    <td><?php echo $this->__('Time') . ': '; ?>
+                                    <td>
+                                        <?php echo ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('estimateSendTime', $storeOpen, $storeClose, $excludeHoursStart); ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><?php echo $this->__('Pickup Date:') ?></td>
+                                    <td>
+                                        <?php if ($_order->getEstimateReturn() != ''): ?>
+                                            <?php $endDate = date('m/d/Y', strtotime($_order->getEstimateReturn())); ?>
+                                        <?php else: ?>
+                                            <?php $endDate = ''; ?>
+                                        <?php endif; ?>
+                                        <?php echo $this->getLayout()->createBlock('core/html_date')
+                                            //->setTime('true')
+                                            ->setImage(Mage::getDesign()->getSkinUrl('images/grid-cal.gif'))
+                                            ->setFormat(Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT))
+                                            ->setName('estimateReturn')
+                                            ->setValue($endDate)
+                                            ->setId('estimateReturn')
+                                            ->setClass('datetime-picker input-text estimateReturn')
+                                            ->toHtml();    ?>
+
+                                    </td>
+                                    <td><?php echo $this->__('Time:'); ?></td>
+                                    <td>
+                                        <?php echo ITwebexperts_Payperrentals_Helper_Timebox::getTimeInput('estimateReturnTime', $storeOpen, $storeClose, $excludeHoursStart); ?>
+                                    </td>
+                                <!--</tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>-->
+                                    <td>
+                                        <button style="margin-left: 10px;" id="okBut" type="button" name="okBut"><span><span><?php echo $this->__('OK'); ?></span></span></button>
+                                    </td>
+                                    <td>
+                                        <button style="margin-left: 10px;" id="cancelBut" type="button" name="cancelBut"><span><span><?php echo $this->__('Cancel'); ?></span></span></button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <?php echo ITwebexperts_Payperrentals_Helper_Html::showSingleDates($this->getOrder(), false);?>
+                        <p id="estimatedDates">
+                            <?php if ($_order->getSendDatetime() != ''): ?>
+                                <strong><?php echo $this->__('Dropoff Date:') ?></strong>
+                                <span><?php echo ITwebexperts_Payperrentals_Helper_Date::formatDbDate($_order->getSendDatetime(), false); ?></span><br/>
+                            <?php endif; ?>
+
+                            <?php if ($_order->getReturnDatetime() != ''): ?>
+                                <strong><?php echo $this->__('Pickup Date:') ?></strong>
+                                <span><?php echo ITwebexperts_Payperrentals_Helper_Date::formatDbDate($_order->getReturnDatetime(), false); ?></span><br/>
+                            <?php endif ?>
+                        </p>
+
+                        <?php if ($_order->getTracksCollection()->count()) : ?>
+                            <a href="#" id="linkId" onclick="popWin('<?php echo $this->helper('shipping')->getTrackingPopupUrlBySalesModel($_order) ?>','trackorder','width=800,height=600,resizable=yes,scrollbars=yes')" title="<?php echo $this->__('Track Order') ?>"><?php echo $this->__('Track Order') ?></a>
+                            <br/>
+                        <?php endif; ?>
+                        <?php if ($_order->getShippingDescription()): ?>
+                            <strong><?php echo $this->escapeHtml($_order->getShippingDescription()) ?></strong>
+
+                            <?php if ($this->helper('tax')->displayShippingPriceIncludingTax()): ?>
+                                <?php $_excl = $this->displayShippingPriceInclTax($_order); ?>
+                            <?php else: ?>
+                                <?php $_excl = $this->displayPriceAttribute('shipping_amount', false, ' '); ?>
+                            <?php endif; ?>
+                            <?php $_incl = $this->displayShippingPriceInclTax($_order); ?>
+
+                            <?php echo $_excl; ?>
+                            <?php if ($this->helper('tax')->displayShippingBothPrices() && $_incl != $_excl): ?>
+                                (<?php echo $this->__('Incl. Tax:'); ?> <?php echo $_incl; ?>)
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <?php echo $this->helper('payperrentals')->__('No shipping information available'); ?>
+                        <?php endif; ?>
+                    </fieldset>
+                </div>
+            </div>
+        <?php endif; ?>
+        <div class="clear"></div>
+        <?php echo $this->getGiftOptionsHtml() ?>
+        <div class="clear"></div>
+        <div class="entry-edit">
+            <div class="entry-edit-head">
+                <h4 class="icon-head head-products"><?php echo Mage::helper('payperrentals')->__('Items Ordered') ?></h4>
+            </div>
+        </div>
+        <?php echo $this->getItemsHtml() ?>
+        <div class="clear"></div>
+
+        <div class="box-left">
+            <div class="entry-edit">
+                <div class="entry-edit-head">
+                    <h4><?php echo Mage::helper('payperrentals')->__('Comments History') ?></h4>
+                </div>
+                <fieldset><?php echo $this->getChildHtml('order_history') ?></fieldset>
+            </div>
+        </div>
+        <div class="box-right entry-edit">
+            <div class="entry-edit-head"><h4><?php echo Mage::helper('payperrentals')->__('Order Totals') ?></h4></div>
+            <div class="order-totals"><?php echo $this->getChildHtml('order_totals') ?></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <?php echo $this->getChildHtml('popup_window'); ?>
+
+    <script type="text/javascript">
+        $jppr = jQuery.noConflict();
+        $jppr(document).ready(function () {
+
+            $jppr("#buttonDropoff").click(function () {
+                $jppr("#dialogDates").css('display', '');
+            });
+            $jppr("#cancelBut").click(function () {
+                $jppr("#dialogDates").css('display', 'none');
+            });
+            $jppr("#okBut").click(function () {
+                Element.show('loading-mask');
+                $jppr.ajax({
+                    cache: false,
+                    dataType: 'json',
+                    type: 'post',
+                    url: '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/setEstimated/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>',
+                    data: {
+                        'orderid':<?php echo $_order->getId();?>,
+                        'startDate': $jppr('.estimateSend').val(),
+                        'endDate': $jppr('.estimateReturn').val(),
+                        'startTime': $jppr('.estimateSendTime').val(),
+                        'endTime': $jppr('.estimateReturnTime').val()
+                    },
+                    success: function (data) {
+                        Element.hide('loading-mask');
+                        $jppr("#estimatedDates").html(data.html);
+                        $jppr("#dialogDates").css('display', 'none');
+                    }});
+            });
+
+            $jppr("#dialogDates").css('display', 'none');
+        });
+    </script>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        /**
+         * Retrieve gift options tooltip content
+         */
+        function getGiftOptionsTooltipContent(itemId) {
+            var contentLines = [];
+            var headerLine = null;
+            var contentLine = null;
+
+            $$('#gift_options_data_' + itemId + ' .gift-options-tooltip-content').each(function (element) {
+                if (element.down(0)) {
+                    headerLine = element.down(0).innerHTML;
+                    contentLine = element.down(0).next().innerHTML;
+                    if (contentLine.length > 30) {
+                        contentLine = contentLine.slice(0, 30) + '...';
+                    }
+                    contentLines.push(headerLine + ' ' + contentLine);
+                }
+            });
+            return contentLines.join('<br/>');
+        }
+        giftOptionsTooltip.setTooltipContentLoaderFunction(getGiftOptionsTooltipContent);
+        //]]>
+    </script>
