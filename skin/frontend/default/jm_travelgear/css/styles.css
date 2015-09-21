@@ -728,7 +728,7 @@ tr.summary-details-excluded { font-style: italic; }
 .has-toggle { float: right; }
 
 
-.btn-toggle { color: #666; cursor: pointer; display: block; height: 30px; line-height: 30px; padding: 0 15px; position: relative; z-index: 10; }
+.btn-toggle { color: #666; cursor: pointer; display: block; height: 30px; line-height: 30px; padding: 0 10px; position: relative; z-index: 10; }
 
 .btn-toggle strong { font-weight: 300; }
 
@@ -754,10 +754,10 @@ tr.summary-details-excluded { font-style: italic; }
 
 .head { border-bottom: 1px solid #eaeaea; color: #727272; font-size: 12px; line-height: 30px; min-height: 30px; text-align: right; }
 
-.hotline { padding: 0 180px 0 0; }
+.hotline { padding: 0 216px 0 0; }
 
 .locate-fr .hotline,
-.locate-en .hotline { padding: 0 160px 0 0; }
+.locate-en .hotline { padding: 0 216px 0 0; }
 
 /*--- Logo*/
 #logo{ float: left; margin: 0; }
@@ -772,6 +772,8 @@ tr.summary-details-excluded { font-style: italic; }
 #jm-quickaccess { background: url('../images/hr-toogle.png') no-repeat left 50%; position: absolute; right: 0; top: 0; }
 
 #jm-setting { background: url('../images/hr-toogle.png') no-repeat left 50%; position: absolute; right: 78px; top: 0; }
+
+#jm-top-email { background: url('../images/hr-toogle.png') no-repeat left 50%; position: absolute; right: 78px; top: 0; width: 128px;}
 
 /*--- Search */
 #jm-search { background: #191919 url('../images/icon-search.png') no-repeat 50% 50%; border: none; height: 45px; padding: 0; position: absolute; right: 45px; top: 49px; width: 45px; }
@@ -3202,6 +3204,7 @@ tr.summary-details-excluded { font-style: italic; }
 .sale-off-items:hover:after,
 .sale-off-items:hover:before { height: 100%; width: 100%; }
 
+.mega-jmproducts { margin-top: 20px;}
 
 /* ======= */
 .home-jmproducts-list { float: left; width: 50%; }

@@ -3,10 +3,10 @@
  * Theme Name: JM Team
  * Theme URI: http://www.joomlart.com
  * Version: 1.0
- * Description: 
+ * Description:
  * Author: JM Team - Joomlart.com
  * Author URI: http://www.joomlart.com
- * 
+ *
  * Powered by Magento
  * Licensed under the Apache License v2.0
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -15,7 +15,9 @@
 ?>
 <div class="head">
 		<?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('position-01')->toHtml() ?>
+        <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('top-email')->toHtml() ?>
 		<!-- BEGIN: setting -->
+        <!--
 		<div id="jm-setting" class="quick-setting has-toggle">
 			<div class="btn-toggle setting-toggle">
 				<strong><?php echo $this->__('Settings') ?></strong>
@@ -26,7 +28,8 @@
 					<?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('colors')->toHtml() ?>
 			</div>
 		</div>
-		<!-- END: QUICK ACCESS -->
+        -->
+		<!-- END: Settings -->
 		<!-- BEGIN: QUICK ACCESS -->
 		<div id="jm-quickaccess" class="quick-access has-toggle">
 			<div class="btn-toggle quickaccess-toggle">
@@ -34,7 +37,7 @@
 			</div>
 			<div class="inner-toggle">
 				<div class="shop-access">
-					<?php 
+					<?php
 					if($this->getChildHtml('customer_account_navigation')):
 						echo $this->getChildHtml('customer_account_navigation');
 					endif;
@@ -81,13 +84,13 @@
 		<div id="jm-mainnav" class="has-toggle">
 			<div class="btn-toggle menu-toggle">
 				<strong><?php echo $this->__('Menu') ?></strong>
-			</div>				
+			</div>
 			<div class="inner-toggle" id="jm-mainnav-inner">
 				<?php echo $this->getChildHtml('topMenu') ?>
 			</div>
 		</div>
 		<!-- END: NAV -->
-		
+
 		<script type="text/javascript">
 		//<![CDATA[
 		function detectmob() {
@@ -103,13 +106,13 @@
 		    $(window).scroll(function(e){
 		       var currentScroll = $(this).scrollTop();
 		       if (currentScroll > previousScroll){
-		       	  $("#jm-header").removeClass("sticky-out").addClass("sticky"); 
-		       	  $("#jm-wrapper").removeClass("sticky-out").addClass("sticky"); 
+		       	  $("#jm-header").removeClass("sticky-out").addClass("sticky");
+		       	  $("#jm-wrapper").removeClass("sticky-out").addClass("sticky");
 		       } else if(previousScroll >= 20) {
 		       	  $("#jm-header").removeClass("sticky").addClass("sticky-out");
 		       	  $("#jm-wrapper").removeClass("sticky").addClass("sticky-out");
-		       } else if(previousScroll == 0) { 
-		       		$("#jm-header").removeClass("sticky-out").addClass("sticky-end"); 
+		       } else if(previousScroll == 0) {
+		       		$("#jm-header").removeClass("sticky-out").addClass("sticky-end");
 			       	$("#jm-wrapper").removeClass("sticky-out").addClass("sticky-end");
 		       }
 		       previousScroll = currentScroll;
@@ -178,7 +181,7 @@
 		            $(this).children().removeClass("active");
 		            $(this).removeClass("active");
 		            $("#jmoverlay").remove();
-		            
+
 		        });
 		    }
 
