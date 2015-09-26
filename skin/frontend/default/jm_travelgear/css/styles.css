@@ -763,7 +763,7 @@ tr.summary-details-excluded { font-style: italic; }
 #logo{ float: left; margin: 0; }
 
 #logo a{ background-position: top left; background-repeat: no-repeat; color: #666; display: block; font-size: 26px;
-    min-height: 100px; min-width: 180px; padding: 0; text-decoration: none; text-indent: -999em; text-transform: uppercase; }
+    margin-top: 15px; min-height: 60px; min-width: 180px; padding: 0; text-decoration: none; text-indent: -999em; text-transform: uppercase; }
 
 #flogo{ float: none; margin: 0 0 15px; }
 
