@@ -1,0 +1,4 @@
+.reservationCalendarDiv .shipMethods .additional-shipping, .reservationCalendarDiv .shipMethods .additional-zip,
+.reservationCalendarDiv .shipMethods .additional-shipping-methods{
+    margin: 5px 0;
+}

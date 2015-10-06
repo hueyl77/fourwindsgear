@@ -1,0 +1,209 @@
+/*!
+ * Theme Name: JM Team
+ * Theme URI: http://www.joomlart.com
+ * Version: 1.0
+ * Description: 
+ * Author: JM Team - Joomlart.com
+ * Author URI: http://www.joomlart.com
+ * 
+ * Powered by Magento
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+/* MAIN CONTAINER
+--------------------------------------------------------- */
+#jm-wrapper {
+  margin: auto;
+  max-width: 1024px;
+}
+
+#jm-header {
+  border-bottom: 1px solid #ebebeb;
+}
+
+.block.block-cart {
+  min-width: 260px;
+}
+
+.main {
+  text-align: left;
+  width: 1000px;
+}
+
+.jm-col2-right-layout #jm-main {
+  width: 78%;
+}
+
+#jm-mainnav {
+  margin: 18px 100px 18px 0;
+}
+
+/*slide*/
+.jm-slide-thumbs-wrap {
+	display: none !important;
+}
+
+.jm-slide-buttons span {
+  margin-top: 205px;
+}
+
+.jm-masshead {
+  background-size: 1500px 100%;
+  width: 1024px;
+}
+
+/*slider*/
+.jm-slider li {
+  width: 331px !important;
+}
+
+#jm-mass-top img {
+	width: 100%;
+}
+
+/*banner right*/
+.home-banner-right img {
+	width: 100%;
+}
+
+/*block lastnews*/
+.block-lastnews .news-photo {
+  width: 52%;
+}
+
+.from-category:visited, 
+.from-category {
+  margin: 17px 0 20px;
+}
+
+.block-lastnews .news-photo img { 
+	width: 100%;
+}
+
+
+/*boots 2*/
+#jm-bots2 li {
+  width: 166px;
+}
+
+#jm-bots2 li img{ 
+	width: 100%;
+}
+
+/*footer*/
+#jm-bots3 .block {
+  padding: 0 20px;
+  width: 12.6%;
+}
+
+.block-best-seller .jm-slider li {
+  width: 205px !important;
+}
+
+.block-best-seller .jm-slider li .inner {
+  padding: 20px 10px;
+}
+
+.products-list .product-shop {
+  width: 62%;
+}
+
+.products-list .actions {
+  border-left: 0 none;
+  border-top: 1px solid #ebebeb;
+  float: left;
+  padding: 20px 0 0;
+  margin: 20px 0 0 0;
+  width: 62%;
+}
+
+
+.product-img-box {
+  margin: 0 20px 0 0;
+  width: 320px;
+}
+
+.product-view .product-shop {
+  width: 430px;
+}
+
+.product-view .product-shop .add-to-links .out-of-stock, 
+.product-view .product-shop .add-to-links .link-compare, 
+.product-view .product-shop .add-to-links .link-wishlist {
+  padding: 0 0 0 45px;
+}
+
+.product-view .product-shop .add-to-links li {
+  margin: 0 8px 0 0;
+}
+
+
+.review-product-list .product-view .product-shop {
+  width: 660px;
+}
+
+.account-login .new-users, 
+.account-login .registered-users {
+  width: 49.4% !important;
+}
+
+.cart .crosssell .products-grid {
+  border: 2px solid #ebebeb;
+  padding: 0;
+}
+
+.products-grid li .inner .product-image img{
+  width: 100%;
+}
+
+.view-mode {
+  min-width: 100px;
+  padding: 0 10px;
+}
+.pages {
+  padding: 0 10px;
+}
+
+.select-box2 select {
+  padding: 5px;
+}
+
+.more-views ul {
+  width: 1000px !important;
+}
+
+.more-views li {
+  text-align: center;
+}
+
+.more-views li a img {
+  height: 100%;
+  width: auto;
+}
+
+.sales-order-view .link-print {
+  background: none repeat scroll 0 0 #fff;
+  float: right;
+  font-weight: bold;
+  padding: 0 0 0 10px;
+}
+.sales-order-view .page-title .separator {
+  background: none repeat scroll 0 0 #fff;
+  float: right;
+  margin: 0;
+  padding: 0 3px;
+}
+.sales-order-view .link-reorder {
+  background: none repeat scroll 0 0 #fff;
+  display: inline-block;
+  float: right;
+  font-weight: normal;
+}
+
+#multiship-addresses-table {
+  margin: 20px 0 0;
+}
+
+.mega-jmproducts .icon-label {
+  display: none;
+}

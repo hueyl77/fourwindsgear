@@ -1,0 +1,15 @@
+<div class="content-header">
+	<table cellspacing="0" class="grid-header">
+		<tr>
+			<td><h3><?php echo $this->__('Send Return Queue History Report')?></h3></td>
+		</tr>
+	</table>
+</div>
+<?php if(count(Mage::app()->getWebsites())): ?>
+    <?php echo $this->getChildHtml('store_switcher') ?>
+<?php endif; ?>
+<div id="sendreturnTable">
+	<?php
+	echo $this->getGridHtml();
+	?>
+</div>

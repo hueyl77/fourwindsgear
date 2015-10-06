@@ -1,0 +1,12 @@
+testId1:
+  min: 86400
+  max: 2419200
+testId2:
+  min: 259200
+  max: 2419200
+testId3:
+  min: 0
+  max: 0
+testId4:
+  min: 0
+  max: 0

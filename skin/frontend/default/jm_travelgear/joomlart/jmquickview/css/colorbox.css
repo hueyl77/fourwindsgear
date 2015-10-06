@@ -1,0 +1,304 @@
+/*!
+ * Theme Name: JM Team
+ * Theme URI: http://www.joomlart.com
+ * Version: 1.0
+ * Description: 
+ * Author: JM Team - Joomlart.com
+ * Author URI: http://www.joomlart.com
+ * 
+ * Powered by Magento
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+#colorbox, #cboxOverlay, #cboxWrapper{position:absolute; top:0; left:0; z-index:9999; overflow:hidden;}
+#cboxOverlay{position:fixed; width:100%; height:100%;}
+#cboxMiddleLeft, #cboxBottomLeft{clear:left;}
+#cboxContent{position:relative;}
+#cboxLoadedContent{overflow:hidden;}
+#cboxTitle{margin:0; display: none !important;}
+#cboxLoadingOverlay, #cboxLoadingGraphic{position:absolute; top:0; left:0; width:100%; height:100%; z-index: 10;}
+#cboxPrevious, #cboxNext, #cboxClose, #cboxSlideshow{cursor:pointer;}
+.cboxPhoto{float:left; margin:auto; border:0; display:block; max-width:none;}
+.cboxIframe{width:100%; height:100%; display:block; border:0;}
+#colorbox, #cboxContent, #cboxLoadedContent{box-sizing:content-box; -moz-box-sizing:content-box; -webkit-box-sizing:content-box;}
+
+/* 
+    User Style:
+    Change the following styles to modify the appearance of ColorBox.  They are
+    ordered & tabbed in a way that represents the nesting of the generated HTML.
+*/
+#cboxOverlay{background:#000; opacity: 0.8 !important;}
+#colorbox{}
+/*
+    #cboxTopLeft{width:25px; height:25px; background:url(../images/colorbox/border1.png) no-repeat 0 0;}
+    #cboxTopCenter{height:25px; background:url(../images/colorbox/border1.png) repeat-x 0 -50px;}
+    #cboxTopRight{width:25px; height:25px; background:url(../images/colorbox/border1.png) no-repeat -25px 0;}
+    #cboxBottomLeft{width:25px; height:25px; background:url(../images/colorbox/border1.png) no-repeat 0 -25px;}
+    #cboxBottomCenter{height:25px; background:url(../images/colorbox/border1.png) repeat-x 0 -75px;}
+    #cboxBottomRight{width:25px; height:25px; background:url(../images/colorbox/border1.png) no-repeat -25px -25px;}
+    #cboxMiddleLeft{width:25px; background:url(../images/colorbox/border2.png) repeat-y 0 0;}
+    #cboxMiddleRight{width:25px; background:url(../images/colorbox/border2.png) repeat-y -25px 0;}
+*/
+    #cboxContent{background:#555; overflow:hidden;}
+        .cboxIframe{background:#fff;}
+        #cboxError{padding:50px; border:1px solid #ccc;}
+        #cboxLoadedContent{background: #fff; padding-bottom:50px;}
+        #cboxTitle{position:absolute; top:0px; left:0; text-align:center; width:100%; color:#999;}
+        #cboxCurrent{position:absolute; bottom:25px; left:105px; color:#464646; font-size: 14px;}
+        #cboxSlideshow{position:absolute; top:0px; right:42px; color:#444;}
+        #cboxPrevious{position:absolute; bottom:20px; left:20px; color:#fff; height: 29px; width: 29px; background: url(../images/bg-pre.png) no-repeat top left; text-indent: -999px;}
+        #cboxNext{position:absolute; bottom:20px; left:63px; color:#fff; height: 29px; width: 29px; background: url(../images/bg-next.png) no-repeat top left; text-indent: -999px;}
+        #cboxLoadingOverlay{background:#fff url(../images/colorbox/loading.gif) no-repeat 5px 5px;}
+        #cboxClose{position:absolute; top:15px; right:20px; display:block; color:#444; text-transform:uppercase; background: url(../images/bg-close.png) no-repeat top left; width: 15px; height: 15px; text-indent: 999px;}
+
+/*
+  The following fixes a problem where IE7 and IE8 replace a PNG's alpha transparency with a black fill
+  when an alpha filter (opacity change) is set on the element or ancestor element.  This style is not applied to or needed in IE9.
+  See: http://jacklmoore.com/notes/ie-transparency-problems/
+*/
+.cboxIE #cboxTopLeft,
+.cboxIE #cboxTopCenter,
+.cboxIE #cboxTopRight,
+.cboxIE #cboxBottomLeft,
+.cboxIE #cboxBottomCenter,
+.cboxIE #cboxBottomRight,
+.cboxIE #cboxMiddleLeft,
+.cboxIE #cboxMiddleRight {
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#00FFFFFF,endColorstr=#00FFFFFF);
+}
+
+/*
+  The following provides PNG transparency support for IE6
+  Feel free to remove this and the /ie6/ directory if you have dropped IE6 support.
+*/
+.cboxIE6 #cboxTopLeft{background:url(../images/colorbox/ie6/borderTopLeft.png);}
+.cboxIE6 #cboxTopCenter{background:url(../images/colorbox/ie6/borderTopCenter.png);}
+.cboxIE6 #cboxTopRight{background:url(../images/colorbox/ie6/borderTopRight.png);}
+.cboxIE6 #cboxBottomLeft{background:url(../images/colorbox/ie6/borderBottomLeft.png);}
+.cboxIE6 #cboxBottomCenter{background:url(../images/colorbox/ie6/borderBottomCenter.png);}
+.cboxIE6 #cboxBottomRight{background:url(../images/colorbox/ie6/borderBottomRight.png);}
+.cboxIE6 #cboxMiddleLeft{background:url(../images/colorbox/ie6/borderMiddleLeft.png);}
+.cboxIE6 #cboxMiddleRight{background:url(../images/colorbox/ie6/borderMiddleRight.png);}
+
+.cboxIE6 #cboxTopLeft,
+.cboxIE6 #cboxTopCenter,
+.cboxIE6 #cboxTopRight,
+.cboxIE6 #cboxBottomLeft,
+.cboxIE6 #cboxBottomCenter,
+.cboxIE6 #cboxBottomRight,
+.cboxIE6 #cboxMiddleLeft,
+.cboxIE6 #cboxMiddleRight {
+    _behavior: expression(this.src = this.src ? this.src : this.currentStyle.backgroundImage.split('"')[1], this.style.background = "none", this.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src=" + this.src + ", sizingMethod='scale')");
+}
+
+#floatingBarsG{
+	position: fixed;
+	width:60px;
+	height:75px;
+	top:50%;
+	left:50%;
+	display:none;
+	z-index: 99999;
+}
+
+.blockG{
+position:absolute;
+background-color:#FFFFFF;
+width:10px;
+height:23px;
+-moz-border-radius:8px 8px 0 0;
+-moz-transform:scale(0.4);
+-moz-animation-name:fadeG;
+-moz-animation-duration:1.1199999999999999s;
+-moz-animation-iteration-count:infinite;
+-moz-animation-direction:linear;
+-webkit-border-radius:8px 8px 0 0;
+-webkit-transform:scale(0.4);
+-webkit-animation-name:fadeG;
+-webkit-animation-duration:1.1199999999999999s;
+-webkit-animation-iteration-count:infinite;
+-webkit-animation-direction:linear;
+-ms-border-radius:8px 8px 0 0;
+-ms-transform:scale(0.4);
+-ms-animation-name:fadeG;
+-ms-animation-duration:1.1199999999999999s;
+-ms-animation-iteration-count:infinite;
+-ms-animation-direction:linear;
+-o-border-radius:8px 8px 0 0;
+-o-transform:scale(0.4);
+-o-animation-name:fadeG;
+-o-animation-duration:1.1199999999999999s;
+-o-animation-iteration-count:infinite;
+-o-animation-direction:linear;
+border-radius:8px 8px 0 0;
+transform:scale(0.4);
+animation-name:fadeG;
+animation-duration:1.1199999999999999s;
+animation-iteration-count:infinite;
+animation-direction:linear;
+}
+
+#rotateG_01{
+left:0;
+top:27px;
+-moz-animation-delay:0.41999999999999993s;
+-moz-transform:rotate(-90deg);
+-webkit-animation-delay:0.41999999999999993s;
+-webkit-transform:rotate(-90deg);
+-ms-animation-delay:0.41999999999999993s;
+-ms-transform:rotate(-90deg);
+-o-animation-delay:0.41999999999999993s;
+-o-transform:rotate(-90deg);
+animation-delay:0.41999999999999993s;
+transform:rotate(-90deg);
+}
+
+#rotateG_02{
+left:8px;
+top:10px;
+-moz-animation-delay:0.5599999999999999s;
+-moz-transform:rotate(-45deg);
+-webkit-animation-delay:0.5599999999999999s;
+-webkit-transform:rotate(-45deg);
+-ms-animation-delay:0.5599999999999999s;
+-ms-transform:rotate(-45deg);
+-o-animation-delay:0.5599999999999999s;
+-o-transform:rotate(-45deg);
+animation-delay:0.5599999999999999s;
+transform:rotate(-45deg);
+}
+
+#rotateG_03{
+left:25px;
+top:3px;
+-moz-animation-delay:0.7s;
+-moz-transform:rotate(0deg);
+-webkit-animation-delay:0.7s;
+-webkit-transform:rotate(0deg);
+-ms-animation-delay:0.7s;
+-ms-transform:rotate(0deg);
+-o-animation-delay:0.7s;
+-o-transform:rotate(0deg);
+animation-delay:0.7s;
+transform:rotate(0deg);
+}
+
+#rotateG_04{
+right:8px;
+top:10px;
+-moz-animation-delay:0.8399999999999999s;
+-moz-transform:rotate(45deg);
+-webkit-animation-delay:0.8399999999999999s;
+-webkit-transform:rotate(45deg);
+-ms-animation-delay:0.8399999999999999s;
+-ms-transform:rotate(45deg);
+-o-animation-delay:0.8399999999999999s;
+-o-transform:rotate(45deg);
+animation-delay:0.8399999999999999s;
+transform:rotate(45deg);
+}
+
+#rotateG_05{
+right:0;
+top:27px;
+-moz-animation-delay:0.9799999999999999s;
+-moz-transform:rotate(90deg);
+-webkit-animation-delay:0.9799999999999999s;
+-webkit-transform:rotate(90deg);
+-ms-animation-delay:0.9799999999999999s;
+-ms-transform:rotate(90deg);
+-o-animation-delay:0.9799999999999999s;
+-o-transform:rotate(90deg);
+animation-delay:0.9799999999999999s;
+transform:rotate(90deg);
+}
+
+#rotateG_06{
+right:8px;
+bottom:7px;
+-moz-animation-delay:1.1199999999999999s;
+-moz-transform:rotate(135deg);
+-webkit-animation-delay:1.1199999999999999s;
+-webkit-transform:rotate(135deg);
+-ms-animation-delay:1.1199999999999999s;
+-ms-transform:rotate(135deg);
+-o-animation-delay:1.1199999999999999s;
+-o-transform:rotate(135deg);
+animation-delay:1.1199999999999999s;
+transform:rotate(135deg);
+}
+
+#rotateG_07{
+bottom:0;
+left:25px;
+-moz-animation-delay:1.26s;
+-moz-transform:rotate(180deg);
+-webkit-animation-delay:1.26s;
+-webkit-transform:rotate(180deg);
+-ms-animation-delay:1.26s;
+-ms-transform:rotate(180deg);
+-o-animation-delay:1.26s;
+-o-transform:rotate(180deg);
+animation-delay:1.26s;
+transform:rotate(180deg);
+}
+
+#rotateG_08{
+left:8px;
+bottom:7px;
+-moz-animation-delay:1.4s;
+-moz-transform:rotate(-135deg);
+-webkit-animation-delay:1.4s;
+-webkit-transform:rotate(-135deg);
+-ms-animation-delay:1.4s;
+-ms-transform:rotate(-135deg);
+-o-animation-delay:1.4s;
+-o-transform:rotate(-135deg);
+animation-delay:1.4s;
+transform:rotate(-135deg);
+}
+
+@-moz-keyframes fadeG{
+0%{
+background-color:#000000}
+
+100%{
+background-color:#FFFFFF}
+
+}
+
+@-webkit-keyframes fadeG{
+0%{
+background-color:#000000}
+
+100%{
+background-color:#FFFFFF}
+
+}
+
+@-ms-keyframes fadeG{
+0%{
+background-color:#000000}
+
+100%{
+background-color:#FFFFFF}
+
+}
+
+@-o-keyframes fadeG{
+0%{
+background-color:#000000}
+
+100%{
+background-color:#FFFFFF}
+
+}
+
+@keyframes fadeG{
+0%{
+background-color:#000000}
+
+100%{
+background-color:#FFFFFF}
+
+} 

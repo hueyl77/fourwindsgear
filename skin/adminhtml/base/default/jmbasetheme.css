@@ -1,0 +1,79 @@
+/* CSS Document */
+.row_wavethemes_jmbasetheme_wavethemes_jmbasetheme_title {
+    background-color: #dfdfdf;
+    font-weight: bold;
+}
+.columns .form-list td.value {
+    width: 400px;
+}
+#row_wavethemes_jmbasetheme_jmbasethemegeneral_profilejson button {
+    margin-right: 10px;
+}
+
+.form-list td.label label {
+    width: 285px;
+}
+
+.form-list .delete-image input.checkbox {
+    cursor: pointer;
+}
+#basetheme-process-bar {
+    display: inline-block;
+    height: 16px;
+    position: relative;
+    width: 16px;
+}
+.loading {
+    background: url('images/ajax-loading.gif') no-repeat scroll right top;
+}
+/*For message box*/
+#popup_container {
+    font-family: 'Lucida Grande', arial;
+    font-weight: bold;
+    text-align: left;
+    font-size: 12px;
+    width: 350px;
+    height: 158px;
+    background: #F3F3F3;
+    border: solid 0px #dedede;
+    /*border-bottom: solid 2px #d6d6d6;*/
+    border: none;
+    color: #000;
+}
+#popup_title {
+    background: none repeat scroll 0 0 #6f8992;
+    display: block;
+    font-size: 14px;
+    padding: 5px 10px;
+    color: #fff;
+}
+#popup_content {
+    height: 120px;
+}
+#popup_message {
+    height: 90px;
+    padding: 0 10px;
+}
+#popup_panel {
+    background: none repeat scroll 0 0 #d6d6d6;
+    padding: 0 10px;
+    text-align: center;
+}
+#popup_container #popup_panel input {
+    background-color: #6f8992;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    margin: 5px 10px 5px;
+    padding: 3px;
+    border: none;
+}
+#popup_container #popup_panel input:hover {
+    opacity: 0.7;
+}
+#popup_container #popup_message #popup_prompt {
+    padding: 3px;
+}
+#popup_container #popup_message span.profile-name{color: red;}
+

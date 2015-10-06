@@ -1,0 +1,16 @@
+testId1:
+  date1: true
+  date2: false
+  date3: false
+testId2:
+  date1: true
+  date2: false
+  date3: true
+testId3:
+  date1: true
+  date2: false
+  date3: true
+testId4:
+  date1: true
+  date2: true
+  date3: true

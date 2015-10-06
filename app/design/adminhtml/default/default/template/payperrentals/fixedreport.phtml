@@ -1,0 +1,30 @@
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?php echo $this->__('Reservations by Start & End Date')?></h3></td>
+        </tr>
+    </table>
+</div>
+<?php if(count(Mage::app()->getWebsites())): ?>
+    <?php echo $this->getChildHtml('store_switcher') ?>
+<?php endif; ?>
+<?php $_fixedDatesNames = Mage::getResourceModel('payperrentals/fixedrentalnames_collection'); ?>
+<table>
+    <tr>
+        <td class="label"><?php echo  $this->__('Search by Fixed Rental') ?></td>
+        <td class="input-ele">
+            <select class="select-box fixedDate" name="fixeddate_id">
+                <option value="0"><?php echo $this->__('Please Select Fixed Date Event') ?></option>
+                <?php foreach ($_fixedDatesNames as $_fixedNames): ?>
+                    <option value="<?php echo $_fixedNames->getId() ?>"<?php if(isset($_params['fixedDate']) && $_params['fixedDate'] == $_fixedNames->getId()): ?> selected<?php endif; ?>><?php echo $_fixedNames->getName() ?></option>
+                <?php endforeach; ?>
+            </select>
+        </td>
+    </tr>
+</table>
+
+<div id="fixedTable">
+    <?php
+    echo $this->getGridHtml();
+    ?>
+</div>

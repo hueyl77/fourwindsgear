@@ -1,0 +1,162 @@
+<?php
+    $baseconfig =  Mage::helper("jmbasetheme")->getactiveprofile();
+    if ($baseconfig) : 
+      $showlabel = $baseconfig["showlabel"];
+	  else :
+      $showlabel = 0;
+	  endif;
+
+
+$divid = 'jm-contain-'.rand().rand().time();
+$classid = 'jm-products-slider-content'.rand().rand().time();
+$_collectionSize = 0;
+if($listall) $_collectionSize = $listall->count() ;
+if($configs['autorun']){
+	$configs['autorun'] = $configs['delaytime'];
+}
+
+
+?>
+
+<?php if($_collectionSize){?>
+
+
+<?php if(!defined('JM_ADD_SKIN_PRODUCTS_SILDER')){?>
+
+<?php if ($configs['use_scrollerbar']){ ?>
+<script type="text/javascript" src="<?php echo $this->getSkinUrl('joomlart/jmproductsslider/js/jquery.customScroller-1.2.js') ?>"></script>
+<script type="text/javascript" src="<?php echo $this->getSkinUrl('joomlart/jmproductsslider/js/jquery.mousewheel.js') ?>"></script>
+<script type="text/javascript" src="<?php echo $this->getSkinUrl('joomlart/jmproductsslider/js/jquery.wresize.js') ?>"></script>
+<?php }else{ ?>
+<script type="text/javascript" src="<?php echo $this->getSkinUrl('joomlart/jmproductsslider/js/jcarousellite_1.0.1_custom.js') ?>"></script>
+<?php } ?>
+
+<?php  define('JM_ADD_SKIN_PRODUCTS_SILDER', true); ?>
+<?php }?>
+
+<script type="text/javascript">
+	jQuery.noConflict();
+<?php if ($configs['use_scrollerbar']){ ?>
+	jQuery(window).bind("load", function(){
+		jQuery(".<?php echo $classid; ?>").customScroller({width: <?php echo ($configs['itemwidth'])*($configs['number_items']);?>, height: <?php echo ($configs['itemheight']);?>});
+	});
+<?php }else{ ?>
+	jQuery(document).ready(function($){
+
+	    $("#<?php echo $divid?>").jCarouselLite({
+			auto: <?php echo $configs['autorun']?>,
+			speed: <?php echo $configs['animationtime']?>,
+			visible: <?php echo $configs['number_items']?>,
+			btnNext: "#jmmainwrap-<?php echo $divid?> .jm-next",
+			btnPrev: "#jmmainwrap-<?php echo $divid?> .jm-prev",
+			width: <?php echo $configs['number_items']*($configs['width']+10); ?>,
+			width_img: <?php echo $configs['width']; ?>,
+			afterEnd: function(a) {
+				if($().jmquickview){
+					a.jmquickview();
+				}
+	     	}
+		});
+	});
+	
+<?php } ?>	
+</script>
+<?php }?>
+
+<div class="block jm-products-slider-listing" id="jmmainwrap-<?php echo $divid?>">
+	<?php if(isset($configs['title']) && $configs['title']!=''){?>
+	<div class="block-title"><strong><span><?php echo $configs['title']?> </span></strong>
+		<?php if (!$configs['use_scrollerbar']){ ?>
+		<div class="jm-prev"></div>
+		<div class="jm-next"></div>
+		<?php }?>
+	</div>
+	<?php }?>	
+
+	<?php if($_collectionSize){?>
+	
+		  <div class="jm-products-slider-content clearfix block-content <?php echo $classid; ?>" > 
+		  
+		  	
+		    	<div id="<?php echo $divid?>" class="jm-slider" style="overflow: hidden; width: <?php echo $_collectionSize*($configs['itemwidth']);?>px; float: left; left: 0 !important;">		    		    	
+		      	<ul class="jm-slider-ul">
+		      		<?php
+		      			foreach ($listall->getItems() as $_product){
+		      			$product = Mage::getModel('catalog/product')->load($_product->getId());
+								$attribute = $product->getResource()->getAttribute('label');
+								if(is_object($attribute)){
+								 
+								    $_options= $attribute->getSource()->getAllOptions(true, true);
+									foreach($_options as $option){
+										  if ($option['value'] == $product->getData("label")){
+											$class =  $option['label'];
+										  }
+									 }		   
+									 $attdefaultvalue = $attribute->getDefaultValue();
+									 $attributeValue = Mage::getModel('catalog/product')->load($_product->getId())->getlabel();
+									 $attributeValueName = Mage::getModel('catalog/product')->load($_product->getId())->getAttributeText('label');
+										 if(strlen($attributeValue) &&  ($attdefaultvalue !== $attributeValue)) { 
+											 $labeltype = $class;   
+											 $labelname = $attributeValueName;     
+											 } 
+											 else {
+											 $labeltype = "";
+									 } 
+								}
+								// //Optimize image
+								// $img_file = $this->helper('catalog/image')->init($_product, 'thumbnail')->keepAspectRatio(TRUE)->resize($configs['width'], $configs['height'])->setWatermarkSize('30x10');
+								// // Read image path, convert to base64 encoding
+								// $imgData = file_get_contents($img_file);
+								// // Format the image SRC:  data:{mime};base64,{data};
+								// $src = 'data:image/' . $type . ';base64,' . base64_encode($imgData);
+		      		?>
+	      			<li class="jm-slider-li" style="float: left;width:<?php echo $configs['itemwidth']; ?>px;height:<?php echo $configs['itemheight']; ?>px">
+								<div class="inner">
+									<a class="product-image" title="<?php echo $this->htmlEscape($_product->getName()) ?>" href="<?php echo $_product->getProductUrl() ?>">
+										<img src="<?php echo $this->helper('catalog/image')->init($_product, 'thumbnail')->keepAspectRatio(TRUE)->resize($configs['width'], $configs['height'])->setWatermarkSize('30x10'); ?>" alt="<?php echo $this->htmlEscape($_product->getName()) ?>"/> 
+										<?php if ($labeltype && $showlabel): ?>
+											<span class="icon-label <?php echo $labeltype; ?>-label"><?php echo $labelname;	?></span>		
+										<?php endif; ?>
+										<?php if($configs['show_cart']){ ?>
+											<?php if($_product->isSaleable()): ?>
+												<span class="outer-addtocart">
+													<button type="button" title="<?php echo $this->__('Add to Cart') ?>" class="button btn-cart" onclick="setLocation('<?php echo $this->getAddToCartUrl($_product) ?>')"><span><span><i class="fa fa-shopping-cart"></i><?php echo $this->__('Add to Cart') ?></span></span></button>
+												</span>
+											<?php else: ?>
+												<p class="availability out-of-stock"><span><?php echo $this->__('Out of stock') ?></span></p>
+											<?php endif; ?>
+										<?php } ?>
+									</a>
+									<a class="product-name" title="<?php echo $this->htmlEscape($_product->getName()) ?>" href="<?php echo $_product->getProductUrl() ?>">
+										<?php echo $_product->getName() ?>
+									</a>
+									<?php if(($configs['show_desc']) && ($configs['max'])):?>
+										<div class="jm-slider-desc">
+											<?php echo substr($_product->getShortDescription(),0, ($configs['max']));?>
+										</div>                                  
+									<?php endif;?>
+									<?php if($configs['show_readmore']){ 
+										echo '<a class="read-more" href="'.$_product->getProductUrl().'">Details</a>';
+									}?>
+
+									<?php if ($configs['show_price']) : ?>
+										<?php echo $this->getPriceHtml($_product,true, '_jmslider') ?>
+									<?php endif; ?>
+									<?php echo $this->getReviewsSummaryHtml($_product, true, true)?>
+									<div class="actions">
+										<?php if ($this->helper('wishlist')->isAllow()) : ?>
+												<button class="button btn-wishlist" onclick="setLocation('<?php echo $this->helper('wishlist')->getAddUrl($_product) ?>')" title="<?php echo $this->__('Add to Wishlist') ?>">&nbsp;</button>
+										<?php endif; ?>
+										<?php if($_compareUrl=$this->getAddToCompareUrl($_product)): ?>
+												<button class="button btn-compare" onclick="setLocation('<?php echo $_compareUrl ?>')" title="<?php echo $this->__('Add to Compare') ?>">&nbsp;</button>
+										<?php endif; ?>
+										
+									</div>
+								</div>
+	      			</li> 
+							<?php } ?> 
+		      	</ul>
+		    	</div>
+		   </div>
+	<?php } ?>
+</div>

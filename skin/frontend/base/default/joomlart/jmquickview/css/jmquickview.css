@@ -1,0 +1,108 @@
+/* CSS Document */
+#cart-quickview-mess .message{
+    text-transform: none;
+}
+#cart-quickview-mess .success{
+    color: green;
+}
+#cart-quickview-mess .error{
+    color: red;
+}
+#cart-quickview-mess .warning{
+    color: #ffff00;
+}
+.products-grid .actions{position: relative !important;}
+a.button.jmquickview{
+    margin: 10px 0;
+    width: 120px;
+    display: block;
+}
+.cart-return-buttons {
+    display: block;
+    text-align: center;
+    margin: 10px 0px;
+}
+
+/*Top cart side bar - Jm my cart*/
+#jm-mycart > .active{display: block !important;}
+#jm-mycart > .jm-mycart-loading{
+    display:none; background:url("../images/loading.GIF") no-repeat scroll right center rgba(0, 0, 0, 0);
+    position: relative;
+    right: 10px;
+    top: 65px;
+}
+#jm-mycart {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    z-index: 999;
+}
+#jm-mycart > .block-title{border: none;cursor: pointer;text-align: right;}
+#jm-mycart > .block-title span{text-transform: none;}
+#jm-mycart > .block-content.inner-toggle{display: none;background: #d6d6d6;padding: 10px;}
+#jm-mycart .summary .subtotal {background: #ccc;margin: 5px 0px;}
+#jm-mycart .summary .subtotal .label{color: #444;}
+#jm-mycart .actions{text-align: right;}
+
+#jmoverlay {
+  background: none repeat scroll 0 0 transparent;
+  height: 100% !important;
+  left: 0;
+  min-height: 100% !important;
+  position: fixed !important;
+  top: 0;
+  width: 100% !important;
+  z-index: 3;
+  zoom: 1;
+  background-color: #000;
+  opacity: 0.05;
+  filter: alpha(opacity=5);
+}
+.cart-collaterals .totals {
+  width: 100% !important;
+}
+/*ColorBox custom css*/
+.colorbox-jmquickview .product-shop .email-friend, .colorbox-jmquickview .product-shop .no-rating{
+    display: block;
+    float: left;
+    width: 100%;
+}
+.colorbox-jmquickview .product-shop .add-to-box{
+    display: block;
+    float: left;
+    width: 100%;
+}
+
+/*Colorbox custom*/
+.colorbox-jmquickview #cboxContent{background: transparent;}
+.colorbox-jmquickview #cboxLoadedContent{background: #fff;}
+.colorbox-jmquickview #cboxTitle{background: #fff;}
+.colorbox-jmquickview .product-view .more-views ul li{display: inline-block;float: left;}
+.colorbox-jmquickview #cboxLoadingOverlay, .colorbox-jmquickview #cboxLoadingGraphic {
+    background: url("../images/quickview_loading.gif") no-repeat scroll 50% 50% rgba(0, 0, 0, 0);
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+.colorbox-jmquickview #cboxClose {
+    background: url("../images/btn-quickview-inner.png") no-repeat scroll 0 0 #d90036;
+    border: 0 none;
+    border-radius: 35px;
+    color: #444444;
+    display: block;
+    height: 35px;
+    position: absolute;
+    right: 0px;
+    text-indent: -99999em;
+    text-transform: uppercase;
+    top: 0px;
+    width: 35px;
+}
+#cboxOverlay.colorbox-jmquickview {
+    background: none repeat scroll 0 0 #000;
+    opacity: 0.7 !important;
+}
+
+

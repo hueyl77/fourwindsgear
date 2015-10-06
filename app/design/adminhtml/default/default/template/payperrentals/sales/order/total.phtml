@@ -1,0 +1,19 @@
+<?php $this->setPriceDataObject($this->getSource()) ?>
+<?php if ((float)$this->getSource()->getBaseDamageWaiverAmount()): ?>
+    <tr>
+        <td class="label"><?php echo Mage::helper('payperrentals')->__('Damage Waiver'); ?></td>
+        <td>
+            <?php echo $this->displayPrices($this->getSource()->getBaseDamageWaiverAmount(), $this->getSource()->getDamageWaiverAmount()); ?>
+        </td>
+    </tr>
+<?php endif; ?>
+<?php $depositTitle = Mage::helper('payperrentals')->__('Deposit'); ?>
+
+<?php if ((float)$this->getSource()->getDepositpprAmount()): ?>
+    <tr>
+        <td class="label"><?php echo $depositTitle; ?></td>
+        <td>
+            <?php echo $this->displayPrices($this->getSource()->getBaseDepositpprAmount(), $this->getSource()->getDepositpprAmount()); ?>
+        </td>
+    </tr>
+<?php endif; ?>

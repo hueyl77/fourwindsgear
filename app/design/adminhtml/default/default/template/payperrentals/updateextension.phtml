@@ -1,0 +1,125 @@
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?php echo $this->__('Starting Updating Extension Please Wait ...')?></h3></td>
+        </tr>
+    </table>
+</div>
+<?php
+
+/*
+ *
+ * Updating very old version of magento
+ * Mostly not needed
+ *
+
+$salesModel = Mage::getModel("sales/order");
+$salesCollection = $salesModel->getCollection()
+->addFieldToFilter('start_datetime', array(
+        'null' => true,
+    ));
+
+foreach($salesCollection as $order){
+    $orderId = $order->getId();
+    $order = Mage::getModel('sales/order')->load($orderId);
+    $items = $order->getItemsCollection();
+    $startDate = null;
+    $endDate = null;
+
+    foreach ($items as $item) {
+        $Product = Mage::getModel('catalog/product')->load($item->getProductId());
+        if ($Product->getTypeId() != ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE && $Product->getTypeId() != ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE_CONFIGURABLE) {
+            continue;
+        }
+
+        $data1 = $item->getProductOptionByCode('info_buyRequest');
+        if($data1[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION] != ''){
+            $startDate = date('Y-m-d H:i:s', strtotime($data1[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION]));
+            $endDate = date('Y-m-d H:i:s', strtotime($data1[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::END_DATE_OPTION]));
+        }
+        break;
+    }
+
+    $write = Mage::getSingleton('core/resource')->getConnection('core_write');
+    $write->query("update ".Mage::getSingleton('core/resource')->getTableName('sales/order')." set start_datetime=? where entity_id=?", array($startDate, $order->getId()));
+    $write->query("update ".Mage::getSingleton('core/resource')->getTableName('sales/order')." set end_datetime=? where entity_id=?", array($endDate, $order->getId()));
+}
+/*End of update very old version*/
+
+/*start update turnovers --not checking the case if there are no turnovers, normally they should be setup*/
+$reservationOrdersModel = Mage::getModel("payperrentals/reservationorders");
+$reservationOrdersCollection = $reservationOrdersModel->getCollection();
+$write = Mage::getSingleton('core/resource')->getConnection('core_write');
+foreach($reservationOrdersCollection as $resObj) {
+    $orderItem = Mage::getModel('sales/order_item')->load($resObj->getOrderItemId());
+    $options = $orderItem->getProductOptions();
+    if(isset($options['info_buyRequest'])) {
+        $turnoverAr = ITwebexperts_Payperrentals_Helper_Data::getTurnoverFromQuoteItemOrBuyRequest($resObj->getProductId(), $options['info_buyRequest'], $resObj->getStartDate(), $resObj->getEndDate());
+        $write->query("update " . Mage::getSingleton('core/resource')->getTableName('payperrentals/reservationorders') . " set start_turnover_before=? where id=?", array($turnoverAr['before'], $resObj->getId()));
+        $write->query("update " . Mage::getSingleton('core/resource')->getTableName('payperrentals/reservationorders') . " set end_turnover_after=? where id=?", array($turnoverAr['after'], $resObj->getId()));
+    }
+}
+/*end update turnovers*/
+
+/*start update inventory*/
+$productModel = Mage::getModel("catalog/product");
+$productCollection = $productModel->getCollection()
+    /* ->addAttributeToFilter(array(
+             array('attribute'=>'inventory_serialized','eq' => 'not_updated'),
+             array('attribute'=>'inventory_serialized','null' => true),
+         ))*/;
+
+foreach($productCollection as $productObj) {
+    $iProduct = $productObj->getId();
+    $inventorySerialized = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($iProduct, 'inventory_serialized');
+    //if(!$inventorySerialized) {
+    ITwebexperts_Payperrentals_Helper_Inventory::updateInventory($iProduct);
+    //}
+}
+/*end update inventory*/
+
+/*
+ * remove reservations for deleted orders
+ */
+$joinConditionAr = array(
+    'main_table.order_id = sfo.entity_id',
+);
+$reservationOrdersModel = Mage::getModel("payperrentals/reservationorders");
+$reservationOrdersCollection = $reservationOrdersModel->getCollection();
+$reservationOrdersCollection->getSelect()
+    ->joinLeft(
+        array('sfo' => $reservationOrdersCollection->getTable('sales/order')),
+        implode(' AND ', $joinConditionAr),
+        array(
+        ))
+    ->where('sfo.entity_id is null AND main_table.order_id <> 0');
+
+if(count($reservationOrdersCollection)) {
+    $write = Mage::getSingleton('core/resource')->getConnection('core_write');
+    echo 'Deleted Orders with reservations: ';
+    foreach ($reservationOrdersCollection as $reservationItem) {
+        echo $reservationItem->getOrderId() . '   ';
+        //$write->query("DELETE FROM `".Mage::getSingleton('core/resource')->getTableName('payperrentals/reservationorders')."` WHERE `order_id`=".$reservationItem->getOrderId());
+    }
+}
+
+/*update sendreturn with resorder_id*/
+$reservationOrdersModel1 = Mage::getModel("payperrentals/reservationorders");
+$reservationOrdersCollection1 = $reservationOrdersModel1->getCollection()
+    ->addFieldToFilter('sendreturn_id > 0');
+foreach($reservationOrdersCollection1 as $resObj) {
+    $write->query("update " . Mage::getSingleton('core/resource')->getTableName('payperrentals/sendreturn') . " set resorder_id=? where id=?", array($resObj->getId(), $resObj->getSendreturnId()));
+}
+
+$write->query("update " . Mage::getSingleton('core/resource')->getTableName('payperrentals/reservationorders') . " set sendreturn_id=?", array(0));
+
+/*end updatesendreturn*/
+?>
+
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?php echo $this->__('Extension Update Has Been Completed!!')?></h3></td>
+        </tr>
+    </table>
+</div>

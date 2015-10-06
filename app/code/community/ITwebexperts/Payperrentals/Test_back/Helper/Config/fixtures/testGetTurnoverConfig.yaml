@@ -1,0 +1,90 @@
+eav:
+  catalog_category:
+    - entity_id: 2
+      entity_type_id: 3
+      attribute_set_id: 3
+      parent_id: 1
+      level: 1
+      path: 1/2
+      name: Reservation
+      url_key: reservation
+      display_mode: PRODUCTS
+      url_path: reservation.html
+      is_active: 1
+      include_in_menu: 1
+      path_ids:
+        - 1
+          2
+  catalog_product:
+    - entity_id: 1
+      type_id: reservation
+      sku: day_rental_2
+      name: Product Daily Rental
+      short_description: Test
+      description: test
+      url_key: day-rental
+      tax_class_id: 1 # Taxable Goods
+      status: 1 # Enabled
+      visibility: 4 # Visible in Catalog & Search
+      weight: 1
+      is_reservation: 1 # Reservation
+      payperrentals_quantity: 1
+      payperrentals_pricingtype: 2 # Non-prorated
+      payperrentals_use_times: 1 # Enabled
+      show_time_grid: 1 # Enabled
+      use_global_exclude_dates: 1 # Global Config
+      global_turnover_after: 1 # Used Global
+      global_turnover_before: 1 # Used Product
+      payperrentals_avail_number: 0
+      payperrentals_avail_type: 2 # Hours
+      payperrentals_avail_numberb: 3
+      payperrentals_avail_typeb: 4 # Weeks
+      store_id: 1
+      website_ids:
+        - 1
+      category_ids:
+        - 2 # Default Category
+      stock:
+        qty: 1
+        min_qty: 0
+        is_in_stock: 1
+    - entity_id: 2
+      type_id: reservation
+      sku: day_rental_2
+      name: Product Daily Rental
+      short_description: Test
+      description: test
+      url_key: day-rental-2
+      tax_class_id: 1 # Taxable Goods
+      status: 1 # Enabled
+      visibility: 4 # Visible in Catalog & Search
+      weight: 1
+      is_reservation: 1 # Reservation
+      payperrentals_quantity: 1
+      payperrentals_pricingtype: 2 # Non-prorated
+      payperrentals_use_times: 1 # Enabled
+      show_time_grid: 1 # Enabled
+      use_global_exclude_dates: 0 # Product Config
+      global_turnover_after: 0 # Used Product
+      global_turnover_before: 0 # Used Product
+      payperrentals_avail_number: 0
+      payperrentals_avail_type: 2 # Hours
+      payperrentals_avail_numberb: 3
+      payperrentals_avail_typeb: 4 # Weeks
+      store_id: 1
+      website_ids:
+        - 1
+      category_ids:
+        - 2 # Default Category
+      stock:
+        qty: 1
+        min_qty: 0
+        is_in_stock: 1
+
+config:
+  default/payperrentals/appearance_turnover/turnover_after_number: 1
+  default/payperrentals/appearance_turnover/turnover_after_type: 4 # Weeks
+  default/payperrentals/appearance_turnover/turnover_before_number: 3
+  default/payperrentals/appearance_turnover/turnover_before_type: 3 # Days
+  default/dev/template/allow_symlink: 1
+  default/dev/log/active: 1

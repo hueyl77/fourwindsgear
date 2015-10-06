@@ -1,0 +1,8 @@
+testId1:
+  contain: ["2013-12-24", "2013-12-25"]
+  not_contain: ["2013-12-22", "2013-12-23"]
+  is_not_found: false
+testId2:
+  contain: ["2013-12-18", "2013-12-19"]
+  not_contain: ["2013-12-24", "2013-12-25"]
+  is_not_found: false

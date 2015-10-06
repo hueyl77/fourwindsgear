@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+
+<config>
+    <tabs>
+        <sales_igniter_tab translate="label">
+            <label><![CDATA[<div style="position: absolute;"><img id="si_block" src="" alt="" border="0" /></div>&nbsp;<script>
+            var n = SKIN_URL.indexOf("adminhtml");
+            $('si_block').src = SKIN_URL.substring(0, n) + "adminhtml/default/default/images/sales_igniter/si_system_logo.png";
+            </script>]]></label>
+            <sort_order>280</sort_order>
+        </sales_igniter_tab>
+    </tabs>
+    <sections>
+        <payperrentals translate="label" module="rshipping">
+            <label><![CDATA[Rentals]]></label>
+            <tab>sales_igniter_tab</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>100</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <rshipping_general>
+                    <label><![CDATA[Reservation Shipping Methods]]></label>
+                    <sort_order>130</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enabled translate="label">
+                            <label><![CDATA[Reservation Shipping]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+                        <allow_custom_price translate="label">
+                            <label><![CDATA[Allow Custom Shipping Price]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allow_custom_price>
+                        <product_page_shipping_methods translate="label">
+                            <label><![CDATA[Customer Can Chose Shipping Method on Product Page Global Configuration]]></label>
+                            <tooltip><![CDATA[Select "Yes" if you want use this config for all products instead product configuration.]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </product_page_shipping_methods>
+                        <allow_all_methods translate="label">
+                            <label><![CDATA[Allow all Methods for Products]]></label>
+                            <tooltip><![CDATA[Allowed shipping methods global configuration. Select "Yes" if you want allow all shipping methods instead product configuration.]]></tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </allow_all_methods>
+                    </fields>
+                </rshipping_general>
+                <rshipping_ups translate="label">
+                    <label><![CDATA[Shipping Live Transit API]]></label>
+                    <sort_order>140</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enabled translate="label">
+                            <label><![CDATA[Enable]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+                        <ups_mode translate="label">
+                            <label><![CDATA[API Mode]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>rshipping/ups_mode</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </ups_mode>
+                        <store_post_code translate="label">
+                            <label><![CDATA[Store Zip Code]]></label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </store_post_code>
+                        <ups_access_token translate="label">
+                            <label><![CDATA[Access Key]]></label>
+                            <frontend_type>password</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </ups_access_token>
+                        <ups_username translate="label">
+                            <label><![CDATA[UPS Username]]></label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </ups_username>
+                        <ups_password translate="label">
+                            <label><![CDATA[UPS Password]]></label>
+                            <frontend_type>password</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </ups_password>
+                    </fields>
+                </rshipping_ups>
+            </groups>
+        </payperrentals>
+    </sections>
+</config>

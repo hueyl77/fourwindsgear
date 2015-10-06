@@ -1,0 +1,25 @@
+# used in test like $this->expected($expectation)->getPrice();
+p1:
+  price: 1
+p2:
+  price: 1
+p3:
+  price: 2
+p4:
+  price: 5
+p5:
+  price: 5
+p6:
+  price: 6
+p7:
+  price: 1
+p8:
+  price: 1
+p9:
+  price: 2
+p10:
+  price: 5
+p11:
+  price: 5
+p12:
+  price: 5.71

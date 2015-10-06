@@ -1,0 +1,80 @@
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js'; ?>"></script>
+<script src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/jquery/jquery-ui.min.js'; ?>"></script>
+<link rel="stylesheet" href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/jquery/jquery-ui.min.css'; ?>" type="text/css" media="all" />
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/touchpunch/jquery.ui.touch-punch.js'; ?>"></script>
+<script type="text/javascript">
+    $jppr = jQuery.noConflict();
+</script>
+
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?php echo $this->__('Rental Queue')?></h3></td>
+        </tr>
+    </table>
+</div>
+
+<?php
+echo $this->getRentalQueue();
+?>
+
+<?php
+if(ITwebexperts_Payperrentals_Helper_Data::isDeliveryDatesInstalled()) {
+    echo $this->getChildHtml('calendar');
+}
+?>
+
+<div class="box-account box-sentitems">
+    <div class="box-head">
+        <h2><?php echo $this->__('Sent Items')?></h2>
+    </div>
+    <?php
+    echo $this->getSentItems();
+    ?>
+</div>
+
+
+
+<script type="text/javascript">
+    decorateTable('sentItemsTable');
+    $jppr(document).ready(function() {
+
+        $jppr( "#sortable" ).sortable({
+                update: function(event, ui) {
+                    $jppr.ajax({
+                        cache: false,
+                        dataType: 'json',
+                        type: 'post',
+                        url: '<?php echo Mage::getUrl("payperrentals_front/ajax/updateSortable/")?>',
+                        data: $jppr('#sortable').sortable('serialize'),
+                        success: function (data) {
+                        }
+                    });
+                }
+            }
+        );
+        $jppr( "#sortable" ).disableSelection();
+
+        $jppr('.remove').click(function(){
+            $jppr(this).parent().remove();
+            $jppr.ajax({
+                cache: false,
+                dataType: 'json',
+                type: 'post',
+                url: '<?php echo Mage::getUrl("payperrentals_front/ajax/updateSortable/")?>',
+                data: $jppr('#sortable').sortable('serialize'),
+                success: function (data) {
+                }
+            });
+        });
+        $jppr('.remove').css('cursor','pointer');
+
+    });
+
+</script>
+<style type="text/css">
+    #sortable { list-style-type: none; margin: 0; padding: 0; width: 80%; }
+    #sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 12px; cursor:crosshair;line-height: 1em; }
+    .box-sentitems{margin-top:20px;}
+
+</style>

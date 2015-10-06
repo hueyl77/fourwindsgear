@@ -1,0 +1,55 @@
+<div class="entry-edit">
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Rental Shipping Methods'); ?></h4>
+    </div>
+    <div id="" class="fieldset ">
+        <table cellspacing="0" class="form-list">
+            <tbody>
+            <tr>
+                <?php $_attributeModel = Mage::getModel('eav/entity_attribute')->loadByCode(Mage_Catalog_Model_Product::ENTITY, 'allow_shipping'); ?>
+                <td class="label"><label for="name"><?php echo $_attributeModel->getFrontendLabel(); ?></label></td>
+                <td class="value">
+                    <?php
+                    $_source = array(
+                        '0' => 'No',
+                        '1' => 'Yes'
+                    );
+                    //Mage::helper('rshipping')->getSelectedShippingMethods();
+                    ?>
+                    <select class="select" name="product[allow_shipping][]">
+                        <?php foreach ($_source as $_key => $_value) { ?>
+                            <option value="<?php echo $_key; ?>"><?php echo $_value; ?></option>
+                        <?php } ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="name"><?php echo $this->__('Select Shipping Method'); ?></label></td>
+                <td class="value">
+                    <?php
+                    $_rshipping = Mage::getModel('rshipping/rshipping')->getCollection();
+                    $product_id = $this->getRequest()->getParam('id');
+                    if ($product_id) {
+                        $product = Mage::getModel('catalog/product')->load($product_id);
+                        $shipping_method = $product->getShippingMethod();
+                        if ($shipping_method)
+                            $shipping_method_arr = explode(',', $shipping_method);
+                        else
+                            $shipping_method_arr = array();
+                    }
+
+                    //Mage::helper('rshipping')->getSelectedShippingMethods();
+                    ?>
+                    <select multiple="multiple" size="10" class=" select multiselect" name="product[shipping_method][]">
+                        <?php foreach ($_rshipping as $i => $row) { ?>
+                            <option <?php if (in_array($row->getData('rshipping_id'), $shipping_method_arr)) : ?> selected="selected"<?php endif; ?>
+                                value="<?php echo $row->getData('rshipping_id'); ?>"><?php echo $row->getData('shipping_title') . " - " . $row->getData('shipping_method'); ?></option>
+                        <?php } ?>
+                    </select>
+                </td>
+                <td class="scope-label"><span class="nobr"></span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

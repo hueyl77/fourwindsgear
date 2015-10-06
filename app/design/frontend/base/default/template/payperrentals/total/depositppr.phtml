@@ -1,0 +1,65 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<script type="text/javascript">
+    //<![CDATA[
+    function openLayerX() {
+        var elStyle = $('boxppr').getStyle('display');
+        if (elStyle == 'none') {
+            $('boxppr').setStyle({'display': 'block'});
+        } else {
+            $('boxppr').setStyle({'display': 'none'});
+        }
+
+    }
+    //]]>
+</script>
+<tr>
+    <td colspan="<?php echo $this->getColspan(); ?>" style="<?php echo $this->getTotal()->getStyle() ?>" class="a-right">
+        <?php if ($this->getRenderingArea() == $this->getTotal()->getArea()): ?><strong><?php endif; ?>
+            <?php echo $this->escapeHtml($this->getTotal()->getTitle()); ?>
+            <?php if ($this->getRenderingArea() == $this->getTotal()->getArea()): ?></strong><?php endif; ?>
+        <!--<div>
+            <div class="box" id="boxppr">
+                <a class="boxclose" id="boxclose" onclick="openLayerX();return false;"></a>
+
+                <p>
+                    <?php $depositHtml = $this->getLayout()->createBlock('cms/block')->setBlockId('my-deposit-popup')->toHtml(); ?>
+                    <?php if ($depositHtml == ''): ?>
+                        <?php $depositHtml = $this->__('The deposit is only authorized to your credit card and not charged. If items are lost or damaged then we would bill this amount to your credit card according to the damages or lost items value.'); ?>
+                    <?php endif; ?>
+                    <?php echo $depositHtml; ?>
+                </p>
+            </div>
+        </div>
+        <div><a href="#" onclick="openLayerX();return false;"><?php echo $this->__('What is this?'); ?></a></div>-->
+    </td>
+    <td style="<?php echo $this->getTotal()->getStyle() ?>" class="a-right">
+        <?php if ($this->getRenderingArea() == $this->getTotal()->getArea()): ?><strong><?php endif; ?>
+            <?php echo $this->helper('checkout')->formatPrice($this->getTotal()->getValue()) ?>
+            <?php if ($this->getRenderingArea() == $this->getTotal()->getArea()): ?></strong><?php endif; ?>
+    </td>
+</tr>

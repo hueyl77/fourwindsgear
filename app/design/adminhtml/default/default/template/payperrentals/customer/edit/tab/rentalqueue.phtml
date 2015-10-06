@@ -1,0 +1,101 @@
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?php echo $this->__('Rental Queue')?></h3></td>
+        </tr>
+    </table>
+</div>
+<div class="entry-edit">
+    <div id="sendTable" class="grid">
+
+    </div>
+</div>
+
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?php echo $this->__('Rental Queue')?></h3></td>
+        </tr>
+    </table>
+</div>
+<div class="entry-edit">
+    <div id="retTable" class="grid">
+		<?php
+		echo $this->getSentItems();
+		?>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+	function refreshList(){
+        Element.show('loading-mask');
+        $jppr.ajax({
+            cache: false,
+            dataType: 'json',
+            type: 'post',
+            url: '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/getRentalQueueSend/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>',
+            data: {
+                'customer_id':'<?php echo Mage::registry('current_customer')->getId(); ?>'
+            },
+            success: function (data) {
+                Element.hide('loading-mask');
+                Element.show('sendTable');
+                $jppr('#sendTable').html(data.html);
+                var serviceUrl = '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/getSerialNumbers/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>';
+                getSerialNumbers('.sn', serviceUrl);
+
+                $jppr('.sendSelected').click(function(){
+
+                    Element.show('loading-mask');
+
+                    $jppr.ajax({
+                        cache: false,
+                        dataType: 'json',
+                        type: 'post',
+                        url: '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/sendSelectedQueue/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>',
+                        data: $jppr('#sendTable *').serialize(),
+                        success: function (data) {
+                            Element.hide('loading-mask');
+                            refreshList();
+                        }
+                    });
+
+                    return false;
+                });
+
+                $jppr('.returnSelected').click(function(){
+
+                    Element.show('loading-mask');
+
+                    $jppr.ajax({
+                        cache: false,
+                        dataType: 'json',
+                        type: 'post',
+                        url: '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/returnSelectedQueue/", array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>',
+                        data: $jppr('#retTable *').serialize(),
+                        success: function (data) {
+                            Element.hide('loading-mask');
+                            setLocation(data.customerUrl)
+                        }
+                    });
+
+                    return false;
+                });
+
+            }
+        });
+	}
+$jppr(document).ready(function() {
+
+refreshList();
+
+
+});
+
+</script>
+<style type="text/css">
+
+
+</style>

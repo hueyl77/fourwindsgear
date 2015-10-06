@@ -1,0 +1,59 @@
+
+<?php 
+    $landingItem = $this->getData('landingItem');
+    $landingThumbWidth = $this->getData('landingThumbWidth');
+    $landingThumbHeight = $this->getData('landingThumbHeight');
+    $maxChar = $this->getData('maxDesc');
+?>
+
+<?php if ($landingItem): ?>
+    <p class="product-image">
+        <a title="<?php echo $this->htmlEscape($landingItem->getName()) ?>"
+           href="<?php echo $landingItem->getProductUrl() ?>">
+            <img
+                src="<?php echo $this->helper('catalog/image')->init($landingItem, 'thumbnail')->resize($landingThumbWidth, $landingThumbWidth); ?>"
+                alt="<?php echo $this->htmlEscape($landingItem->getName()) ?>"/>
+        </a>
+    </p>
+     <!-- Product Description -->
+    <div class="product-information">
+        <h5 class="product-name">
+            <a title="<?php echo $this->htmlEscape($landingItem->getName()) ?>"
+               href="<?php echo $landingItem->getProductUrl() ?>"><?php echo $landingItem->getName() ?></a>
+        </h5>
+        <?php echo $this->getReviewsSummaryHtml($landingItem, true, true) ?>
+        <?php echo $this->getPriceHtml($landingItem, true, '_jmproduct_' . uniqid()); ?>
+        <?php
+            if ($maxChar) :
+                $productDesc = $landingItem->getDescription();
+                $productShortDesc = $landingItem->getShortDescription();
+        ?>
+            <p class="pdescription"><?php echo mb_substr(nl2br(strlen($productDesc) > 10 ? $productDesc : $productShortDesc), 0, $maxChar, 'UTF-8') . '...'; ?></p>
+        <?php endif; ?>
+        <!-- Add to cart -->
+        <?php if ($landingItem->isSaleable()): ?>
+            <button class="button btn-cart"
+                    onclick="setLocation('<?php echo $this->getAddToCartUrl($landingItem) ?>')">
+                <span><?php echo $this->helper("catalog")->__('Add to Cart'); ?></span>
+            </button>
+        <?php else: ?>
+            <div class="out-of-stock"><?php echo $this->helper("catalog")->__('Out of stock'); ?></div>
+        <?php endif; ?>
+        <!-- Add to links -->
+        <ul class="add-to-links">
+            <?php if ($this->helper('wishlist')->isAllow()) : ?>
+                <li>
+                    <a href="<?php echo $this->helper('wishlist')->getAddUrl($landingItem); ?>" class="link-wishlist">
+                        <?php echo $this->__('Wishlist'); ?>
+                    </a>
+                </li>
+            <?php endif; ?>
+            <?php if ($compareUrl = $this->getAddToCompareUrl($landingItem)): ?>
+                <li>
+                    <a href="<?php echo $compareUrl ?>" class="link-compare"><?php echo $this->__('Compare'); ?></a>
+                </li>
+            <?php endif; ?>
+        </ul>
+    </div>
+    <!-- /Product information -->
+<?php endif; ?>

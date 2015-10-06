@@ -1,0 +1,8 @@
+-
+  - 1 # test id
+  - category: 2 # category id
+    id: 1 # product id
+-
+  - 2 # test id
+  - category: 2 # category id
+    id: 2 # product id

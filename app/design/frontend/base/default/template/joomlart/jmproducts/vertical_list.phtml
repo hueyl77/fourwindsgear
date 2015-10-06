@@ -1,0 +1,97 @@
+<?php
+/*!
+ * http://www.ubertheme.com/
+ * Version: 1.0
+ * Description: 
+ * Author: Uber theme team
+ * Author URI: http://www.ubertheme.com/
+ * 
+ * Powered by Magento
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+?>
+
+<?php
+
+$listId = uniqid();
+$thumbWidth = $config['width'];
+$thumbHeight = $config['height'];
+$maxChar = $config['max'];
+?>
+
+<script type="text/javascript">
+	(function ($) {
+		$(document).ready(function () {
+			$("#productsgrid_<?php echo $listId; ?>").jmproduct({
+				qtytable:<?php echo $config['qtytable']; ?>,
+				qtytableportrait:<?php echo $config['qtytableportrait']; ?>,
+				istable:<?php echo $config['istable']; ?>,
+				qtymobile:<?php echo $config['qtymobile']; ?>,
+				qtymobileportrait:<?php echo $config['qtymobileportrait']; ?>,
+				ismobile:<?php echo $config['ismobile']; ?>
+			});
+		});
+	})(jQuery);
+</script>
+
+<div class="block jm-product-vlist <?php echo $config['mode']; ?> clearfix">
+	<?php if ($config['title']): ?>
+		<div class="block-title">
+			<strong><?php echo $config['title']; ?></strong>
+
+			<a title="<?php echo Mage::helper('joomlart_jmproducts')->__('View more'); ?>" class="view-more"
+			   href="<?php echo Mage::getModel('core/url')->getUrl('jmproducts/viewall/index'); ?>">
+				<?php echo Mage::helper('joomlart_jmproducts')->__('View more'); ?>
+			</a>
+		</div>
+	<?php endif; ?>
+
+	<div class="block-content clearfix">
+		<?php
+		$collection = $this->getCollection();
+		$collectionSize = $collection ? $collection->count() : 0;
+		$i = 0;
+		?>
+
+		<?php if ($collectionSize): ?>
+			<ul id="productsgrid_<?php echo $listId; ?>" class="mini-products-list">
+				<?php
+				$j = 0;
+				$rowCount = ceil($collectionSize / $config['perrow']);
+				foreach ($collection->getItems() as $product):
+					if ($i % $config['perrow'] == 0) {
+						$j++;
+					}
+					$i++;
+					?>
+					<li class="item <?php if ($j == $rowCount) : echo "item-row-last"; endif; ?> <?php if (($i - 1) % $config['perrow'] == 0): ?> first<?php elseif ($i % $config['perrow'] == 0): ?> last<?php endif; ?> p-item">
+						<div class="inner">
+							<!-- Product image -->	
+							<a class="product-image" title="<?php echo $this->htmlEscape($product->getName()) ?>"
+							   href="<?php echo $product->getProductUrl() ?>">
+								<img src="<?php echo $this->helper('catalog/image')->init($product, 'thumbnail')->resize($thumbWidth, $thumbHeight)->setWatermarkSize('30x10'); ?>" alt="<?php echo $this->htmlEscape($product->getName()) ?>" />
+							</a>
+
+							<!-- Product Description -->
+							<div class="product-details">
+								<h5 class="product-name">
+									<a title="<?php echo $this->htmlEscape($product->getName()) ?>"
+									   href="<?php echo $product->getProductUrl() ?>"><?php echo $product->getName() ?></a>
+								</h5>
+								<?php echo $this->getPriceHtml($product, true, '_jmproduct_' . uniqid()); ?>
+								<?php echo $this->getReviewsSummaryHtml($product, true, true) ?>
+							</div>
+							<!-- /Product information -->
+						</div>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+			<script
+				type="text/javascript">decorateGeneric($$('ul.products-grid'), ['odd', 'even', 'first', 'last'])</script>
+		<?php else: ?>
+			<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>
+		<?php endif; ?>
+	</div>
+</div>
+<div class="clearfix"></div>

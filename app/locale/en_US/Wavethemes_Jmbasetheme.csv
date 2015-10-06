@@ -1,0 +1,9 @@
+"Profile "%s" already exists. Please enter another profile name.","Profile "%s" already exists. Please enter another profile name."
+"Please enter the profile name.","Please enter the profile name."
+"Please select one profile.","Please select one profile."
+"Editing %s profile will affect and overwrite the profile settings in other configuration scope used it as well. Are you sure you want to continue?","Editing %s profile will affect and overwrite the profile settings in other configuration scope used it as well. Are you sure you want to continue?"
+"Do you want to clone this profile?","Do you want to clone this profile?"
+"Are you sure you want to delete this profile?","Are you sure you want to delete this profile?"
+
+
+

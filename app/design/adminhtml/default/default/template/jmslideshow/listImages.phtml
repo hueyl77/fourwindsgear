@@ -1,0 +1,35 @@
+<?php
+$slides = $this->getSlides();
+$images = isset($slides["images"]) ? $slides["images"] : array();
+$items = isset($slides["items"]) ? $slides["items"] : array();
+$titles = isset($slides["titles"]) ? $slides["titles"] : array();
+$urls = isset($slides["urls"]) ? $slides["urls"] : array();
+$targets = isset($slides["targets"]) ? $slides["targets"] : array();
+?>
+
+<?php if($images): ?>
+
+    <h3> <?php echo $this->__("Slide Show Images");?>:</h3>
+    <form id="slide-images-form">
+    <ul class="slide-images">
+        <?php foreach($items as $key => $item):?>
+            <li>
+                <div class="slide-thumb">
+                    <?php echo $item['thumb']; ?>
+                </div>
+                <input class="slide-title" type="hidden" name="slide_images[]" value="<?php echo isset($images[$key]) ? $images[$key] : ''; ?>" />
+                <input class="slide-title" placeholder="<?php echo $this->__('Title'); ?>" name="slide_titles[]" value="<?php echo (isset($titles[$key]) && $titles[$key]) ? $titles[$key] : $images[$key]; ?>" />
+                <input class="slide-link" placeholder="<?php echo $this->__('Link'); ?>" name="slide_links[]" value="<?php echo isset($urls[$key]) ? $urls[$key] : ''; ?>" />
+                <select class="slide-target" name="link_targets[]">
+                    <option value="_self" <?php if($targets[$key] == '_self') echo 'selected="selected"'; ?> > <?php echo $this->__('Open as default')?></option>
+                    <option value="_blank" <?php if($targets[$key] == '_blank') echo 'selected="selected"'; ?>><?php echo $this->__('Open new window or tab')?></option>
+                </select>
+                <?php $caption = isset($item['caption']) ? str_replace("<br />", "\n", trim($item['caption'])) : ''; ?>
+                <textarea class="slide-desc" placeholder="<?php echo $this->__('Description'); ?>" name="slide_desc[]"><?php echo $caption; ?></textarea>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+    </form>
+<?php else: ?>
+    <span class="images-not-found"> <?php echo $this->__("Not found images");?>:</span>
+<?php endif; ?>

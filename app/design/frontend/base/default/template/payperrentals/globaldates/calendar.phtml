@@ -1,0 +1,46 @@
+<?php if (ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDatesShoppingCart()):?>
+
+    <?php
+        $_useFlicker = Mage::helper('payperrentals/config')->getThemeStyle(Mage::app()->getStore()->getId()) == ITwebexperts_Payperrentals_Model_Source_Themestyle::RTRW_STYLE;
+        $_localeCode = substr(Mage::app()->getLocale()->getLocaleCode(), 0, strpos(Mage::app()->getLocale()->getLocaleCode(), '_'));
+        if(!$_useFlicker){
+            $_langCode = $_localeCode;
+        }else{
+            $_langCode = 'flick';
+        }
+    ?>
+    <script type="text/javascript">
+        jsMagentoUrl = '<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS);?>';
+        langCode = '<?php echo $_langCode;?>';
+    </script>
+
+    <script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/utils/require.js'; ?>"></script>
+    <script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/utils/frontendApp.js'; ?>"></script>
+    <script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) . 'mage/adminhtml/events.js'; ?>"></script>
+
+<?php $_useTimes = Mage::helper('payperrentals/config')->useGlobalShoppingCartWithTime(); ?>
+ <div id="shoppingCartCalendar">
+    <?php echo Mage::helper('payperrentals/calendar')->getCalendar(null, $_useTimes);?>
+ </div>
+<script type="text/javascript">
+
+    /*$jppr(window).load(function(){
+        var htmlBut = $jppr('<div style="display: inline-block;vertical-align: middle;padding-top: 5px;" class="nearCalendar"><div class="calendar-button-container" style="display: inline-block;margin-right: 10px;">'+
+            '<button id="btn-update-global-dates" type="submit" class="button">'+
+            '<span>'+
+            '<span><?php echo $this->__('Confirm Dates');?></span>'+
+        '</span>'+
+        '</button>'+
+        '</div> <div class="datesShow"></div>'+
+         '<div class="errorShow"></div></div>');
+        $jppr(currentCalendar).wrapInner('<form action="<?php echo $this->getUrl('payperrentals_front/globaldates/update') ?>" method="post" id="formWrap"></form>');
+        $jppr('#formWrap').append(htmlBut);
+        $jppr(currentCalendar).find(' .btn-resfreshCalendar').parent().appendTo( $jppr(currentCalendar).find(' .nearCalendar'));
+        $jppr(currentCalendar).find(' .dateSelectedCalendar').css('display', 'inline-block');
+        $jppr(currentCalendar).find(' .dateSelectedCalendar').css('width', '450px');
+        $jppr(currentCalendar).find(' .dateSelectedCalendar').css('vertical-align', 'middle');
+        $jppr(currentCalendar).find(' .dateView').css('width','100%');
+
+    });*/
+</script>
+<?php endif; ?>

@@ -1,0 +1,22 @@
+<?php $this->setPriceDataObject($this->getSource()) ?>
+<?php if ((float)$this->getSource()->getDepositpprAmount()): ?>
+    <?php $config = Mage::getSingleton('tax/config'); ?>
+    <?php $source = $this->getSource(); ?>
+    <?php $depositppr = $source->getBaseDepositpprAmount(); ?>
+    <?php $depositFormat = Mage::app()->getStore()->roundPrice($depositppr) * 1; ?>
+    <?php $depositTileFormat = Mage::helper('payperrentals')->__('Deposit'); ?>
+
+    <tr>
+        <td class="label"><?php echo $depositTileFormat; ?></td>
+        <td>
+            <input type="text" name="creditmemo[depositppr_amount]" value="<?php echo $depositFormat; ?>" class="input-text not-negative-amount" style="width:60px;text-align:right" id="depositppr_amount"/>
+        </td>
+
+    </tr>
+    <script type="text/javascript">
+        if ($('depositppr_amount')) {
+            $('depositppr_amount').advaiceContainer = $('depositppr_amount_adv');
+            unblockSubmit('depositppr_amount');
+        }
+    </script>
+<?php endif;

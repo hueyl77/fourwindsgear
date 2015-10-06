@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config>
+    <sections>
+        <payperrentals>
+            <groups>
+                <maintenance translate="label">
+                    <label>Product Maintenance</label>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <sort_order>100</sort_order>
+                    <fields>
+                        <percent_maintain>
+                            <label><![CDATA[Percentage of available inventory to maintain for automated maintenance]]></label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>simaintenance/source_percentoptions</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </percent_maintain>
+                    </fields>
+                </maintenance>
+            </groups>
+        </payperrentals>
+    </sections>
+</config>

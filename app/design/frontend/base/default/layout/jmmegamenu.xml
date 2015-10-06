@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<layout version="0.1.3">
+	<jmmegamenu_index_index>
+		<reference name="content">
+		   <block type="jmmegamenu/jmmegamenu" name="jmmegamenu" >
+			   <action method="addData"><data><menu_type>vertical-mega-menu</menu_type></data></action>
+		   </block>
+		</reference>
+	</jmmegamenu_index_index>
+	<default>
+        <reference name="head">
+        	<action method="addCss"><stylesheet>joomlart/jmmegamenu/css/jmmegamenu.css</stylesheet></action>
+        </reference>
+    </default>
+</layout>

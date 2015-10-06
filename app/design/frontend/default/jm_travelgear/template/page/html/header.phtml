@@ -1,0 +1,241 @@
+<?php
+/*!
+ * Theme Name: JM Team
+ * Theme URI: http://www.joomlart.com
+ * Version: 1.0
+ * Description:
+ * Author: JM Team - Joomlart.com
+ * Author URI: http://www.joomlart.com
+ *
+ * Powered by Magento
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Template for Mage_Page_Block_Html
+ */
+?>
+<div class="head">
+		<?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('position-01')->toHtml() ?>
+        <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('top-email')->toHtml() ?>
+		<!-- BEGIN: setting -->
+        <!--
+		<div id="jm-setting" class="quick-setting has-toggle">
+			<div class="btn-toggle setting-toggle">
+				<strong><?php echo $this->__('Settings') ?></strong>
+			</div>
+			<div class="inner-toggle">
+					<?php echo $this->getChildHtml('store_language') ?>
+					<?php echo $this->getChildHtml('custom_currency_selector') ?>
+					<?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('colors')->toHtml() ?>
+			</div>
+		</div>
+        -->
+		<!-- END: Settings -->
+		<!-- BEGIN: QUICK ACCESS -->
+		<div id="jm-quickaccess" class="quick-access has-toggle">
+			<div class="btn-toggle quickaccess-toggle">
+				<strong><?php echo $this->__('My Account') ?></strong>
+			</div>
+			<div class="inner-toggle">
+				<div class="shop-access">
+					<?php
+					if($this->getChildHtml('customer_account_navigation')):
+						echo $this->getChildHtml('customer_account_navigation');
+					endif;
+					?>
+					<?php echo $this->getChildHtml('topLinks');  ?>
+				</div>
+			</div>
+		</div>
+		<!-- END: QUICK ACCESS -->
+</div>
+<div class="main">
+		<h1 id="logo"><a href="<?php echo $this->getUrl('') ?>" title="<?php echo $this->getLogoAlt() ?>" style="background-image: url(<?php echo $this->getLogoSrc() ?>);"><?php echo $this->getLogoAlt() ?></a></h1>
+		<p class="no-display"><a href="#main"><strong><?php echo $this->__('Skip to Main Content') ?> &raquo;</strong></a></p>
+		<!-- BEGIN: SITE SEARCH -->
+		<div id="jm-search" class="has-toggle">
+		  <div class="btn-toggle search-toggle"><span><?php echo $this->__("Search ") ?></span></div>
+		  <div class="inner-toggle">
+			   <?php echo $this->getChildHtml('topSearch') ?>
+		  </div>
+		</div>
+		<!-- END: SITE SEARCH -->
+		<!-- BEGIN: MY CART-->
+		<div id="jm-mycart" class="has-toggle">
+			<div class="jm-mycart-loading">&nbsp;</div>
+			<div class="btn-toggle mycart-toggle">
+					<?php if(Mage::getSingleton('checkout/session')->getQuote()->getSubtotal() > 0 || Mage::getSingleton('checkout/session')->getQuote()->getSubtotal() > 1 ) { ?>
+						<a class="ico-shopping-cart" href="<?php echo Mage::getUrl("checkout/cart") ?>">
+							<span><?php echo $this->__("My Cart ") ?></span>
+							<strong><?php echo Mage::getSingleton('checkout/session')->getQuote()->getItemsSummaryQty(); ?></strong>
+						</a>
+					<?php	} else { ?>
+						<a class="ico-shopping-cart" href="<?php echo Mage::getUrl("checkout/cart") ?>">
+							<span><?php echo $this->__("My Cart ") ?></span>
+							<strong><?php echo Mage::getSingleton('checkout/session')->getQuote()->getItemsSummaryQty(); ?></strong>
+						</a>
+					<?php	} ?>
+			</div>
+			<div class="inner-toggle">
+				<?php echo $this->getChildHtml('mycart') ?>
+			</div>
+		</div>
+		<!-- END: MY CART -->
+		<!-- BEGIN: NAV -->
+		<div id="jm-mainnav" class="has-toggle">
+			<div class="btn-toggle menu-toggle">
+				<strong><?php echo $this->__('Menu') ?></strong>
+			</div>
+			<div class="inner-toggle" id="jm-mainnav-inner">
+				<?php echo $this->getChildHtml('topMenu') ?>
+			</div>
+		</div>
+		<!-- END: NAV -->
+
+		<script type="text/javascript">
+		//<![CDATA[
+		function detectmob() {
+	    if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/Windows Phone/i)) {
+	      return true;
+	    } else {
+	      return false;
+	    }
+		}
+
+		(function ($) {
+			var previousScroll = 0;
+		    $(window).scroll(function(e){
+		       var currentScroll = $(this).scrollTop();
+		       if (currentScroll > previousScroll){
+		       	  $("#jm-header").removeClass("sticky-out").addClass("sticky");
+		       	  $("#jm-wrapper").removeClass("sticky-out").addClass("sticky");
+		       } else if(previousScroll >= 20) {
+		       	  $("#jm-header").removeClass("sticky").addClass("sticky-out");
+		       	  $("#jm-wrapper").removeClass("sticky").addClass("sticky-out");
+		       } else if(previousScroll == 0) {
+		       		$("#jm-header").removeClass("sticky-out").addClass("sticky-end");
+			       	$("#jm-wrapper").removeClass("sticky-out").addClass("sticky-end");
+		       }
+		       previousScroll = currentScroll;
+		    });
+		    var inner_toggle = $("#jm-quickaccess,#jm-setting,#jm-mycart,#jm-search");
+		    if (detectmob()) {
+		        inner_toggle.not('#jm-search').click(function () {
+            if (!$(this).children(".inner-toggle").hasClass("active")) {
+                inner_toggle.children().removeClass("active");
+                inner_toggle.removeClass("active");
+                $(this).children().addClass("active");
+                $(this).addClass("active");
+                if (!jQuery('#jmmobileoverlay').length) {
+                    jmoverlay = jQuery('<div id="jmmobileoverlay" class="jmmobileoverlay" style="display: block !important;"></div>');
+                    jmoverlay.appendTo('#jm-wrapper');
+                    jmoverlay.bind("click", function () {
+                        inner_toggle.removeClass('active').children().removeClass("active");
+                        jQuery(this).remove();
+                    });
+                }
+                setupIscroll($(this));
+            } else {
+                inner_toggle.children().removeClass("active");
+                inner_toggle.removeClass("active");
+                $("#jmmobileoverlay").remove();
+            }
+        });
+        $('#jm-search .btn-toggle').click(function () {
+            if (!$(this).hasClass("active")) {
+                inner_toggle.children().removeClass("active");
+                inner_toggle.removeClass("active");
+                $(this).parent().children().addClass("active");
+                $(this).parent().addClass("active");
+                if (!jQuery('#jmmobileoverlay').length) {
+                    jmoverlay = jQuery('<div id="jmmobileoverlay" class="jmmobileoverlay" style="display: block !important;"></div>');
+                    jmoverlay.appendTo('#jm-wrapper');
+                    jmoverlay.bind("click", function () {
+                        inner_toggle.removeClass('active').children().removeClass("active");
+                        jQuery(this).remove();
+                    });
+                }
+            } else {
+                inner_toggle.children().removeClass("active");
+                inner_toggle.removeClass("active");
+                $("#jmmobileoverlay").remove();
+            }
+        });
+        /*$("#jm-quickaccess,#jm-mycart,#jm-setting").children(".btn-toggle").click(function (e) {
+            setupIscroll($(this).parent());
+        });*/
+
+        $(window).resize(function () {
+            var inner_toggle = $("#jm-header #jm-quickaccess,#jm-setting,#jm-mycart");
+            inner_toggle.each(function () {
+                setupIscroll($(this));
+            });
+
+        })
+		    } else {
+		        inner_toggle.mouseenter(function () {
+		            if (!$(this).siblings(".inner-toggle").hasClass("active")) {
+		                $(this).children().addClass("active");
+		                $(this).addClass("active");
+		            }
+		        }).mouseleave(function () {
+		            $(this).children().removeClass("active");
+		            $(this).removeClass("active");
+		            $("#jmoverlay").remove();
+
+		        });
+		    }
+
+
+		    function setupIscroll(parent) {
+        if (parent.hasClass("active")) {
+            if (window.currentIScrol !== undefined && window.currentIScrol !== null) {
+                window.currentIScrol.destroy();
+                window.currentIScrol = null;
+            }
+            parentid = parent.attr("id");
+            iscollwrapperid = "#" + parentid + "scroll";
+            wrapperid = parentid + "scroll";
+            if ($(iscollwrapperid).length) {
+                setTimeout(function () {
+                    windowheight = $(window).height() - $("#jm-header").height();
+                    windowheight = windowheight - parseInt(parent.children(".inner-toggle").css("padding-top"));
+                    windowheight = windowheight - 30;
+                    $(iscollwrapperid).css("max-height", windowheight);
+                    window.currentIScrol = new iScroll(wrapperid, {
+                        vScrollbar: true,
+                        useTransform: true,
+                        hScrollbar: false
+                    });
+                }, 100);
+            } else {
+                quickaccess = parent.children(".inner-toggle").html();
+                iscollinner = $('<div class="inner-togglecontent" />').append(parent.children(".inner-toggle").html());
+                myaccount = $('<div class="inner-togglecontent" />').append($("#jm-quickaccess .inner-toggle").html());
+                iscollinner.css({
+                    float: "left",
+                    height: "auto"
+                });
+                parent.children(".inner-toggle").html("");
+                iscollwrapper = $('<div id="' + wrapperid + '" />');
+                iscollinner.appendTo(iscollwrapper);
+                iscollwrapper.appendTo(parent.children(".inner-toggle"));
+                setTimeout(function () {
+                    windowheight = $(window).height() - $("#jm-header").height();
+                    windowheight = windowheight - parseInt(parent.children(".inner-toggle").css("padding-top"));
+                    windowheight = windowheight - 30;
+                    $(iscollwrapperid).css("max-height", windowheight);
+                    window.currentIScrol = new iScroll(wrapperid, {
+                        vScrollbar: true,
+                        useTransform: true,
+                        hScrollbar: false
+                    });
+                    window.currentIScrol.refresh();
+                }, 100);
+            }
+        }
+    }
+
+		})(jQuery);
+		//]]>
+		</script>
+</div>

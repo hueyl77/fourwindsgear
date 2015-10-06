@@ -1,0 +1,56 @@
+-
+  - 1 # test id
+  - category: 2 # category id
+    id: 1 # product id
+  - false # store config Hotel Mode
+  - false # store config Show Time Grid
+  - 1 # is salable product
+-
+  - 2 # test id
+  - category: 2 # category id
+    id: 2 # product id
+  - false # store config Hotel Mode
+  - false # store config Show Time Grid
+  - 1 # is salable product
+-
+  - 3 # test id
+  - category: 2 # category id
+    id: 3 # product id
+  - false # store config Hotel Mode
+  - false # store config Show Time Grid
+  - 1 # is salable product
+-
+  - 4 # test id
+  - category: 2 # category id
+    id: 4 # product id
+  - false # store config Hotel Mode
+  - false # store config Show Time Grid
+  - 1 # is salable product
+-
+  - 5 # test id
+  - category: 2 # category id
+    id: 5 # product id
+  - false # store config Hotel Mode
+  - false # store config Show Time Grid
+  - 1 # is salable product
+-
+  - 6 # test id
+  - category: 2 # category id
+    id: 1 # product id
+  - true # store config Hotel Mode
+  - false # store config Show Time Grid
+  - 1 # is salable product
+-
+  - 7 # test id
+  - category: 2 # category id
+    id: 5 # product id
+  - false # store config Hotel Mode
+  - true # store config Show Time Grid
+  - 1 # is salable product
+-
+  - 8 # test id
+  - category: 2 # category id
+    id: 1 # product id
+  - true # store config Hotel Mode
+  - true # store config Show Time Grid
+  - 0 # is salable product

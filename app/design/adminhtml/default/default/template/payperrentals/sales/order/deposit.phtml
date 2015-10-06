@@ -1,0 +1,56 @@
+<?php
+
+?>
+<div class="entry-edit">
+	<div class="entry-edit-head">
+		<h4 class="icon-head head-account"><?php echo Mage::helper('payperrentals')->__('Reservation Deposit') ?></h4>
+	</div>
+	<div class="grid np">
+		<div class="hor-scroll">
+			<table id="payperrentals-orders-table" class="data" cellspacing="0" width="100%">
+				<col width="25%"/>
+				<col/>
+				<col width="25%"/>
+				<col width="25%"/>
+				<thead>
+					<tr class="headings">
+						<th><?php echo $this->__('ID #')?></th>
+						<th><?php echo $this->__('Transaction ID')?></th>
+						<th class="a-center"><?php echo $this->__('Parent Transaction ID')?></th>
+						<th><?php echo $this->__('Amount')?></th>
+						<th class="a-center"><?php echo $this->__('Payment Method Name')?></th>
+						<th class="a-center"><?php echo $this->__('Transaction Type')?></th>
+						<th class="a-center"><?php echo $this->__('Is Closed')?></th>
+						<th class="a-center"><?php echo $this->__('Created At')?></th>
+						<th class="a-center"><?php echo $this->__('Action')?></th>
+					</tr>
+				</thead>
+				<tbody class="odd">
+					<?php foreach($this->getCollection() as $item): ?>
+						<?php
+							$payment = Mage::getModel('sales/order_payment')->load($item->getPaymentId());
+						?>
+						<tr class="border">
+							<td><?php echo $item->getID(); ?></td>
+							<td><?php echo $item->getTxnId(); ?></td>
+							<td><?php echo $item->getParentTxnId(); ?></td>
+							<td><?php echo Mage::helper('core')->currency($payment->getAmountOrdered(), true, false); ?></td>
+							<td><?php echo $item->getMethod(); ?></td>
+							<td><?php echo $item->getTxnType(); ?></td>
+							<td><?php echo $item->getIsClosed() ? $this->__('Yes') : $this->__('No'); ?></td>
+							<td><?php echo Mage::helper('core')->formatDate($item->getCreatedAt(), 'medium', false); ?></td>
+							<td class="a-center">
+								
+								<?php if ($payment->canCapture() && !$item->getIsClosed() && $item->getTxnType() == 'authorization') : ?>
+									<button class="button" onclick="window.location.href = '<?php echo $this->getUrl('payperrentals_admin/adminhtml_sales_payment_transaction/capture', array('id' => $item->getID())) ?>';"><span><span><?php echo $this->__('Capture') ?></span></span></button>
+								<?php endif; ?>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+			<br/>
+		</div>
+	</div>
+</div>
+<div class="clear"></div>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <ITwebexperts_Payperrentals>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Mage_Adminhtml />
+                <Mage_Core />
+                <Fooman_EmailAttachments />
+            </depends>
+        </ITwebexperts_Payperrentals>
+    </modules>
+</config> 

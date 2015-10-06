@@ -1,0 +1,335 @@
+<?php
+/*!
+ * http://www.ubertheme.com/
+ * Version: 1.0
+ * Description:
+ * Author: Uber theme team
+ * Author URI: http://www.ubertheme.com/
+ *
+ * Powered by Magento
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+?>
+
+<?php
+	$listId = uniqid();
+	$thumbWidth = $config['width'];
+	$thumbHeight = $config['height'];
+    
+    $landingThumbWidth = $config['landing_width'];
+	$landingThumbHeight = $config['landing_height'];
+   
+	$maxChar = $config['max'];
+
+	// Image loading
+	$loadingImage = $this->getSkinUrl('joomlart/jmproducts/images/loader.gif');
+
+	// Calculator with
+	if ($config['perrow']){
+		$perrow = $config['perrow'];
+		$width = 100/$config['perrow'];
+	}
+	// Tablet
+	$perrowtablet = $config["perrowtablet"];
+	$widthtablet = 100/$config["perrowtablet"];
+
+	if (isset($config["perrowtabletportrait"]) && $config["perrowtabletportrait"]){
+		$perrowtabletportrait = $config["perrowtabletportrait"];
+		$widthtabletportrait = 100/$config["perrowtabletportrait"];
+	}
+	else {
+		$perrowtabletportrait = $perrowtablet;
+		$widthtabletportrait = $widthtablet;
+	}
+
+	// Mobile
+	$perrowmobile = $config["perrowmobile"];
+	$widthmobile = 100/$config["perrowmobile"];
+	if (isset($config["perrowmobileportrait"]) && $config["perrowmobileportrait"]){
+		$perrowmobileportrait = $config["perrowmobileportrait"];
+		$widthmobiletportrait = 100/$config["perrowmobileportrait"];
+	}
+	else {
+		$perrowmobileportrait = $perrowmobile;
+		$widthmobiletportrait = $widthmobile;
+	}
+?>
+<style type="text/css">
+	#jm_product_grid_<?php echo $listId; ?> li.item {
+			width: <?php echo $width.'%';?>;
+		}
+	#jm_product_grid_<?php echo $listId; ?> > li:nth-child(<?php echo $perrow;?>n+1) {
+    clear: both;
+	}
+	@media only screen and (min-width:986px) and (max-width: 1235px) {
+		#jm_product_grid_<?php echo $listId; ?> li.item {
+			width: <?php echo $widthtablet.'%';?>;
+		}
+		#jm_product_grid_<?php echo $listId; ?> > li:nth-child(<?php echo $perrow;?>n+1) {
+	    clear: none;
+		}
+		#jm_product_grid_<?php echo $listId; ?> > li:nth-child(<?php echo $perrowtablet;?>n+1) {
+	    clear: both;
+		}
+	}
+	@media only screen and (min-width:720px) and (max-width: 985px) {
+		#jm_product_grid_<?php echo $listId; ?> li.item {
+			width: <?php echo $widthtabletportrait.'%';?>;
+		}
+		#jm_product_grid_<?php echo $listId; ?> > li:nth-child(<?php echo $perrow;?>n+1) {
+	    clear: none;
+		}
+		#jm_product_grid_<?php echo $listId; ?> > li:nth-child(<?php echo $perrowtablet;?>n+1) {
+	    clear: none;
+		}
+		#jm_product_grid_<?php echo $listId; ?> > li:nth-child(<?php echo $perrowtabletportrait;?>n+1) {
+	    clear: both;
+		}
+	}
+	@media only screen and (max-width:719px) {
+		#jm_product_grid_<?php echo $listId; ?> li.item {
+			width: <?php echo $widthmobile.'%';?>;
+		}
+		#jm_product_grid_<?php echo $listId; ?> > li:nth-child(<?php echo $perrow;?>n+1) {
+	    clear: none;
+		}
+		#jm_product_grid_<?php echo $listId; ?> > li:nth-child(<?php echo $perrowtablet;?>n+1) {
+	    clear: none;
+		}
+		#jm_product_grid_<?php echo $listId; ?> > li:nth-child(<?php echo $perrowtabletportrait;?>n+1) {
+	    clear: none;
+		}
+		#jm_product_grid_<?php echo $listId; ?> > li:nth-child(<?php echo $perrowmobile;?>n+1) {
+	    clear: both;
+		}
+	}
+	@media only screen and (max-width:479px) {
+		#jm_product_grid_<?php echo $listId; ?> li.item {
+			width: <?php echo $widthmobiletportrait.'%';?>;
+		}
+		<?php if ($perrowmobileportrait == 1):?>
+			#jm_product_grid_<?php echo $listId; ?> {
+				margin: 0;
+			}
+		<?php endif; ?>
+	}
+</style>
+
+<!-- Block products with slider -->
+<div class="jm-product-list <?php echo $config['mode']; ?> jm-product-slider">
+	<?php if($config['title']): ?>
+		<div class="page-title category-title clearfix">
+			<h2><?php echo $config['title']; ?></h2>
+		</div>
+	<?php endif; ?>
+    <?php
+        $collection = $this->getCollection();
+        $collectionSize = $collection ? $collection->count() : 0;
+        $i = 0;
+    ?>
+    <?php if ($collectionSize): ?>
+    
+    <div id="jm-product-slider-<?php echo $listId; ?>">
+        <div id="<?php echo $listId ?>_items" class="listing-type-grid category-products">
+            <ul id="jm_product_grid_<?php echo $listId; ?>" class="products-grid jm-product-slider-item" >
+                <?php
+                $j = 0;
+                foreach ($collection->getItems() as $product):
+                    $activeClass = ($i == 0) ? 'active' : '';
+                    $rowCount = ceil($collectionSize / $config['perrow']);
+                    if ($i % $config['perrow'] == 0){
+                        $j++;
+                    }
+
+                    $product = Mage::getModel('catalog/product')->load($product->getId());
+
+                    //get label 
+                    if (isset($showLabel) AND $showLabel){
+                        $attribute = $product->getResource()->getAttribute('label');
+                        if (is_object($attribute)) {
+                            $options = $attribute->getSource()->getAllOptions(true, true);
+                            foreach ($options as $option) {
+                                if ($option['value'] == $product->getData("label")) {
+                                    $class = $option['label'];
+                                }
+                            }
+                            $attDefaultValue = $attribute->getDefaultValue();
+                            $attributeValue = Mage::getModel('catalog/product')->load($product->getId())->getlabel();
+                            $attributeValueName = Mage::getModel('catalog/product')->load($product->getId())->getAttributeText('label');
+                            if (strlen($attributeValue) && ($attDefaultValue !== $attributeValue)) {
+                                $labelType = $class;
+                                $labelName = $attributeValueName;
+                            } else {
+                                $labelType = "";
+                            }
+                        }
+                    }
+                    ?>
+                    <li data-index="<?php echo $i; ?>" class="item <?php echo $activeClass; ?> <?php if ($j == $rowCount) : echo "item-row-last"; endif; ?> <?php if (($i - 1) % $config['perrow'] == 0): ?> first<?php elseif ($i % $config['perrow'] == 0): ?> last<?php endif; ?>">
+                        <div class="inner">
+                            <!-- Product image -->
+                            <p class="product-image">
+                                <a title="<?php echo $this->htmlEscape($product->getName()) ?>"
+                                   href="javascript:void(0);">
+                                    <img data-id="<?php echo $product->getId(); ?>"
+                                        src="<?php echo $this->helper('catalog/image')->init($product, 'thumbnail')->resize($thumbWidth, $thumbHeight)->setWatermarkSize('30x10'); ?>"
+                                        alt="<?php echo $this->htmlEscape($product->getName()) ?>"
+                                    />
+                                </a>
+                                <?php if (isset($labelType) AND isset($showLabel) AND $showLabel): ?>
+                                    <span class="<?php echo $labelType; ?>-label label"><?php echo $labelName; ?></span>
+                                <?php endif; ?>
+                            </p>
+                            <div style="display:none;" class="slide-detail">
+                                <p class="product-image">
+                                    <a title="<?php echo $this->htmlEscape($product->getName()) ?>"
+                                       href="<?php echo $product->getProductUrl() ?>">
+                                        <img src="<?php echo $this->helper('catalog/image')->init($product, 'thumbnail')->resize($landingThumbWidth, $landingThumbWidth); ?>"
+                                            alt="<?php echo $this->htmlEscape($product->getName()) ?>"/>
+                                    </a>
+                                </p>
+                                 <!-- Product Description -->
+                                <div class="product-information">
+                                    <h5 class="product-name">
+                                        <a title="<?php echo $this->htmlEscape($product->getName()) ?>"
+                                           href="<?php echo $product->getProductUrl() ?>"><?php echo $product->getName() ?></a>
+                                    </h5>
+                                    <?php echo $this->getReviewsSummaryHtml($product, true, true) ?>
+                                    <?php echo $this->getPriceHtml($product, true, '_jmproduct_' . uniqid()); ?>
+                                    <?php
+                                        if ($maxChar) :
+                                            $productDesc = $product->getDescription();
+                                            $productShortDesc = $product->getShortDescription();
+                                    ?>
+                                        <p class="pdescription"><?php echo mb_substr(nl2br(strlen($productDesc) > 10 ? $productDesc : $productShortDesc), 0, $maxChar, 'UTF-8') . '...'; ?></p>
+                                    <?php endif; ?>
+                                    <!-- Add to cart -->
+                                    <?php if ($product->isSaleable()): ?>
+                                        <button class="button btn-cart"
+                                                onclick="setLocation('<?php echo $this->getAddToCartUrl($product) ?>')">
+                                            <span><?php echo $this->helper("catalog")->__('Add to Cart'); ?></span>
+                                        </button>
+                                    <?php else: ?>
+                                        <div class="out-of-stock"><?php echo $this->helper("catalog")->__('Out of stock'); ?></div>
+                                    <?php endif; ?>
+                                    <!-- Add to links -->
+                                    <ul class="add-to-links">
+                                        <?php if ($this->helper('wishlist')->isAllow()) : ?>
+                                            <li>
+                                                <a href="<?php echo $this->helper('wishlist')->getAddUrl($product); ?>" class="link-wishlist">
+                                                    <?php echo $this->__('Wishlist'); ?>
+                                                </a>
+                                            </li>
+                                        <?php endif; ?>
+                                        <?php if ($compareUrl = $this->getAddToCompareUrl($product)): ?>
+                                            <li>
+                                                <a href="<?php echo $compareUrl ?>" class="link-compare"><?php echo $this->__('Compare'); ?></a>
+                                            </li>
+                                        <?php endif; ?>
+                                    </ul>
+                                </div>
+                                <!-- /Product information -->
+                            </div>
+                        </div>
+                    </li>
+                <?php $i++; endforeach; ?>
+            </ul>
+            <script type="text/javascript">decorateGeneric($$('ul.products-grid'), ['odd', 'even', 'first', 'last'])</script>
+        </div>
+    </div>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script type="text/javascript">
+    (function ($) {
+        $(document).ready(function ($) {
+
+            var $container = $('#jm-product-slider-<?php echo $listId  ?>'),
+                $elements = $('#jm_product_grid_<?php echo $listId  ?>').children('li'),
+                sliderInterval = '',
+                currentIndex = 0,
+                sliderDuration = <?php echo $config['slide_duration']; ?>,
+                slideSpeed = 300,
+                autoSlider = <?php echo $config['slide_auto']; ?>,
+                transition = '<?php echo $config['slide_transition']; ?>', //ltr|rtl|fade
+                $slideHolder = $container.find('.slide-content');
+
+            initialize = function () {
+                
+                if (!$slideHolder.length) {
+                    $slideHolder = $('<div class="slide-content">').prependTo($container);
+                    $slideHolder.html($elements.filter('.active').find('.slide-detail').html());
+                }
+                
+                if (autoSlider){
+                    this.runSlider($elements);
+                }
+                
+                //bind event to slide items
+                $elements.on('mouseenter', hoverEvent);
+                $elements.on('mouseleave', leaveEvent);
+                
+                //bind event to slide placeholder
+                $slideHolder.on('mouseenter', function(){
+                    clearInterval(sliderInterval);
+                });
+                $slideHolder.on('mouseleave', function(){
+                    if (autoSlider){
+                        runSlider($elements);
+                    }
+                });
+            }
+            activate = function ($elem) {
+                if ($elem.hasClass('active')) return;
+                $elements.removeClass('active');
+                $elem.addClass('active');
+                
+                if (transition == 'rtl'){
+                    $slideHolder.toggle('slide', {direction: 'left'}, slideSpeed, function(){
+                        $(this).html($elem.find('.slide-detail').html()).toggle('slide', {direction: 'right'}, slideSpeed);
+                    });
+                } else if (transition == 'ltr') {
+                    $slideHolder.toggle('slide', {direction: 'right'}, slideSpeed, function(){
+                        $(this).html($elem.find('.slide-detail').html()).toggle('slide', {direction: 'left'}, slideSpeed);
+                    });
+                } else {
+                    $slideHolder.fadeOut(slideSpeed, function () {
+                        $(this).html($elem.find('.slide-detail').html()).fadeIn(slideSpeed);
+                    });
+                }
+            }
+            hoverEvent = function () {
+                //clear slider
+                clearInterval(sliderInterval);
+                //active current item
+                activate($(this));
+            }
+            leaveEvent = function () {
+                if (autoSlider){
+                    //start from current item
+                    currentIndex = $(this).attr('data-index');
+                    //run slider
+                    runSlider($elements);
+                }
+            }
+            runSlider = function($elements){
+                sliderInterval = setInterval(function () {
+                    //update current index
+                    currentIndex = (currentIndex == $elements.length - 1) ? 0 : ++currentIndex;
+                    //run slide
+                    activate($($elements[currentIndex]));
+                }, sliderDuration);
+            }
+
+            //run
+            initialize();
+        });
+    })(jQuery);
+    </script>
+    
+    <?php else: // no product to show?>
+    <div class="listing-type-grid category-products">
+        <p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>
+    </div>
+    <?php endif; ?>
+</div>
+<!--// Block Products with slider -->

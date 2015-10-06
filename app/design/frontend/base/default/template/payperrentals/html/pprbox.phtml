@@ -1,0 +1,538 @@
+<?php
+$attrName		=	Mage::getStoreConfig('payperrentals/calendar_widget/attrib_name',Mage::app()->getStore());
+$catId = Mage::getStoreConfig('payperrentals/calendar_widget/catid_name', Mage::app()->getStore());
+$attrValues = $this->getAttrValues();
+$categories = $this->getFrontendCategories();
+if($catId){
+    $categoryMainUrl = $this->getMainCategory($catId)->getUrl();
+}else{
+    $categoryMainUrl = '';
+}
+$currentURL = $this->helper('core/url')->getCurrentUrl();
+$baseUrl = str_replace('/index.php', '', Mage::getBaseUrl());
+$use_categories	=	Mage::getStoreConfig('payperrentals/global/use_categories_box',Mage::app()->getStore());
+$use_left	=	Mage::getStoreConfig('payperrentals/global/use_pprbox_left',Mage::app()->getStore());
+$use_right	=	Mage::getStoreConfig('payperrentals/global/use_pprbox_right',Mage::app()->getStore());
+$use_header	=	Mage::getStoreConfig('payperrentals/global/use_pprbox_header',Mage::app()->getStore());
+$use_homepage	=	Mage::getStoreConfig('payperrentals/global/use_pprbox_homepage',Mage::app()->getStore());
+$use_styling	=	Mage::getStoreConfig('payperrentals/calendar_widget/use_pprbox_style',Mage::app()->getStore());
+$isFrontendGlobal = true;
+$is_homepage = Mage::getBlockSingleton('page/html_header')->getIsHomePage();
+$is_product_view = (Mage::registry('current_product'));
+$block = $this->getNameInLayout();
+
+if($block == 'left.pprbox' && !$use_left){
+    return;
+}
+
+if($block == 'right.pprbox' && !$use_right){
+    return;
+}
+
+if($block == 'header.pprbox' && !$use_header && !$use_homepage){
+    return;
+}
+if($block == 'header.pprbox' && !$use_homepage && $is_homepage){
+    return;
+}
+if($block == 'header.pprbox' && $use_homepage && !$is_homepage){
+    return;
+}
+//if($is_product_view && Mage::helper('payperrentals/config')->showCalendarOnProductInfo()){
+  //  return;
+//}
+$request = $this->getRequest();
+$module = $request->getModuleName();
+$controller = $request->getControllerName();
+$action = $request->getActionName();
+
+if($module == 'checkout' && $controller == 'cart' && $action == 'index'){
+    return;
+}
+?>
+    <script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/utils/jquery.hiddenposition.js'; ?>"></script>
+    <script type="text/javascript">
+
+    currentCalendar = '.datesblock';
+    function followCategory(url, force)
+    {
+        //replace jscontainerprefix with a js variable which contains either of the too if on product view page .reservationCalendarDiv .calendarSelector
+        if(typeof force === 'undefined' || force == false) {
+        <?php if ($_product && $_product->getHideEndDate() || Mage::getStoreConfig('payperrentals/listing/hide_end_date_product')): ?>
+        if($jppr(currentCalendar).find('.readStartDate').val() == ''){
+            alert('Please select starting date!');
+            return false;
+        }
+        <?php else: ?>
+        if($jppr(currentCalendar).find('.readEndDate').val() == '' || $jppr(currentCalendar).find('.readStartDate').val() == '' ){
+            alert('Please select both dates!');
+            return false;
+        }
+        if($jppr(currentCalendar).find('.readStartDate').val() == $jppr(currentCalendar).find('.readEndDate').val() && $jppr(currentCalendar).find('.start_time').val() == $jppr(currentCalendar).find('.end_time').val()){
+            alert('You have selected invalid rental times. The End Time needs to be later than the Start Time!');
+            return false;
+        }
+        <?php endif; ?>
+            varienGlobalEvents.attachEventHandler('update_initial_global_success', function(data){
+                if(typeof data.url !== "undefined"){
+                    window.location = data.url;
+                }
+            });
+        updateInitialsGlobal(url);
+        }else{
+            window.location.href=url;
+        }
+        return false;
+
+    }
+
+
+    <?php if(Mage::helper('payperrentals/config')->disableClickingRentIfDatesNotSelected()): ?>
+    $jppr(window).load(function(){
+        $jppr('.btn-cart-res[onclick]').each(function(){
+            $jppr(this).data('onclick', this.onclick);
+
+            this.onclick = function(event) {
+                if ($jppr('.readStartDate').val() == '' && $jppr('.readEndDate').val() == '') {
+                    alert('Please Select Both Dates');
+                    return false;
+                }
+
+                $jppr(this).data('onclick').call(this, event || window.event);
+            };
+        });
+    });
+    <?php endif; ?>
+
+</script>
+
+<?php if($is_homepage && $use_styling):?>
+
+    <div id="hp-search-block">
+        <div id="hp-search" class="has-grid-cal">
+            <div id="hp-search-title" class="head2">LET'S GET DRESSED</div>
+            <div id="hp-search-subtitle"></div>
+            <div class="rescal-datepicker-wrapper">
+            </div>
+            <?php if($attrName != ''): ?>
+            <div class="flr pretty-checkbox-set">
+                <span class="label" id="hp-size">Size</span>
+                <div id="sizes" style="display: none;">
+                    <input type="hidden" value="<?php echo $attrName?>" id="attrName"/>
+                <?php foreach ($attrValues as $iVal): ?>
+                    <a href="javascript:void(0)" class="size" theval="<?php echo $iVal['value']; ?>"><?php echo $iVal['label'];?></a>
+                <?php endforeach;?>
+                    <button id="size-close" class="s8-ico-close log close"></button>
+                </div>
+            </div>
+                <?php else:?>
+            <?php endif;?>
+            <button id="hp-search-btn" class="btn">Search</button>
+        </div>
+        <div id="top-searches">
+            <div id="top-title">TOP SEARCHES</div>
+            <?php foreach($categories as $name => $data): ?>
+                <a href="<?php echo $data['url']; ?>" class="top-search white" title="<?php echo $name; ?>" alt="<?php echo $name; ?>"><?php echo $name; ?></a>
+            <?php endforeach; ?>
+        </div>
+    </div> 
+    <style type="text/css">
+        #hp-search-title {
+            height: 32px;
+            margin: 0;
+            margin-top: 24px;
+        }
+        .head2 {
+            font-size: 20px;
+            color: #FFF;
+        }
+        a.close, button.close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+        .s8-ico-close {
+            background:url("<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);?>frontend/base/default/itwebexperts_payperrentals/datepick/close.png");
+            width: 16px;
+            height: 16px;
+        }
+        a.white{
+            color:#ffffff;
+        }
+        a.white:hover{
+            color:#d90077;
+        }
+
+        #hp-search-block {
+            z-index: 10000;
+            width: 300px;
+            <?php if($attrName != ''): ?> height: 350px;
+            <?php else:?> height: 310px;
+            <?php endif;?>
+            position: absolute;
+            background: url("<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);?>frontend/base/default/itwebexperts_payperrentals/datepick/dot.png") repeat;
+            text-align: center
+        }
+        #hp-search {
+            padding: 0 40px 30px 40px;
+            border-bottom: 1px solid #420C3A;
+            position: relative
+        }
+        #hp-search-title {
+            height: 32px;
+            margin: 0;
+            margin-top: 24px
+        }
+        #hp-search-subtitle {
+            margin: 3px 0 12px;
+            font-family: 'ProximaNova-Light', 'ProximaNova-Regular';
+            font-style: italic;
+            color: white;
+            font-size: 13px
+        }
+        .readStartDate, #hp-size, #hp-zip {
+            text-transform: capitalize;
+            text-align: left;
+            display: inline-block;
+            background: #FFF;
+            border: 1px solid #b6b6ba;
+            -webkit-box-shadow: inset 1px 1px 5px #dddddd;
+            -moz-box-shadow: inset 1px 1px 5px #dddddd;
+            box-shadow: inset 1px 1px 5px #dddddd;
+            outline: none;
+            font-family: 'ProximaNova-Regular';
+            font-size: 14px;
+            color: #000;
+            height: 15px;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            -ms-border-radius: 3px;
+            -o-border-radius: 3px;
+            border-radius: 3px;
+            padding: 10px
+        }
+        .readStartDate {
+            cursor: pointer;
+            width: 198px;
+            margin-bottom: 15px;
+            background: #fff url("<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);?>frontend/base/default/itwebexperts_payperrentals/datepick/ico-cal-purple.png") no-repeat 95% 50%
+        }
+        #hp-size {
+            float: left;
+            width: 68px;
+            display: block;
+            padding: 7px 22px 7px 10px;
+            padding-right: 22px;
+            border: 1px solid #ccc;
+            border-color: #E6E6E6 #E6E6E6 #B3B3B3;
+            background: #fff url("<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);?>frontend/base/default/itwebexperts_payperrentals/datepick/arr-purple.png") no-repeat 88% 50%;
+            cursor: pointer;
+            text-align: left;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            -ms-border-radius: 4px;
+            -o-border-radius: 4px;
+            border-radius: 4px;
+            -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+            -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+            padding-top: 10px;
+            padding-bottom: 10px
+        }
+        #hp-size:hover {
+            background-color: #e6e6e6
+        }
+        #hp-zip {
+            float: right;
+            width: 94px
+        }
+        #hp-search-btn {
+            clear: both;
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+        #sizes {
+            -moz-border-radius-bottomleft: 3px;
+            -webkit-border-bottom-left-radius: 3px;
+            border-bottom-left-radius: 3px;
+            -moz-border-radius-bottomright: 3px;
+            -webkit-border-bottom-right-radius: 3px;
+            border-bottom-right-radius: 3px;
+            background-color: #f0f0f0;
+            background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #fff), color-stop(100%, #e1e1e1));
+            background-image: -webkit-linear-gradient(#fff 0%, #e1e1e1 100%);
+            background-image: -moz-linear-gradient(#fff 0%, #e1e1e1 100%);
+            background-image: -o-linear-gradient(#fff 0%, #e1e1e1 100%);
+            background-image: linear-gradient(#ffffff 0%, #e1e1e1 100%);
+            border: 1px solid #b6b6ba;
+            font-family: "ProximaNova-Regular", Arial, sans-serif;
+            position: absolute;
+            width: 161px;
+            text-align: left;
+            margin-top: 36px;
+            padding: 20px 25px 15px 15px
+        }
+        .size {
+            text-decoration: none;
+            display: inline-block;
+            font-size: 11px;
+            color: black;
+            width: 26px;
+            height: 18px;
+            background: #f6f6f6;
+            border: 1px solid #b0adad;
+            text-align: center;
+            margin: 0 1px 3px 0;
+            line-height: 20px
+        }
+        .size:hover, .size-selected {
+            border: 1px solid #d90077;
+            background: #fff;
+            color: #d90077
+        }
+        #top-searches {
+            text-align: left;
+            font-size: 10px;
+            font-family: ProximaNova-Regular;
+            padding: 15px 40px 20px 40px;
+            background: url("<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);?>frontend/base/default/itwebexperts_payperrentals/datepick/tops.png") repeat;
+            overflow: hidden;
+            color: #FFF;
+            height: 60px;
+            line-height: 16px;
+            border-top: 1px solid #651257
+        }
+        #top-searches a {
+            text-decoration: underline
+        }
+        #top-title {
+            letter-spacing: 1px;
+            font-family: "ProximaNova-Bold", Arial, sans-serif;
+            color: #D90077;
+            text-align: center;
+            margin: -5px 0 3px
+        }
+        .top-search {
+            display: inline-block;
+            width: 110px;
+            float: left
+        }
+        #hp-search-block  button.btn{
+            line-height: 40px;
+            height: 40px;
+            padding: 0 30px;
+            font-size: 14px;
+
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            outline: none;
+            text-align: center;
+            -webkit-box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            -moz-box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            border-top: 1px solid #f7319e;
+            border-bottom: 1px solid #a8005c;
+            background-color: #d90077;
+            color: #fff;
+            background-color: #d60076;
+            background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #e7007f), color-stop(100%, #c5006d));
+            background-image: -webkit-linear-gradient(#e7007f 0%, #c5006d 100%);
+            background-image: -moz-linear-gradient(#e7007f 0%, #c5006d 100%);
+            background-image: -o-linear-gradient(#e7007f 0%, #c5006d 100%);
+            background-image: linear-gradient(#e7007f 0%,#c5006d 100%);
+        }
+
+        #hp-search-block  button.btn:hover{
+            background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #c5006d), color-stop(100%, #e7007f));
+            background-image: -webkit-linear-gradient(#c5006d 0%, #e7007f 100%);
+            background-image: -moz-linear-gradient(#c5006d 0%, #e7007f 100%);
+            background-image: -o-linear-gradient(#c5006d 0%, #e7007f 100%);
+            background-image: linear-gradient(#c5006d 0%,#e7007f 100%);
+        }
+
+    </style>
+<?php else:?>
+
+<?php if(!$use_header || $is_homepage):?>
+<?php if($is_homepage): ?>
+    <div class="block-pprdates-homepage-topcontainer">
+ <?php endif;?>
+<div class="block block-pprdates <?php if($is_homepage): ?>block-pprdates-homepage <?php endif;?>">
+    <div class="block-title">
+        <strong><span><?php echo $this->__('Choose Your Dates') ?></span></strong>
+    </div>
+    <div class="block-content <?php if($is_homepage): ?>block-pprdates-content-homepage <?php endif;?>">
+<?php endif; ?>
+
+        <div class="vertical-nav-container-global <?php if($is_homepage): ?>block-pprdates-vertical-nav-container-homepage <?php endif;?>">
+            <div class="vertical-nav <?php if($is_homepage): ?>block-pprdates-vertical-nav-homepage <?php endif;?>">
+                <div class="datesblock" style="<?php if(!$use_header || $is_homepage):?> float:left;<?php else: ?> <?php endif;?>">
+
+                    <?php //if(!$is_product_view || $is_product_view && !Mage::helper('payperrentals/config')->showCalendarOnProductInfo()): ?>
+                    <?php echo $this->getCalendar(); ?>
+                    <?php //endif; ?>
+
+                    <?php // if(!$is_homepage) {
+
+                    if (!in_array(Mage::app()->getFrontController()->getAction()->getFullActionName(), array('cms_index_noRoute', 'cms_index_defaultNoRoute'))) {
+                        $currentUrl = Mage::helper('core/url')->getCurrentUrl();
+                    }
+                    ?>
+                        <?php //} ?>
+
+                </div>
+                <div style="<?php if($use_header):?>display:inline-block;vertical-align:top; margin-top:20px;<?php endif;?>"><button class="button btn-cart" onclick="followCategory('<?php echo (isset($currentUrl)?$currentURL:''); ?>')"><span><span> <?php echo $this->__('Go'); ?></span></span></button></div>
+                <?php
+                if($use_categories == 1){
+                    ?>
+                    <div class="block-pprdates-category"  style="font-weight:bold; font-size:12px; float: left; width: 224px;">SELECT CATEGORY</div>
+                    <ul id="nav_vert">
+                        <li class="level0 nav-0 <?php echo (str_replace('/index.php', '', $currentURL) == $baseUrl)?' active': ''?>">
+                            <a href="<?php echo $this->getUrl('') ?>">
+                                <span><?php echo $this->__('Home') ?></span>
+                            </a>
+                        </li>
+                        <?php foreach ($this->getStoreCategories() as $_key=>$_category){ ?>
+                            <?php $_subcategories = $_category->getChildren() ?>
+                            <?php                     $hasChildren = $_subcategories && $_subcategories->count(); ?>
+
+                            <li class="level0 nav-<?php echo $_key; ?><?php echo ($this->getCurrentCategory() == $_category->getId() || (in_array($_category->getId(),$this->getCurrentCategory()->getPathIds())))?' active': ''?> ">
+                                <?php if ($hasChildren <= 0){ ?>
+
+                                    <a href="javascript:void(0)" onclick="followCategory('<?php echo $this->getCategoryUrl($_category) ?>', true)">
+                                        <?php echo $_category->getName() ?>
+                                    </a>
+
+                                <?php } else { ?>
+
+                                    <a href="javascript:void(0)" onclick='$jppr("#subcategories-<?php echo $_category->getId(); ?>").slideToggle("medium");'>
+                                        <?php echo $_category->getName() ?>
+                                    </a>
+
+                                <?php  } ?>
+                            </li>
+                            <?php //subcategories ?>
+                            <?php //if ($this->getCurrentCategory() == $_category->getId() || (in_array($_category->getId(),$this->getCurrentCategory()->getPathIds()))){ ?>
+                            <?php if ($hasChildren){ ?>
+                            <ul id="subcategories-<?php echo $_category->getId(); ?>"  class="navsub sub-<?php echo $_key; ?><?php echo ($this->getCurrentCategory() == $_category->getId() || (in_array($_category->getId(),$this->getCurrentCategory()->getPathIds())))?' active': ''?> ">
+                                <?php foreach($_subcategories as $_subcategory): ?>
+                                    <li <?php echo ($this->getCurrentCategory()->getId() == $_subcategory->getId())?'class="active"': ''?>>
+                                        <!-- <a href="<?php echo $this->getCategoryUrl($_subcategory) ?>">-->
+                                        <a href="javascript:void(0)" onclick="followCategory('<?php echo $this->getCategoryUrl($_subcategory) ?>', true)">
+                                            <span><?php echo $_subcategory->getName() ?></span>
+                                        </a>
+
+                                        <?php //subcategories ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <?php // } ?>
+                        <?php } ?>
+
+                            <?php //subcategories end ?>
+
+                            <?php } ?>
+
+                        <li class="level0 nav-all <?php echo ($currentURL == $this->getUrl('all-products'))?' active': ''?>">
+                            <a href="<?php echo $this->getUrl('all-products') ?>">
+                                <span><?php echo $this->__('All Products') ?></span>
+                            </a>
+                        </li>
+                    </ul>
+                <?php
+                }
+                ?>
+            </div>
+
+            <div style="clear:both"></div>
+
+            <?php echo $this->getChildHtml('topLeftLinks') ?>
+        </div>
+
+        <style type="text/css">
+            #nav_vert { float: left;}
+            #nav_vert ul.navsub { display: none; }
+            #nav_vert ul.active  { display: block;}
+            /*this part should be customized*/
+            .block-pprdates-homepage-topcontainer .block-title{
+                display:none;
+            }
+            .block-pprdates-homepage-topcontainer .block-pprdates-vertical-nav-container-homepage{
+                background: none;
+                border:0;
+            }
+            .block-pprdates-homepage-topcontainer .block-pprdates-homepage{
+                background:none;
+                border:0;
+            }
+            .block-pprdates-homepage-topcontainer .block-pprdates-content-homepage{
+                background:none;
+                border:0;
+            }
+
+            .vertical-nav-container-global .btn-cart{
+                margin-top: 10px;
+            }
+
+            .vertical-nav-container-global .datesSelector input{
+                width:auto !important;
+            }
+            <?php if ($use_header): ?>
+            .datesblock .dateView{
+                display: inline-block !important;
+                width: 600px !important;
+                margin-right:30%;
+            }
+            .datesblock .btn-resfreshCalendar{
+                display: none;
+            }
+            .datesblock .calendarSelector{
+                display: inline-block;
+            }
+            .vertical-nav-container-global{
+                float:right;
+                width: 800px;
+                margin-right:20%;
+                position:relative;
+                z-index:100000;
+            }
+            .datesblock .dateStartLine{
+                width:250px;
+                display: inline-block;
+            }
+            .datesblock .dateSelectorStart label{
+                display: inline-block;
+            }
+            .datesblock .dateSelectorEnd label{
+                display: inline-block;
+            }
+
+            .datesblock .dateEndLine{
+                width:250px;
+                display: inline-block;
+            }
+            .datesblock{
+                display:inline-block;
+                width:550px;
+                margin-top: 11px;
+            }
+            .datesblock .legend-detail-container{
+                display: none;
+            }
+
+            <?php endif; ?>
+
+        </style>
+<?php if(!$use_header  || $is_homepage): ?>
+    <?php if($is_homepage): ?>
+            </div>
+    <?php endif;?>
+    </div>
+</div>
+<?php endif;?>
+<?php endif;?>
