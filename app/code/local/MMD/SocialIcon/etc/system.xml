@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+     <tabs>
+       <mmd translate="label">
+			<label>Mage Mobile Design</label>
+			<sort_order>400</sort_order>
+		</mmd>
+    </tabs>
+
+    <sections>
+        <socialicon translate="label" module="socialicon">
+            <label>Social Media Icons</label>
+            <tab>mmd</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>71</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <general translate="label">
+                    <label>Social Network Options</label>
+                    <sort_order>600</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        
+						
+						<social_icons_enabled translate="label">
+                            <label>Enabled Social Media Icons</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </social_icons_enabled>
+						
+						
+						<social_icons_fb_enabled translate="label">
+                            <label>Enabled Facebook</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+                        </social_icons_fb_enabled>
+						
+						<social_icons_fb_url translate="label">
+                        <label>Facebook Url</label>
+						<frontend_type>text</frontend_type>
+							<sort_order>30</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_fb_enabled>1</social_icons_fb_enabled></depends>
+						</social_icons_fb_url>
+						
+						
+						<social_icons_fb_img translate="label">
+                        <label>Upload Facebook Icon</label>
+						 <frontend_type>image</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">wysiwyg/socialicons</upload_dir> 
+                            <base_url type="media" scope_info="1">wysiwyg/socialicons</base_url>
+							<sort_order>40</sort_order>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_fb_enabled>1</social_icons_fb_enabled></depends>>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</social_icons_fb_img>
+						
+						
+						<social_icons_tw_enabled translate="label">
+                            <label>Enabled Twitter</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+                        </social_icons_tw_enabled>
+						
+						<social_icons_tw_url translate="label">
+                        <label>Twitter Url</label>
+						<frontend_type>text</frontend_type>
+							<sort_order>60</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_tw_enabled>1</social_icons_tw_enabled></depends>
+						</social_icons_tw_url>
+						
+						
+						<social_icons_tw_img translate="label">
+                        <label>Upload Twitter Icon</label>
+						 <frontend_type>image</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">wysiwyg/socialicons</upload_dir> 
+                            <base_url type="media" scope_info="1">wysiwyg/socialicons</base_url>
+							<sort_order>70</sort_order>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_tw_enabled>1</social_icons_tw_enabled></depends>>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</social_icons_tw_img>
+						
+						<social_icons_gp_enabled translate="label">
+                            <label>Enabled Google Plus</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+                        </social_icons_gp_enabled>
+						
+						<social_icons_gp_url translate="label">
+                        <label>Google Plus Url</label>
+						<frontend_type>text</frontend_type>
+							<sort_order>90</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_gp_enabled>1</social_icons_gp_enabled></depends>
+						</social_icons_gp_url>
+						
+						
+						<social_icons_gp_img translate="label">
+                        <label>Upload Google Plus Icon</label>
+						 <frontend_type>image</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">wysiwyg/socialicons</upload_dir> 
+                            <base_url type="media" scope_info="1">wysiwyg/socialicons</base_url>
+							<sort_order>100</sort_order>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_gp_enabled>1</social_icons_gp_enabled></depends>>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</social_icons_gp_img>
+						
+						
+						<social_icons_pn_enabled translate="label">
+                            <label>Enabled Pinterest</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+                        </social_icons_pn_enabled>
+						
+						<social_icons_pn_url translate="label">
+                        <label>Pinterest Url</label>
+						<frontend_type>text</frontend_type>
+							<sort_order>120</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_pn_enabled>1</social_icons_pn_enabled></depends>
+						</social_icons_pn_url>
+						
+						
+						<social_icons_pn_img translate="label">
+                        <label>Upload Pinterest Icon</label>
+						 <frontend_type>image</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">wysiwyg/socialicons</upload_dir> 
+                            <base_url type="media" scope_info="1">wysiwyg/socialicons</base_url>
+							<sort_order>130</sort_order>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_pn_enabled>1</social_icons_pn_enabled></depends>>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</social_icons_pn_img>
+						
+						<social_icons_yt_enabled translate="label">
+                            <label>Enabled YouTube</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+                        </social_icons_yt_enabled>
+						
+						<social_icons_yt_url translate="label">
+                        <label>YouTube Url</label>
+						<frontend_type>text</frontend_type>
+							<sort_order>150</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_yt_enabled>1</social_icons_yt_enabled></depends>
+						</social_icons_yt_url>
+						
+						
+						<social_icons_yt_img translate="label">
+                        <label>Upload YouTube Icon</label>
+						 <frontend_type>image</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">wysiwyg/socialicons</upload_dir> 
+                            <base_url type="media" scope_info="1">wysiwyg/socialicons</base_url>
+							<sort_order>160</sort_order>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_yt_enabled>1</social_icons_yt_enabled></depends>>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</social_icons_yt_img>
+						
+						<social_icons_ig_enabled translate="label">
+                            <label>Enabled Instagram</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>170</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+                        </social_icons_ig_enabled>
+						
+						<social_icons_ig_url translate="label">
+                        <label>Instagram Url</label>
+						<frontend_type>text</frontend_type>
+							<sort_order>180</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_ig_enabled>1</social_icons_ig_enabled></depends>
+						</social_icons_ig_url>
+						
+						
+						<social_icons_ig_img translate="label">
+                        <label>Upload Instagram Icon</label>
+						 <frontend_type>image</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">wysiwyg/socialicons</upload_dir> 
+                            <base_url type="media" scope_info="1">wysiwyg/socialicons</base_url>
+							<sort_order>190</sort_order>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_ig_enabled>1</social_icons_ig_enabled></depends>>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</social_icons_ig_img>
+						
+						<social_icons_bg_enabled translate="label">
+                            <label>Enabled Blog</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+                        </social_icons_bg_enabled>
+						
+						<social_icons_bg_url translate="label">
+                        <label>Blog Url</label>
+						<frontend_type>text</frontend_type>
+							<sort_order>210</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_bg_enabled>1</social_icons_bg_enabled></depends>
+						</social_icons_bg_url>
+						
+						
+						<social_icons_bg_img translate="label">
+                        <label>Upload Blog Icon</label>
+						 <frontend_type>image</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">wysiwyg/socialicons</upload_dir> 
+                            <base_url type="media" scope_info="1">wysiwyg/socialicons</base_url>
+							<sort_order>220</sort_order>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<depends><social_icons_bg_enabled>1</social_icons_bg_enabled></depends>>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</social_icons_bg_img>
+						
+						<social_all_size translate="label">
+                        <label>Set Social Icons Size</label>
+						<frontend_type>text</frontend_type>
+							<sort_order>230</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<depends><social_icons_enabled>1</social_icons_enabled></depends>
+							<comment>Set Image Size like (64x64 or 48x48 or 32x32 or 24x24 or 16x16)</comment>
+						</social_all_size>
+						
+						
+					</fields>
+                </general>
+            </groups>
+        </socialicon>
+    </sections>
+</config>

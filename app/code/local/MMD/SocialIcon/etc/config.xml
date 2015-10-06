@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <modules>
+        <MMD_SocialIcon>
+            <version>1.0</version>
+        </MMD_SocialIcon>
+    </modules>
+
+    <global>
+      
+        <blocks>
+            <SocialIcon>
+                <class>MMD_SocialIcon_Block</class>
+            </SocialIcon>
+        </blocks>
+        <helpers>
+            <socialicon>
+                <class>MMD_SocialIcon_Helper</class>
+            </socialicon>
+        </helpers>
+    </global>
+
+    
+</config>

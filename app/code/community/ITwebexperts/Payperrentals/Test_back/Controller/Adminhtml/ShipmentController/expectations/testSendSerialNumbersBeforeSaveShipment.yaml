@@ -1,7 +1,0 @@
-testId1:
-  serial_count: 1
-testId2:
-  serial_count: 1
-  expected_serials: [69dd12d8d4e7]
-testId3:
-  serial_count: 0

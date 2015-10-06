@@ -1,5 +1,0 @@
-<?php
-class ITwebexperts_Payperrentals_Block_Adminhtml_Sales_Returnlate_Popup extends Mage_Core_Block_Template
-{
-
-}
