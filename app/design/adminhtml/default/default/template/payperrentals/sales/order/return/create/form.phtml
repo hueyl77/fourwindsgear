@@ -70,7 +70,7 @@
                     <th class="a-center">Sent Date</th>
                     <th class="a-center">Qty</th>
                     <?php foreach ($this->getSentItems() as $sentItem): ?>
-                        <?php $_serialNumbers = $sentItem->getSn() ? explode(',', $sentItem->getSn()) : array() ?>
+                        <?php $_serialNumbers = $sentItem->getSnAll() ? explode(',', $sentItem->getSnAll()) : array() ?>
                         <?php $_needSnColumn = (bool)(count($_serialNumbers)); ?>
                         <?php if($_needSnColumn) break; ?>
                     <?php endforeach; ?>
@@ -81,9 +81,14 @@
                 </thead>
                 <tbody class="odd">
                 <?php foreach ($this->getSentItems() as $sentItem): ?>
-                    <?php $_serialNumbers = $sentItem->getSn() ? explode(',', $sentItem->getSn()) : array() ?>
+                    <?php $_returnedItems = $this->getReturnedItems($sentItem->getResorderId());?>
+                    <?php $_serialNumbersSent = $sentItem->getSnAll() ? explode(',', $sentItem->getSnAll()) : array() ?>
+                    <?php $_serialNumbersReturned = $_returnedItems->getSnAll() ? explode(',', $_returnedItems->getSnAll()) : array() ?>
+                    <?php $_serialNumbers = array_diff($_serialNumbersSent, $_serialNumbersReturned);?>
+                    <?php $_qtyReturned = $_returnedItems->getQtyReturned()?$_returnedItems->getQtyReturned():0;?>
                     <?php /** @var $_product Mage_Catalog_Model_Product */ ?>
                     <?php $_product = $this->getProductFromSentItem($sentItem) ?>
+                    <?php if($sentItem->getQtyShipped() - $_qtyReturned > 0) :?>
                     <tr class="border">
                         <td>
                             <input type="checkbox" name="send_items[]" value="<?php echo $sentItem->getId() ?>"/>
@@ -103,7 +108,7 @@
                         </td>
 
                         <td>
-                            <?php echo $sentItem->getQty() ?>
+                            <input type="text" maxqty="<?php echo ($sentItem->getQtyShipped()-$_qtyReturned) ?>" name="qty[<?php echo $sentItem->getId() ?>]" value="<?php echo ($sentItem->getQtyShipped()-$_qtyReturned) ?>"/>
                         </td>
                         <?php if ($_needSnColumn): ?>
                         <td class="last a-center">
@@ -113,7 +118,7 @@
                                     <tbody>
                                     <?php foreach ($_serialNumbers as $_sn): ?>
                                         <tr>
-                                            <td><?php echo $this->escapeHtml($_sn) ?></td>
+                                            <td><?php echo $this->escapeHtml($_sn) ?><input type="checkbox" name="sn[<?php echo $sentItem->getId() ?>][]" value="<?php echo $this->escapeHtml($_sn) ?>" />Return</td>
                                         </tr>
                                     <?php endforeach ?>
                                     </tbody>
@@ -123,13 +128,17 @@
                         </td>
                     <?php endif; ?>
                     </tr>
+                <?php endif; ?>
                 <?php endforeach ?>
                 </tbody>
             </table>
         </div>
         <div class="a-right">
-            <button title="Submit Shipment" type="submit" class="scalable save submit-button" style=""><span><span><span>Submit Return</span></span></span></button>
+            <button title="Submit Return" type="submit" class="scalable save submit-button" style=""><span><span><span>Submit Return</span></span></span></button>
         </div>
     </div>
 </form>
+<script type="text/javascript">
+
+</script>
 

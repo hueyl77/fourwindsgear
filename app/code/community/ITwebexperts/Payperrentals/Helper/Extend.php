@@ -74,7 +74,7 @@ END2;
                 continue;
             }
             if(is_null($date)){
-                if(ITwebexperts_Payperrentals_Helper_Config::hasExtendEnabled($_item->getId(), $_item->getChildren())){
+                if(Mage::helper('payperrentals/config')->hasExtendEnabled($_item->getId(), $_item->getChildren())){
                     $productsArr[] = array(
                         'name' => $_item->getProduct()->getName(),
                         'oId' => $_item->getId(),
@@ -89,8 +89,8 @@ END2;
                             $end_date
                                 = $options['info_buyRequest'][ITwebexperts_Payperrentals_Model_Product_Type_Reservation::END_DATE_OPTION];
                             $diffSeconds = ITwebexperts_Payperrentals_Helper_Date::getDifferenceInSeconds($start_date, $date);
-                            $maxLength = ITwebexperts_Payperrentals_Helper_Config::getMaximumExtensionLength();
-                            $isExtendEnabled = ITwebexperts_Payperrentals_Helper_Config::hasExtendEnabled($_item->getProduct()->getId());
+                            $maxLength = Mage::helper('payperrentals/config')->getMaximumExtensionLength();
+                            $isExtendEnabled = Mage::helper('payperrentals/config')->hasExtendEnabled($_item->getProduct()->getId());
                             $isAvailable = (ITwebexperts_Payperrentals_Helper_Inventory::getQuantityForAnyProductTypeFromOptions($_item->getProduct()->getId(), $end_date, $date, $options['info_buyRequest']) > 0);
                             if($diffSeconds < $maxLength && strtotime($end_date) < strtotime($date) && $isExtendEnabled && $isAvailable){
                                 $productsArr[] = array(

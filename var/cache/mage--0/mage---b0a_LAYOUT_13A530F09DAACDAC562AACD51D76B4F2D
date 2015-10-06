@@ -424,14 +424,6 @@
       <name>js/configurableswatches/swatches-product.js</name>
    </action>
 </reference>
-<reference name="head">
-   <action method="addJs">
-      <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
-   </action>
-   <action method="addJs">
-      <script>itwebexperts_payperrentals/utils/frontendButtons.js</script>
-   </action>
-</reference>
 <reference name="top.links">
    <action method="addLink" ifconfig="payperrentals/rental/show_rental_link" translate="label title" module="payperrentals">
       <label>Rental Queue</label>
@@ -441,6 +433,12 @@
       <urlParams/>
       <position>10</position>
    </action>
+</reference>
+<reference name="after_body_start">
+   <block type="core/template" name="ppr.body.start" alias="pprheader" template="payperrentals/html/header.phtml"/>
+</reference>
+<reference name="before_body_end">
+   <block type="core/template" name="ppr.body.end" alias="pprfooter" template="payperrentals/html/footer.phtml"/>
 </reference>
 <reference name="topppr.container">
    <block type="core/template" name="top.messageppr" as="topMessagePPR" template="payperrentals/catalog/topmessageppr.phtml"/>

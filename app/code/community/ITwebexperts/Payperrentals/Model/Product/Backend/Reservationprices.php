@@ -103,7 +103,6 @@ class ITwebexperts_Payperrentals_Model_Product_Backend_Reservationprices extends
                     ->setCustomersGroup($period['custgroup'])
                     ->setPtypeadditional($period['ptypeadditional'])
                     ->setPriceadditional($period['priceadditional'])
-                    ->setDamageWaiver($period['damage_waiver'])
                     ->setReservationpricesdatesId($period['reservationpricesdates_id']);
 
                 $myRes->save();

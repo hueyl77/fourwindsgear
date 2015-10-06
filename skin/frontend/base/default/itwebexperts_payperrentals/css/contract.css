@@ -64,9 +64,9 @@ table td {
     border-collapse: collapse;
 }
 
-table td {
-    vertical-align: top;
-}
+/*table td {*/
+    /*vertical-align: top;*/
+/*}*/
 
 a {
     color: #3696c2;
@@ -198,10 +198,15 @@ td.order-details p {
 .cell-name {
     padding: 10px 15px;
     background: #f1f1f1;
-    font-weight: 700;
+    font-weight: bold;
     text-transform: uppercase;
     text-align: left;
-    font-size: 11px;
+    font-size: 12px;
+}
+
+th.cell-name {
+    font-weight:bold;
+    font-size: 15px;
 }
 
 .cell-name.align-center {
@@ -230,7 +235,7 @@ td.order-details p {
     text-transform: uppercase;
     color: #3696c2;
     text-decoration: none;
-    vertical-align: middle;
+    /*vertical-align: middle;*/
     float: left;
     width: 100%;
     display: block;
@@ -275,6 +280,13 @@ td.order-details p {
     width: 100%;
 }
 
+h6.big {
+    font-size:16px !important;
+    font-weight:bold !important;
+    padding:0;
+    margin:0;
+}
+
 .address-details {
     padding-top: 10px;
 }
@@ -285,14 +297,14 @@ td.order-details p {
     padding: 10px 15px 0;
 }
 
-.address-details h6,
-.method-info h6 {
-    font-size: 12px;
-    font-weight: 700;
-    margin-bottom: 0px;
-    margin-top: 5px;
-    text-transform: uppercase;
-}
+/*.address-details h6,*/
+/*.method-info h6 {*/
+    /*font-size: 12px;*/
+    /*font-weight: 700;*/
+    /*margin-bottom: 0px;*/
+    /*margin-top: 5px;*/
+    /*text-transform: uppercase;*/
+/*}*/
 
 .address-details p {
     font-size: 12px;
@@ -783,7 +795,6 @@ p.sku {
     th.cell-name,
     a.product-name,
     p.product-name,
-    .address-details h6,
     .method-info h6,
     h5.closing-text,
     .action-button,
@@ -860,9 +871,21 @@ td.align-right {
     text-align: right !important;
 }
 
+th.align-center {
+    text-align: center !important;
+}
+
+th.align-right {
+    text-align: right !important;
+}
+
 /* Newsletter styles */
 td.expander {
     padding: 0 !important;
+}
+
+td.cell-content {
+    vertical-align: top !important;
 }
 
 table.button td,

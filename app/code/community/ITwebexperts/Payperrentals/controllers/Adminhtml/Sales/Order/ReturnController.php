@@ -36,6 +36,8 @@ class ITwebexperts_Payperrentals_Adminhtml_Sales_Order_ReturnController extends 
             return;
         }
         Mage::helper('payperrentals/inventory')->processReturn($_sendItems);
+
+
         $this->_getSession()->addSuccess('Returns saved successfully');
         $this->_redirect('*/sales_order/view', array('order_id' => $_orderId));
     }

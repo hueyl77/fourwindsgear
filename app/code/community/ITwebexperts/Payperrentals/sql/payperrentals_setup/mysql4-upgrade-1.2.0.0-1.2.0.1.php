@@ -5,7 +5,11 @@ $installer->startSetup();
 
 // Product attributes
 $setup = new Mage_Eav_Model_Entity_Setup('core_setup');
-$setup->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'use_global_padding_days');
+try {
+        $setup->removeAttribute(Mage_Catalog_Model_Product::ENTITY, 'use_global_padding_days');
+}catch(Exception $E) {
+
+}
 $setup->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'use_global_padding_days', array(
         'group'			=> 'Rental Bookings',
         'label'         => 'Use Global Padding Dates',
@@ -19,7 +23,7 @@ $setup->addAttribute(Mage_Catalog_Model_Product::ENTITY, 'use_global_padding_day
         'default'       => 1,
         'apply_to'      => 'reservation',
         'visible_on_front' => false,
-        'position'      =>  20,
+        'position'      =>  100,
     ));
 
 

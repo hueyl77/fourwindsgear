@@ -50,7 +50,7 @@ class ITwebexperts_Payperrentals_Adminhtml_SalesgridController extends Mage_Admi
     {
         $order = Mage::getModel('sales/order')->load($orderId, 'entity_id');
         $iStatus =  Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_RESERVATION_STATUS);
-        if(ITwebexperts_Payperrentals_Helper_Config::reserveByStatus() && $order->getStatus() != $iStatus){
+        if(Mage::helper('payperrentals/config')->reserveByStatus() && $order->getStatus() != $iStatus){
             ITwebexperts_Payperrentals_Helper_Data::reserveOrder( $order->getItemsCollection(), $order);
             $order->setStatus($iStatus);
             $order->save();

@@ -7,5 +7,6 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Manualreserve extends Mage_Admi
         $this->_blockGroup = 'payperrentals';
         $this->_headerText = Mage::helper('payperrentals')->__('Manually Reserve Inventory');
         parent::__construct();
+
     }
 }

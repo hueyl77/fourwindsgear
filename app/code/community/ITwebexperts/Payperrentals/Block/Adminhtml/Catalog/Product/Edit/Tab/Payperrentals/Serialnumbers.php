@@ -60,7 +60,6 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Catalog_Product_Edit_Tab_Payper
             ->addEntityIdFilter($this->getProduct()->getId())
             ->getItems();
     }
-
     public function getSerialUrl()
     {
         if (Mage::helper('itwebcommon')->isVendorAdmin()) {

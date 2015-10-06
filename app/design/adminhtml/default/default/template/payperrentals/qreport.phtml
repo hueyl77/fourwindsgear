@@ -82,30 +82,8 @@
     <?php echo $this->getPagerHtml(); ?>
 </div>
 
-<?php $localeDateFormat = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_LONG); ?>
-<?php $localeDateFormat = str_replace('y', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyyyy', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyyy', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyy', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yy', 'yyyy', $localeDateFormat); ?>
-<?php $monthFormat = str_replace('d', '', $localeDateFormat); ?>
-<?php $weekFormat = str_replace('', '', $localeDateFormat); ?>
-<?php $weekFormat = $weekFormat . "{ &#8212;" . $weekFormat . "}"; ?>
-<?php $dayFormat = str_replace('yy', '', $localeDateFormat); ?>
-
-<?php $localeDateFormat = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT); ?>
-<?php $localeDateFormat = str_replace('y', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyyyy', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyyy', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyy', 'yy', $localeDateFormat); ?>
-<?php $monthFormatC = str_replace('yy', '', $localeDateFormat); ?>
-<?php $monthFormatC = str_replace('MM', '', $monthFormatC); ?>
-<?php $monthFormatC = str_replace('///', '/', $monthFormatC); ?>
-<?php $monthFormatC = str_replace('//', '/', $monthFormatC); ?>
-<?php $monthFormatC = rtrim($monthFormatC, '/'); ?>
-<?php $weekFormatC = 'ddd ' . $monthFormatC; ?>
-<?php $weekFormatC = str_replace('//', '/', $weekFormatC); ?>
-<?php $dayFormatC = str_replace('yy', '', $localeDateFormat); ?>
+<?php list($monthFormat, $weekFormat, $dayFormat) = $this->getDatesFormat();?>
+<?php list($monthFormatC, $weekFormatC, $dayFormatC) = $this->getDatesFormatCalendar();?>
 
 <?php $collection = $this->getPager()->getCollection(); ?>
 <?php $resources = array(); ?>

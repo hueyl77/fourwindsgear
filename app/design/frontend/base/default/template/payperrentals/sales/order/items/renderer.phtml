@@ -34,6 +34,22 @@ $_item = $this->getItem() ?>
         <?php if($this->helper('giftmessage/message')->getIsMessagesAvailable('order_item', $_item) && $_item->getGiftMessageId()): ?>
             <br /><a href="#" id="order-item-gift-message-link-<?php echo $_item->getId() ?>" class="giftmessage-preview-link expand" onclick="return giftMessageToogle('<?php echo $_item->getId() ?>')"><?php echo Mage::helper('sales')->__('Gift Message') ?></a>
         <?php endif; ?>
+        <?php
+        if(Mage::helper('payperrentals/config')->isBuyout($_item->getProductId())) {
+            $options = array();
+            if ($options = $this->getOrderItem()->getProductOptions()) {
+                $options = $options['info_buyRequest'];
+            }
+            $buyoutLink = Mage::helper('checkout/cart')->getAddUrl(
+                $_item->getProduct(), array('_query' => array('options' => array_merge($options,array('buyout' => 'true')),
+                    'buyout' => 'true'))
+            );
+            ?>
+            <button type="button" class="button buyout" title="Buyout" onclick="window.location.href ='<?php echo $buyoutLink;?>'"><span><span><?php echo $this->__('Buyout');?></span></span></button>
+        <?php
+        }
+        ?>
+
     </td>
     <td><?php echo Mage::helper('core/string')->splitInjection($this->getSku()) ?></td>
     <td class="a-right nowrap">

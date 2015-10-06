@@ -3,7 +3,7 @@
 /**
  * Product Shipping tab
  *
- * @category   Itwebexperts
+ * @category   ITwebexperts
  * @package    Itwebexperts_Rshipping
  */
 class ITwebexperts_Rshipping_Block_Adminhtml_Catalog_Product_Edit_Tab_Shipping extends Mage_Adminhtml_Block_Widget_Form

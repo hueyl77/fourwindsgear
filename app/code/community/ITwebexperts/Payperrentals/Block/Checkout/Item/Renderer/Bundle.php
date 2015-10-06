@@ -34,8 +34,8 @@
 class ITwebexperts_Payperrentals_Block_Checkout_Item_Renderer_Bundle extends ITwebexperts_Payperrentals_Block_Checkout_Cart_Item_Renderer_Bundle
 {
 
-    protected function _getDamageWaiverHtml($damageWaiver)
+    protected function _getDamageWaiverHtml()
     {
-        return ITwebexperts_Payperrentals_Helper_Price::getDamageWaiverHtml($this->getItem(), $damageWaiver, (bool)$this->getItem()->getBuyRequest()->getDamageWaiver(), false);
+        return ITwebexperts_Payperrentals_Helper_Price::getDamageWaiverHtml($this->getItem(), (bool)$this->getItem()->getBuyRequest()->getDamageWaiver(), false);
     }
 }

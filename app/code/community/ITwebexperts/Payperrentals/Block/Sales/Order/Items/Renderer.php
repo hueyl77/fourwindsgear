@@ -16,7 +16,7 @@ class ITwebexperts_Payperrentals_Block_Sales_Order_Items_Renderer extends Mage_S
 	if ($options = $this->getOrderItem()->getProductOptions()) {
 
 	    $newResult = Mage::helper('payperrentals/rendercart')->renderDates($options, $this->getOrderItem());
-		$result = array_merge($newResult, $result);
+            $result = array_merge($newResult, $result);
 	    if (isset($options['options'])) {
 		$result = array_merge($result, $options['options']);
 	    }

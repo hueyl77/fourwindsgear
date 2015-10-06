@@ -64,5 +64,37 @@ class ITwebexperts_Payperrentals_Model_Mysql4_Sendreturn_Collection extends Mage
             ->group('main_table.id');
         return $this;
     }
+	/**
+	 * Add collection filter for many product ids
+	 * @param array $_productIds
+	 * @return $this
+	 */
+	public function addProductIdsFilter($_productIds)
+	{
+		$this->addFieldToFilter('product_id', array('in' => $_productIds));
+		return $this;
+	}
+
+
+	/**
+	 * Add product filter
+	 * @param int $_productId
+	 * @return $this
+	 */
+	public function addProductIdFilter($_productId)
+	{
+		$this->getSelect()->where('main_table.product_id=?', $_productId);
+		return $this;
+	}
+
+	/**
+	 * @param $select
+	 * @return $this
+	 */
+	public function addHavingFilter($select)
+	{
+		$this->getSelect()->having($select);
+		return $this;
+	}
 
 }

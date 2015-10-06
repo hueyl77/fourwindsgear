@@ -22,15 +22,6 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
 
 
     /**
-     * Get config helper
-     * @return ITwebexperts_Payperrentals_Helper_Config
-     */
-    public static function getConfigHelper()
-    {
-        return Mage::helper('payperrentals/config');
-    }
-
-    /**
      * Function to return customer group in admin and frontend
      * @return mixed
      */
@@ -48,10 +39,10 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
     public static function isDisabledDates($productId, $startTimestamp, $endTimestamp){
         $blockedDates = ITwebexperts_Payperrentals_Helper_Data::getDisabledDates($productId);
         $disabledDays = ITwebexperts_Payperrentals_Helper_Data::getDisabledDays($productId, true);
-        $disabledDaysStart = ITwebexperts_Payperrentals_Helper_Data::getDisabledDaysStart($productId, true);
-        $disabledDaysEnd = ITwebexperts_Payperrentals_Helper_Data::getDisabledDaysEnd($productId, true);
+        $disabledDaysStart = ITwebexperts_Payperrentals_Helper_Data::getDisabledDaysStart(true);
+        $disabledDaysEnd = ITwebexperts_Payperrentals_Helper_Data::getDisabledDaysEnd(true);
         $currentTimeStamp = Mage::getSingleton('core/date')->timestamp(time());
-        $paddingDays = ITwebexperts_Payperrentals_Helper_Data::getProductPaddingDays($productId, $currentTimeStamp);
+        $paddingDays = ITwebexperts_Payperrentals_Helper_Data::getProductPaddingDays($productId, $currentTimeStamp, 1);
         $dayOfWeekStart = date('w', $startTimestamp);
         $dayOfWeekEnd = date('w', $endTimestamp);
         $formattedDateStart = date('Y-m-d H:i', $startTimestamp);
@@ -70,7 +61,7 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
      *@return array
      */
 
-    public static function getFirstAvailableDateRange($product, $startingDate = null, $rangeSeconds = false)
+    public static function getFirstAvailableDateRange($product, $startingDate = null, $rangeSeconds = false, $asArrayWithDates = false)
     {
         if (!is_object($product)) {
             $product = Mage::getModel('catalog/product')->load((int)$product);
@@ -85,56 +76,87 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         if ($rangeSeconds == false) {
-            $periodInSecond = ITwebexperts_Payperrentals_Helper_Config::getMinimumPeriod($product->getId(), null, true);
+            $periodInSecond = Mage::helper('payperrentals/config')->getMinimumPeriod($product->getId(), null, true);
 
         } else {
             $periodInSecond = $rangeSeconds;
         }
-
+        $disableDatesArray = array();
         $useTimes = self::useTimes($product->getId());
-        $storeTime = self::getConfigHelper()->getStoreTime(Mage::app()->getStore()->getId());
+        $storeTime = Mage::helper('payperrentals/config')->getStoreTime(Mage::app()->getStore()->getId());
         $configHelper = Mage::helper('payperrentals/config');
         $inventoryHelper = Mage::helper('payperrentals/inventory');
 
-
-        if($useTimes){
+        /**
+         * we get the first available date not time, can take a lot if using time
+         */
+        /*if($useTimes){
             $timeIncrement = $configHelper->getTimeIncrement() * 60;
             $currentTimestamp = strtotime(date('Y-m-d', $currentTimestamp).' '.$storeTime[0]);
-        } else {
+        } else {*/
             $timeIncrement = 3600 * 24;
-            $currentTimestamp = strtotime('+0 day',strtotime(date('Y-m-d', $currentTimestamp).' 00:00:00'));
-        }
+            $currentTimestamp = strtotime('+0 day',strtotime(date('Y-m-d', $currentTimestamp /*+ $timeIncrement*/).' 00:00:00'));
+        //}
 
 
         $isAvailable = false;
-
-
+        $initialStart = $currentTimestamp;
         while (!$isAvailable) {
             $start = $currentTimestamp;
             $end = $start + $periodInSecond;
             if (self::isDisabledDates($product->getId(), $start, $end)){
+                if($asArrayWithDates){
+                    $disableDatesArray[] = date('Y-m-d', $currentTimestamp) . ' 00:00';;
+                }
                 $currentTimestamp += $timeIncrement;
                 continue;
             }
-            if($useTimes) {
+            /*if($useTimes) {
                 if ($end > strtotime(date('Y-m-d', $end).' '.$storeTime[1])) {
                     $start = strtotime('+1 day',strtotime(date('Y-m-d', $start).' '.$storeTime[0]));
                     $end = $start + $periodInSecond;
                 }
-            }
+            }*/
             $startDate = date('Y-m-d H:i:s', $start);
             $endDate = date('Y-m-d H:i:s', $end);
 
             $isAvailable = $inventoryHelper->isAvailable(
                 $product->getId(), $startDate, $endDate, 1);
-
+            if(!$isAvailable && $asArrayWithDates){
+                $disableDatesArray[] = date('Y-m-d', $start) . ' 00:00';;
+            }
             $currentTimestamp += $timeIncrement;
+            if($start - $initialStart >= 30 *3 *24 * 3600 || $product->getTypeId() != ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE){//3 months in advance
+                break;
+            }
         }
-
-        return array(
-            'start_date' => $startDate,
-            'end_date'   => $endDate
-        );
+        if($isAvailable) {
+            $turnoverDays = ITwebexperts_Payperrentals_Helper_Data::getProductPaddingDays($product->getId(), strtotime($startDate), 2);
+            if(count($turnoverDays) > 0) {
+                $difference = strtotime($endDate) - strtotime($startDate);
+                $lastTurnoverDay = $turnoverDays[count($turnoverDays) - 1];
+                if($asArrayWithDates){
+                    $disableDatesArray = array_merge($disableDatesArray, $turnoverDays);
+                }
+                $startDate = date('Y-m-d H:i:s', strtotime('+1 day', strtotime($lastTurnoverDay)));
+                $endDate = date('Y-m-d H:i:s', strtotime($startDate) + $difference);
+            }
+            if($asArrayWithDates){
+                return $disableDatesArray;
+            }
+            return array(
+                'start_date' => $startDate,
+                'end_date' => $endDate
+            );
+        }else{
+            if($asArrayWithDates){
+                return array();
+            }
+            return array(
+                'start_date' => 0,
+                'end_date' => 0
+            );
+        }
     }
 
     /**
@@ -170,7 +192,6 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $product
      * @return array
      */
-
     private static function getCollectionExcludedTurnoverDates(){
             $globalExcludeDates = unserialize(Mage::helper('payperrentals/config')->getGlobalExcludeDates(Mage::app()->getStore()->getId()));
             $collectionExcluded = array();
@@ -181,10 +202,8 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
                     }
                 }
             }
-
         return $collectionExcluded;
     }
-
     /**
      * Returns an array of excluded dates (holidays) for a product
      * from either the global or by product setting
@@ -204,60 +223,60 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
 
         foreach ($collectionExcluded as $item) {
             if($item->getDisabledFrom() != '' && $item->getDisabledTo() != '') {
-                $startDate = ITwebexperts_Payperrentals_Helper_Date::toMysqlDate($item->getDisabledFrom(), true);
-                $endDate = ITwebexperts_Payperrentals_Helper_Date::toMysqlDate($item->getDisabledTo(), true);
-                $excludeFrom = $item->getExcludeDatesFrom();
-                if ($isPrice && $excludeFrom == ITwebexperts_Payperrentals_Model_Source_Excludedaysfrom::CALENDAR) {
-                    continue;
-                }
-                if (($excludeFrom == ITwebexperts_Payperrentals_Model_Source_Excludedaysfrom::CALENDAR ||
-                        $excludeFrom == ITwebexperts_Payperrentals_Model_Source_Excludedaysfrom::BOTH) ||
-                    $isPrice
-                ) {
-                    //list($startDate, $endDate) = ITwebexperts_Payperrentals_Helper_Date::convertDatepickerToDbFormat($startDate, $endDate);
+            $startDate = ITwebexperts_Payperrentals_Helper_Date::toMysqlDate($item->getDisabledFrom(), true);
+            $endDate = ITwebexperts_Payperrentals_Helper_Date::toMysqlDate($item->getDisabledTo(), true);
+            $excludeFrom = $item->getExcludeDatesFrom();
+            if($isPrice && $excludeFrom == ITwebexperts_Payperrentals_Model_Source_Excludedaysfrom::CALENDAR){
+                continue;
+            }
+            if(($excludeFrom == ITwebexperts_Payperrentals_Model_Source_Excludedaysfrom::CALENDAR ||
+                $excludeFrom == ITwebexperts_Payperrentals_Model_Source_Excludedaysfrom::BOTH) ||
+                $isPrice
+            ) {
+                //list($startDate, $endDate) = ITwebexperts_Payperrentals_Helper_Date::convertDatepickerToDbFormat($startDate, $endDate);
 
-                    $startTimePadding = strtotime(date('Y-m-d', strtotime($startDate)));
-                    $endTimePadding = strtotime(date('Y-m-d', strtotime($endDate)));
-                    while ($startTimePadding <= $endTimePadding) {
-                        $dateFormatted = date('Y-m-d', $startTimePadding);
-                        $blockedDates[] = $dateFormatted;
+                $startTimePadding = strtotime(date('Y-m-d', strtotime($startDate)));
+                $endTimePadding = strtotime(date('Y-m-d', strtotime($endDate)));
+                while ($startTimePadding <= $endTimePadding) {
+                    $dateFormatted = date('Y-m-d', $startTimePadding);
+                    $blockedDates[] = $dateFormatted;
 
-                        switch ($item->getDisabledType()) {
-                            case 'dayweek'://for this case end_date should be =start_date
-                                $currentDayOfWeek = date('l', $startTimePadding);
-                                $nrWeeks = ITwebexperts_Payperrentals_Helper_Data::CALCULATE_DAYS_AFTER / 7;
-                                $recurringStartDate = $startTimePadding;
+                    switch ($item->getDisabledType()) {
+                        case 'dayweek'://for this case end_date should be =start_date
+                            $currentDayOfWeek = date('l', $startTimePadding);
+                            $nrWeeks = ITwebexperts_Payperrentals_Helper_Data::CALCULATE_DAYS_AFTER / 7;
+                            $recurringStartDate = $startTimePadding;
 
-                                for ($i = 0; $i < $nrWeeks; $i++) {
-                                    $recurringStartDate = strtotime('next ' . $currentDayOfWeek, $recurringStartDate);
-                                    $dateFormatted = date('Y-m-d', $recurringStartDate);
-                                    $blockedDates[] = $dateFormatted;
-                                }
+                            for ($i = 0; $i < $nrWeeks; $i++) {
+                                $recurringStartDate = strtotime('next ' . $currentDayOfWeek, $recurringStartDate);
+                                $dateFormatted = date('Y-m-d', $recurringStartDate);
+                                $blockedDates[] = $dateFormatted;
+                            }
 
-                                break;
-                            case 'monthly':
-                                $nrMonths = ITwebexperts_Payperrentals_Helper_Data::CALCULATE_DAYS_AFTER / 30;
-                                $recurringStartDate = $startTimePadding;
+                            break;
+                        case 'monthly':
+                            $nrMonths = ITwebexperts_Payperrentals_Helper_Data::CALCULATE_DAYS_AFTER / 30;
+                            $recurringStartDate = $startTimePadding;
 
-                                for ($i = 0; $i < $nrMonths; $i++) {
-                                    $recurringStartDate = strtotime('+1 month', $recurringStartDate);
-                                    $dateFormatted = date('Y-m-d', $recurringStartDate);
-                                    $blockedDates[] = $dateFormatted;
-                                }
-                                break;
-                            case 'yearly':
-                                $nrYears = ITwebexperts_Payperrentals_Helper_Data::CALCULATE_DAYS_AFTER / 360;
-                                $recurringStartDate = $startTimePadding;
+                            for ($i = 0; $i < $nrMonths; $i++) {
+                                $recurringStartDate = strtotime('+1 month', $recurringStartDate);
+                                $dateFormatted = date('Y-m-d', $recurringStartDate);
+                                $blockedDates[] = $dateFormatted;
+                            }
+                            break;
+                        case 'yearly':
+                            $nrYears = ITwebexperts_Payperrentals_Helper_Data::CALCULATE_DAYS_AFTER / 360;
+                            $recurringStartDate = $startTimePadding;
 
-                                for ($i = 0; $i < $nrYears; $i++) {
-                                    $recurringStartDate = strtotime('+1 year', $recurringStartDate);
-                                    $dateFormatted = date('Y-m-d', $recurringStartDate);
-                                    $blockedDates[] = $dateFormatted;
-                                }
-                                break;
-                        }
+                            for ($i = 0; $i < $nrYears; $i++) {
+                                $recurringStartDate = strtotime('+1 year', $recurringStartDate);
+                                $dateFormatted = date('Y-m-d', $recurringStartDate);
+                                $blockedDates[] = $dateFormatted;
+                            }
+                            break;
+                    }
 
-                        $startTimePadding += 60 * 60 * 24;
+                    $startTimePadding += 60 * 60 * 24;
                     }
                 }
             }
@@ -496,12 +515,48 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             $bAttr = unserialize($prodOptions['bundle_selection_attributes']);
-            $bAttr['qty'] = $qty;
+           // $bAttr['qty'] = $qty;
             $prodOptions['bundle_selection_attributes'] = serialize($bAttr);
             $item->setProductOptions($prodOptions);
-            $item->setQtyOrdered($qty);
+           // $item->setQtyOrdered($qty);
+           // $item->getParentItem()->setQtyOrdered(1);
             $item->save();
 
+        }
+        if(Mage::helper('payperrentals/config')->removeShipping()) {
+            $item->setIsVirtual(0);
+            if($item->getParentItem()) {
+                $item->getParentItem()->setIsVirtual(0);
+            }
+            $item->getOrder()->setIsVirtual(0);
+            $item->getOrder()->setCanShipPartially(1);
+            $item->getOrder()->setCanShipPartiallyItem(1);
+            $billingAddress = $item->getOrder()->getBillingAddress();
+            $shippingAddress = Mage::getModel('sales/order_address')
+                ->setStoreId($billingAddress->getStoreId())
+                ->setParentId($billingAddress->getParentId())
+                ->setAddressType(Mage_Sales_Model_Quote_Address::TYPE_SHIPPING)
+                ->setCustomerId($billingAddress->getCustomerId())
+                ->setCustomerAddressId($billingAddress->getCustomerAddressId())
+                ->setPrefix($billingAddress->getPrefix())
+                ->setEmail($billingAddress->getEmail())
+                ->setFirstname($billingAddress->getFirstname())
+                ->setMiddlename($billingAddress->getMiddlename())
+                ->setLastname($billingAddress->getLastname())
+                ->setSuffix($billingAddress->getSuffix())
+                ->setCompany($billingAddress->getCompany())
+                ->setStreet($billingAddress->getStreet())
+                ->setCity($billingAddress->getCity())
+                ->setCountryId($billingAddress->getCountryId())
+                ->setRegion($billingAddress->getRegion())
+                ->setRegionId($billingAddress->getRegionId())
+                ->setPostcode($billingAddress->getPostcode())
+                ->setTelephone($billingAddress->getTelephone())
+                ->setFax($billingAddress->getFax())
+                ->save();
+            $item->getOrder()->setShippingAddress($shippingAddress);
+
+            $item->save();
         }
     }
 
@@ -571,11 +626,6 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
                 $endDate = $endDateArr[$count];
                 $qty = $item->getQtyOrdered();
 
-                /* $shippingAddress = $order->getShippingAddress();
-                 $turnoverAr = ITwebexperts_Payperrentals_Helper_Data::getTurnoverDatesForOrderItem(
-                     $product->getId(), strtotime($startDate), strtotime($endDate), $order->getShippingMethod(),
-                     (is_object($shippingAddress) ? $shippingAddress->getPostcode() : '')
-                 );*/
                 $turnoverAr = ITwebexperts_Payperrentals_Helper_Data::getTurnoverFromQuoteItemOrBuyRequest($product, $order, $startDate, $endDate);
 
                 if ($item->getProductType() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE) {
@@ -588,6 +638,13 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
                         ->setQty($qty)
                         ->setOrderId($order->getId())
                         ->setOrderItemId($item->getId());
+
+                    $fixedDateId = array_key_exists(
+                        ITwebexperts_Payperrentals_Model_Product_Type_Reservation::FIXED_DATE_ID, $data
+                    ) ? $data[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::FIXED_DATE_ID] : null;
+                    if(!is_null($fixedDateId)){
+                        $resOrder->setFixeddateId(intval($fixedDateId));
+                    }
                     if(Mage::helper('itwebcommon')->isVendorInstalled() && $product->getVendorId() && $product->getVendorId() != 0){
                         $resOrder->setVendorId($product->getVendorId());
                     }
@@ -619,15 +676,62 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $quoteItems = $quote->getItemsCollection();
         $depositAmount = 0;
+        if (Mage::app()->getStore()->isAdmin()) {
+            $storeID = Mage::getSingleton('adminhtml/session_quote')->getStoreId();
+        } else {
+            $storeID = Mage::app()->getStore()->getId();
+        }
+
+        if ($storeID) {
+            $depositAmountPerOrder = Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_GLOBAL_DEPOSIT_PER_ORDER, $storeID);
+        } else {
+            $depositAmountPerOrder = Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_GLOBAL_DEPOSIT_PER_ORDER);
+        }
+
+        $totalPrice = 0;
         foreach ($quoteItems as $item) {
-            $_product = Mage::getModel('catalog/product')->load($item->getProduct()->getId());
+            $product = Mage::getModel('catalog/product')->load($item->getProduct()->getId());
+            $productOptions = $item->getOptionsByCode();
+            $options = $productOptions['info_buyRequest'];
+
+            $finalPrice = ITwebexperts_Payperrentals_Helper_Price::getPriceForAnyProductType(
+                $item->getProduct(),  isset($options['attributes'])?$options['attributes']:null, isset($options['bundle_option'])?$options['bundle_option']:null, isset($options['bundle_option_qty1'])?$options['bundle_option_qty1']:null, isset($options['bundle_option_qty'])?$options['bundle_option_qty']:null, $item->getBuyRequest()->getStartDate(),
+                $item->getBuyRequest()->getEndDate(), $item->getQty()
+            );
+
             if ($item->getProductType() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE_BUNDLE || $item->getProductType() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE_CONFIGURABLE || $item->getProductType() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE_GROUPED) continue;
             if ($item->getParentItem() && $item->getParentItem()->getProductType() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE_BUNDLE) {
                 $qty1 = $item->getParentItem()->getQty();
             } else {
                 $qty1 = 1;
             }
-            $depositAmount += floatval($_product->getPayperrentalsDeposit()) * $item->getQty() * $qty1;
+
+            if ($storeID) {
+                $depositAmountPerProduct = Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_GLOBAL_DEPOSIT_PER_PRODUCT, $storeID);
+            } else {
+                $depositAmountPerProduct = Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_GLOBAL_DEPOSIT_PER_PRODUCT);
+            }
+
+            $useGlobalDeposit = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($product->getId(), 'use_global_deposit_per_product');
+            if(!$useGlobalDeposit){
+                $depositAmountPerProduct = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($product->getId(), 'payperrentals_deposit');
+            }
+
+            if($depositAmountPerOrder == '') {
+                if (strpos($depositAmountPerProduct, '%') !== false) {
+                    $depositAmountPerProduct = floatval(substr($depositAmountPerProduct, 0, strlen($depositAmountPerProduct) - 1));
+                    $depositAmountPerProduct = $depositAmountPerProduct / 100 * $finalPrice;
+                }
+                $depositAmount += floatval($depositAmountPerProduct) * $item->getQty() * $qty1;
+            }else{
+                $totalPrice += $finalPrice;
+            }
+        }
+        if($totalPrice > 0){
+            if (strpos($depositAmountPerOrder, '%') !== false) {
+                $depositAmount = floatval(substr($depositAmountPerOrder, 0, strlen($depositAmountPerOrder) - 1));
+                $depositAmount = $depositAmount / 100 * $totalPrice;
+            }
         }
         return $depositAmount;
     }
@@ -748,13 +852,17 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
      * Get product padding dates by global or product attribute params
      * Adds to padding the turnover time before because they need
      * to be added together.
+     * type = 0 return padding days with turnover toghether
+     * type = 1 returns only padding days
+     * type = 2 return only turnover
      *
      * @param int $productId
      * @param $startDateTimestamp
+     * @param int $type
      *
      *@return array
      */
-    public static function getProductPaddingDays($productId, $startDateTimestamp)
+    public static function getProductPaddingDays($productId, $startDateTimestamp, $type = 0)
     {
         $paddingDays = array();
         if (Mage::app()->getStore()->isAdmin()) {
@@ -766,7 +874,7 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
 
         $daysPadding = self::getPaddingDays($productId);
 
-        if($t1 > $storeClose || ITwebexperts_Payperrentals_Helper_Config::isNextHourSelection()) $daysPadding++;
+        if($t1 > $storeClose || Mage::helper('payperrentals/config')->isNextHourSelection()) $daysPadding++;
 
         if ($daysPadding > 0) {
             $startTimePadding = $startDateTimestamp;
@@ -777,25 +885,34 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
                 $daysPadding--;
             }
         }
-
-        $turnoverAr = ITwebexperts_Payperrentals_Helper_Data::getTurnoverFromQuoteItemOrBuyRequest($productId, null, null, null, 'days');
-        $turnoverTimeBefore = $turnoverAr['before'];
-        if ($turnoverTimeBefore > 0) {
-            if(!isset($startTimePadding)) {
-                if ($t1 > $storeClose) $turnoverTimeBefore++;
-                $startTimePadding = $startDateTimestamp;
+        if($type == 0 || $type == 2) {
+            if($type == 2){
+                unset($paddingDays);
+                $paddingDays = array();
+                unset($startTimePadding);
             }
-            while ($turnoverTimeBefore > 0) {
-                $dateFormatted = date('Y-m-d', $startTimePadding).' 00:00';
-                if (!in_array($dateFormatted, $paddingDays)) {
-                    $paddingDays[] = $dateFormatted;
+            $turnoverAr = ITwebexperts_Payperrentals_Helper_Data::getTurnoverFromQuoteItemOrBuyRequest($productId, null, null, null, 'days');
+            $turnoverTimeBefore = $turnoverAr['before'];
+            if ($turnoverTimeBefore > 0) {
+                if (!isset($startTimePadding)) {
+                    if ($t1 > $storeClose) $turnoverTimeBefore++;
+                    $startTimePadding = $startDateTimestamp;
                 }
-                $startTimePadding = strtotime('+1 day', $startTimePadding);
-                $turnoverTimeBefore--;
+                while ($turnoverTimeBefore > 0) {
+                    $dateFormatted = date('Y-m-d', $startTimePadding) . ' 00:00';
+                    if (!in_array($dateFormatted, $paddingDays)) {
+                        $paddingDays[] = $dateFormatted;
+                    }
+                    $startTimePadding = strtotime('+1 day', $startTimePadding);
+                    $turnoverTimeBefore--;
+                }
             }
-        }
 
-        return $paddingDays;
+            return $paddingDays;
+        }
+        if($type == 1){
+            return $paddingDays;
+        }
     }
 
     public static function getWeekdayForJs($weekDays, $asNumbers = false){
@@ -869,7 +986,6 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
     public static function isUsingGlobalDatesShoppingCart()
     {
         $use_shopping_cart = Mage::getStoreConfig('payperrentals/global/use_pprbox_shopping_cart', Mage::app()->getStore());
-
         return $use_shopping_cart;
     }
 
@@ -1187,6 +1303,26 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
      * @return array
      */
 
+    public static function toFormattedArraysOfDatesArray($dateArray, $useQuotes = true){
+        $dateFormattedArray = array();
+        foreach($dateArray as $dates){
+            $dateFormattedStartString = date('Y-n-j', strtotime($dates['start_date']));
+            $dateFormatted['start_date'] = (($useQuotes)?'"':'') . $dateFormattedStartString . (($useQuotes)?'"':'');
+            $dateFormattedEndString = date('Y-n-j', strtotime($dates['end_date']));
+            $dateFormatted['end_date'] = (($useQuotes)?'"':'') . $dateFormattedEndString . (($useQuotes)?'"':'');
+            $dateFormattedArray[] = $dateFormatted;
+        }
+        return $dateFormattedArray;
+    }
+
+    /**
+     * Functions used to return an array of dates formatted for js output Y-n-j
+     * @param      $dateArray
+     * @param bool $useQuotes
+     *
+     * @return array
+     */
+
     public static function toFormattedBookedArray($dateArray){
         $dateFormatted = array();
         foreach($dateArray as $date => $qty){
@@ -1345,13 +1481,13 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
             $endOrderDateTimestamp -= 60;
         }
 
-        $turnoverTimeBefore = ITwebexperts_Payperrentals_Helper_Config::getTurnoverTimeBefore($productId);
-        $turnoverTimeAfter = ITwebexperts_Payperrentals_Helper_Config::getTurnoverTimeAfter($productId);
+        $turnoverTimeBefore = Mage::helper('payperrentals/config')->getTurnoverTimeBefore($productId);
+        $turnoverTimeAfter = Mage::helper('payperrentals/config')->getTurnoverTimeAfter($productId);
 
         Mage::dispatchEvent('ppr_get_turnover_dates_for_order_item', array('turnover_time_before' => &$turnoverTimeBefore, 'turnover_time_after' => &$turnoverTimeAfter, 'order_item_before_turnover_timestamp' => &$startOrderDateTimestamp, 'order_item_after_turnover_timestamp' => &$endOrderDateTimestamp, 'product' => $productId, 'shipping_method' => $shippingMethod, 'postcode' => $postcode));
 
         $collectionExcludedTurnover = ITwebexperts_Payperrentals_Helper_Data::getCollectionExcludedTurnoverDates();
-        if(ITwebexperts_Payperrentals_Helper_Config::excludeDisabledDaysOfWeekFromTurnover()){
+        if(Mage::helper('payperrentals/config')->excludeDisabledDaysOfWeekFromTurnover()){
             $turnoverTimeBeforeCurr = $turnoverTimeBefore;
             if(!$startOrderDateTimestamp){
                 $startOrderDateTimestamp = Mage::getSingleton('core/date')->timestamp(date('Y-m-d'));
@@ -1359,7 +1495,6 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
             $startOrderDateTimestampCurr = $startOrderDateTimestamp - $turnoverTimeBeforeCurr;
             $endOrderDateTimestampCurr = $startOrderDateTimestamp;
             $disabledDays = self::getDisabledDays(null, true,false, true);
-
             while($startOrderDateTimestampCurr <= $endOrderDateTimestampCurr){
                 $currDateofWeek = date('w', $startOrderDateTimestampCurr);
                 $currDate = date('Y-m-d', $startOrderDateTimestampCurr);
@@ -1368,13 +1503,11 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
                 }
                 $startOrderDateTimestampCurr += 86400;
             }
-
             $turnoverTimeAfterCurr = $turnoverTimeAfter;
             if($endOrderDateTimestamp) {
                 $endOrderDateTimestampCurr = $endOrderDateTimestamp + $turnoverTimeAfterCurr;
                 $startOrderDateTimestampCurr = $endOrderDateTimestamp;
                 $disabledDays = self::getDisabledDays(null, true, false, true);
-
                 while ($startOrderDateTimestampCurr <= $endOrderDateTimestampCurr) {
                     $currDateofWeek = date('w', $startOrderDateTimestampCurr);
                     $currDate = date('Y-m-d', $startOrderDateTimestampCurr);
@@ -1385,7 +1518,6 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
         }
-
         if($type == 'date') {
             $orderBeforeTurnoverTimestamp = $startOrderDateTimestamp - $turnoverTimeBefore;
             $orderAfterTurnoverTimestamp = $endOrderDateTimestamp + $turnoverTimeAfter;
@@ -1395,13 +1527,126 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
                 'after'  => date('Y-m-d H:i:s', $orderAfterTurnoverTimestamp)
             );
         }elseif($type == 'days'){
-
             return array(
                 'before' => intval($turnoverTimeBefore / 86400),
                 'after'  => intval($turnoverTimeAfter / 86400)
             );
         }
 
+    }
+
+    /**
+     * Returns an array of fixed rental dates for the product
+     * @param $product
+     */
+
+    public static function getFixedRentalDates($product, $fixedNameId = 0){
+        if($fixedNameId == 0) {
+            if (is_object($product)) {
+                $productId = $product->getId();
+            } else {
+                $productId = $product;
+            }
+            $fixedNameId = self::getAttributeCodeForId($productId, 'fixed_rental_name');
+        }
+
+        $fixedRentalNamesCollection = Mage::getModel('payperrentals/fixedrentalnames')->getCollection()
+            ->addFieldToFilter('id', $fixedNameId)
+            ->getFirstItem();
+        $fixedName = $fixedRentalNamesCollection->getName();
+        $fixedRentalCollection = Mage::getModel('payperrentals/fixedrentaldates')->getCollection()
+        ->addFieldToFilter('nameid', $fixedNameId);
+        $dateNames = array('Sunday', 'Monday', 'Tuesday','Wednesday','Thursday','Friday', 'Saturday');
+        $fixedRentalDatesArray = array();
+            foreach($fixedRentalCollection as $item) {
+                    $startDate = $item->getStartDate();
+                    $endDate = $item->getEndDate();
+                    $startTimePadding = strtotime(date('Y-m-d H:i', strtotime($startDate)));
+                    $endTimePadding = strtotime(date('Y-m-d H:i', strtotime($endDate)));
+                    $dateFormatted = date('Y-m-d H:i', $startTimePadding);
+                    $fixedRentalDates['start_date'] = $dateFormatted;
+
+                    switch ($item->getRepeatType()) {
+                        case 'none':
+                            $fixedRentalDates['end_date'] = date('Y-m-d H:i', $endTimePadding);
+                            $fixedRentalDates['id'] = $item->getId();
+                            $fixedRentalDates['name'] = $fixedName;
+                            $fixedRentalDatesArray[] = $fixedRentalDates;
+                            break;
+                        case 'dayweek':
+                            $daysOfWeek = explode(',', $item->getRepeatDays());
+                            $nrWeeks = ITwebexperts_Payperrentals_Helper_Data::CALCULATE_DAYS_AFTER / 7;
+                            $recurringStartDate = $startTimePadding;
+                            $recurringEndDate = $endTimePadding;
+                            $difference = $recurringEndDate - $recurringStartDate;
+                            $fixedRentalDates['end_date'] = date('Y-m-d H:i', $endTimePadding);
+                            $fixedRentalDates['id'] = $item->getId();
+                            $fixedRentalDates['name'] = $fixedName;
+                            $fixedRentalDatesArray[] = $fixedRentalDates;
+                            for ($i = 0; $i < $nrWeeks; $i++) {
+                                foreach($daysOfWeek as $day) {
+                                    $recurringStartDate = strtotime('next ' . $dateNames[$day], $recurringStartDate);
+                                    $dateFormatted = date('Y-m-d', $recurringStartDate) . ' ' . date('H:i', $startTimePadding);
+                                    $fixedRentalDates['start_date'] = $dateFormatted;
+                                    $recurringEndDate = strtotime($dateFormatted) + $difference;
+                                    $dateFormatted = date('Y-m-d H:i', $recurringEndDate);
+                                    $fixedRentalDates['end_date'] = $dateFormatted;
+                                    $fixedRentalDates['id'] = $item->getId();
+                                    $fixedRentalDates['name'] = $fixedName;
+                                    $fixedRentalDatesArray[] = $fixedRentalDates;
+                                }
+                            }
+
+                            break;
+                        case 'monthly':
+                            $nrMonths = ITwebexperts_Payperrentals_Helper_Data::CALCULATE_DAYS_AFTER / 30;
+                            $recurringStartDate = $startTimePadding;
+                            $recurringEndDate = $endTimePadding;
+                            $difference = $recurringEndDate - $recurringStartDate;
+                            $fixedRentalDates['end_date'] = date('Y-m-d H:i', $endTimePadding);
+                            $fixedRentalDates['id'] = $item->getId();
+                            $fixedRentalDates['name'] = $fixedName;
+                            $fixedRentalDatesArray[] = $fixedRentalDates;
+
+                            for ($i = 0; $i < $nrMonths; $i++) {
+                                $recurringStartDate = strtotime('+1 month', $recurringStartDate);
+                                $dateFormatted = date('Y-m-d', $recurringStartDate) . ' ' . date('H:i', $startTimePadding);
+                                $fixedRentalDates['start_date'] = $dateFormatted;
+                                $recurringEndDate =  strtotime($dateFormatted) + $difference;
+                                $dateFormatted = date('Y-m-d H:i', $recurringEndDate);
+                                $fixedRentalDates['end_date'] = $dateFormatted;
+                                $fixedRentalDates['id'] = $item->getId();
+                                $fixedRentalDates['name'] = $fixedName;
+                                $fixedRentalDatesArray[] = $fixedRentalDates;
+                            }
+                            break;
+                        case 'yearly':
+                            $nrYears = ITwebexperts_Payperrentals_Helper_Data::CALCULATE_DAYS_AFTER / 360;
+                            $recurringStartDate = $startTimePadding;
+                            $recurringEndDate = $endTimePadding;
+                            $difference = $recurringEndDate - $recurringStartDate;
+                            $fixedRentalDates['end_date'] = date('Y-m-d H:i', $endTimePadding);
+                            $fixedRentalDates['id'] = $item->getId();
+                            $fixedRentalDates['name'] = $fixedName;
+                            $fixedRentalDatesArray[] = $fixedRentalDates;
+
+                            for ($i = 0; $i < $nrYears; $i++) {
+                                $recurringStartDate = strtotime('+1 year', $recurringStartDate);
+                                $dateFormatted = date('Y-m-d H:i', $recurringStartDate);
+                                $fixedRentalDates['start_date'] = $dateFormatted;
+                                $recurringEndDate = strtotime($dateFormatted) + $difference;
+                                $dateFormatted = date('Y-m-d H:i', $recurringEndDate);
+                                $fixedRentalDates['end_date'] = $dateFormatted;
+                                $fixedRentalDates['id'] = $item->getId();
+                                $fixedRentalDates['name'] = $fixedName;
+                                $fixedRentalDatesArray[] = $fixedRentalDates;
+                            }
+                            break;
+                    }
+
+            }
+        //todo check if there are unavailable dates in the ranges. if there are remove from array
+        return $fixedRentalDatesArray;
     }
 
     /**
@@ -1437,17 +1682,13 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
         $bundleDefaultSelections = array();
         if($bundledProduct->getTypeId() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE_BUNDLE) {
             $typeInstance = $bundledProduct->getTypeInstance(true);
-
             $selectionCollection = $typeInstance->getSelectionsCollection(
                 $typeInstance->getOptionsIds($bundledProduct), $bundledProduct
             );
-
             $optionCollection = $typeInstance->getOptionsCollection($bundledProduct);
-
             $options = $optionCollection->appendSelections($selectionCollection, false,
                 Mage::helper('catalog/product')->getSkipSaleableCheck()
             );
-
             foreach ($options as $key => $value) {
                 if (gettype($value->getDefaultSelection()) == 'object') {
                     $bundleDefaultSelections[] = $value->getDefaultSelection()->getProductId();
@@ -1456,7 +1697,6 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $bundleDefaultSelections;
     }
-
     public static function isFoomanInstalled()
     {
         if (is_null(self::$_isFoomanInstalled)) {
@@ -1482,4 +1722,46 @@ class ITwebexperts_Payperrentals_Helper_Data extends Mage_Core_Helper_Abstract
         return self::$_isDeliveryDatesInstalled;
     }
 
+    /**
+     * Returns true if an order contains a reservation item
+     *
+     * @param $orderid
+     * @return bool
+     */
+
+    public function orderContainsReservation($orderid)
+    {
+        $order = Mage::getModel('sales/order')->load($orderid);
+        foreach ($order->getAllItems() as $_item) {
+            if($_item->getProductType() == $this::PRODUCT_TYPE){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get Signature URL
+     */
+    public function getSignatureUrl($orderid)
+    {
+        return Mage::getUrl('payperrentals_front/signature/sign',array('order_id'=>$orderid));
+    }
+
+    /**
+     * Creates diretory if doesn't exist and if $filename then uploads the file
+     *
+     * @param $path
+     * @param $filename
+     */
+
+    public function uploadFileandCreateDir($path,$file = null,$filename = null)
+    {
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+        }
+        if ($filename) {
+            file_put_contents($path . DS . $filename, $file);
+        }
+    }
 }

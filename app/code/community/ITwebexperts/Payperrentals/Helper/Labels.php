@@ -309,13 +309,11 @@ class ITwebexperts_Payperrentals_Helper_Labels extends Mage_Core_Helper_Abstract
             return substr($lInfo['products_name'], 0, 13) . ' - ' . $lInfo['barcode'];
         } else {return '';}
     }
-
     private function addAddress($lInfo){
         if ($lInfo['customers_address'] !== false){
             return $lInfo['customers_address'];
         }
     }
-
     /**
      * @param $lInfo
      * @param $newLine
@@ -328,8 +326,7 @@ class ITwebexperts_Payperrentals_Helper_Labels extends Mage_Core_Helper_Abstract
         } else {
             $labelContent[] = $this->addProductNameToLabel($lInfo);
             $labelContent[] = $this->addAddress($lInfo);
-        }
-
+		}
         $first = 0;
         $labelText = '';
         foreach($labelContent as $iLabel){

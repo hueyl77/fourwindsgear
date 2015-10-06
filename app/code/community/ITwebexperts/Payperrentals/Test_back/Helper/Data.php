@@ -232,7 +232,7 @@ class ITwebexperts_Payperrentals_Test_Helper_Data extends EcomDev_PHPUnit_Test_C
     public function checkStoreHours($_testId, $_storeId){
         $_expected = $this->expected('testId' . $_testId);
 
-        $storeHours = ITwebexperts_Payperrentals_Helper_Config::getStoreTime($_storeId);
+        $storeHours = Mage::helper('payperrentals/config')->getStoreTime($_storeId);
 
         $this->assertEquals($storeHours, $_expected->getHours());
     }

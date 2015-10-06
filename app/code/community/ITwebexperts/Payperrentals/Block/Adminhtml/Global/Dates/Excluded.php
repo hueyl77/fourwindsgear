@@ -19,7 +19,6 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Global_Dates_Excluded extends M
      * @var
      */
     protected $_selectFieldExcludeTurnoverRenderer;
-
     /**
      * @var
      */
@@ -87,8 +86,6 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Global_Dates_Excluded extends M
         }
         return $this->_selectFieldExcludeTurnoverRenderer;
     }
-
-
     /**
      * Get date block
      *

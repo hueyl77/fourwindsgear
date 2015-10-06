@@ -1,6 +1,5 @@
 <div class="page-create-order">
 <div class="switcher">
-    <!--<div class="msg" style="color:red;font-size:10px;">If a rental product does not have "Use Times" enabled, it will not show time dropdown on configuration. If product is bundle or configurable it will use the config option setup to the main product not the subproducts</div>-->
     <div class="currency-switcher">
         <label for="currency_switcher"><?php echo Mage::helper('payperrentals')->__('Order Currency') . ':' ?></label>
         <select id="currency_switcher" name="order[currency]" onchange="order.setCurrencyId(this.value); order.setCurrencySymbol(this.options[this.selectedIndex].getAttribute('symbol'));">
@@ -9,34 +8,16 @@
             <?php endforeach; ?>
         </select>
     </div>
-
-    <?php
-        if(Mage::helper('payperrentals/config')->forceUseTimes()) {
-            $_useTimes = Mage::helper('payperrentals')->useTimes(-1);
-        }else{
-            $_useTimes = 0;
-        }
-    ?>
-    <?php $isAdminGlobal = true; ?>
     <div id="topDates" style="display: inline-block;margin-left: 10px;">
-        <?php
-        /** @var $block ITwebexperts_Payperrentals_Block_Adminhtml_Sales_Order_Create_Data */
-        $block = new ITwebexperts_Payperrentals_Block_Adminhtml_Sales_Order_Create_Data();
-        $templatePhpInitialisations = $block->getTemplatePhpInitialisations();
-        $templateFunctions = $block->getTemplateFunctions();
-        $templateGlobalCalendarFunctions = $block->getTemplateGlobalCalendarFunctions();
-        $templateJsInitialisations = $block->getTemplateJsInitialisations();
-        $templateStyles = $block->getTemplateStyles();
-        $templateGlobalCalendar = $block->getTemplateGlobalCalendar();
-        ?>
-
-        <?php require($templatePhpInitialisations); ?>
-        <?php require($templateJsInitialisations); ?>
-        <?php require($templateGlobalCalendar); ?>
-        <?php require($templateGlobalCalendarFunctions); ?>
-
+            <?php
+            $calendar = Mage::helper('payperrentals/calendar');
+            echo $calendar->getCalendar(null,true);
+            ?>
             <button class="scalable change" id="changeButton" type="button" ><span><?php echo $this->__('Change All') ?></span></button>
         </div>
+    <script type="text/javascript">
+        onDocReady();
+    </script>
     </div>
 </div>
 
@@ -57,7 +38,7 @@
                 <?php echo $this->getChildHtml('change_customer') ?>
                 <?php echo $this->getChildHtml('form_account') ?>
             </div>
-            <?php if(!ITwebexperts_Payperrentals_Helper_Config::hideAdminAddresses()):?>
+            <?php if(!Mage::helper('payperrentals/config')->hideAdminAddresses()):?>
             <div id="order-addresses">
                 <div id="order-billing_address" class="box-left"><?php echo $this->getChildHtml('billing_address') ?></div>
                 <div id="order-shipping_address" class="box-right"><?php echo $this->getChildHtml('shipping_address') ?></div>
@@ -123,9 +104,6 @@
     </tr>
 </table>
 </div>
-
-<?php require($templateFunctions); ?>
-<?php require($templateStyles); ?>
 <script type="text/javascript">
     function onLoadActions(){
         $jppr('#sales_order_create_search_grid_table a[product_type="reservation"]').click(function () {
@@ -147,4 +125,40 @@
     });
 
     onLoadActions();
+    //$jppr(document).ready(function () {
+    $jppr("#buttonDropoff").click(function () {
+        $jppr("#dialogDates").css('display', '');
+    });
+    $jppr("#cancelBut").click(function () {
+        $jppr("#dialogDates").css('display', 'none');
+    });
+    $jppr("#okBut").click(function () {
+        Element.show('loading-mask');
+        $jppr.ajax({
+            cache: false,
+            dataType: 'json',
+            type: 'post',
+            url: estimateCreateUrl,
+            data: {
+                'startDate': $jppr('.estimateSend').val(),
+                'endDate': $jppr('.estimateReturn').val(),
+                'startTime': $jppr('.estimateSendTime').val(),
+                'endTime': $jppr('.estimateReturnTime').val()
+
+            },
+            success: function (data) {
+                Element.hide('loading-mask');
+                Element.hide('loading-mask');
+                $jppr("#estimatedDates").html(data.html);
+                $jppr("#dialogDates").css('display', 'none');
+            }});
+
+    });
+
+    $jppr("#dialogDates").css('display', 'none');
+    $jppr('#changeButton').click(function () {
+        updateInputValsAll();
+    });
+    //});
+
 </script>

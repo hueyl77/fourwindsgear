@@ -224,6 +224,22 @@
 <reference name="notifications">
    <block type="tax/adminhtml_notifications" name="tax_notifications" template="tax/notifications.phtml"/>
 </reference>
+<reference name="head">
+   <action method="addCss">
+      <stylesheet>jmslideshow.css</stylesheet>
+   </action>
+</reference>
+<reference name="content">
+   <block type="core/template" name="jmslideshow.head" template="jmslideshow/head.phtml"/>
+</reference>
+<reference name="head">
+   <action method="addCss">
+      <name>jmbasetheme.css</name>
+   </action>
+</reference>
+<reference name="content">
+   <block type="core/template" name="jmbasethemehead" template="jmbasetheme/jmbasethemehead.phtml"/>
+</reference>
 <reference name="content">
    <block type="adminhtml/dashboard" name="dashboard">
       <block type="adminhtml/store_switcher" name="store_switcher" as="store_switcher" template="store/switcher.phtml">
@@ -232,4 +248,44 @@
          </action>
       </block>
    </block>
+</reference>
+<reference name="head">
+   <action method="addJs">
+      <script>itwebexperts_payperrentals/fullcalendar2/lib/jquery.min.js</script>
+   </action>
+   <action method="addJs">
+      <script>itwebexperts_payperrentals/fullcalendar2/lib/jquery-ui.custom.min.js</script>
+   </action>
+   <action method="addJs">
+      <script>itwebexperts_payperrentals/fullcalendar2/lib/moment.min.js</script>
+   </action>
+   <action method="addJs">
+      <script>itwebexperts_payperrentals/fullcalendar2/fullcalendar.js</script>
+   </action>
+   <action method="addJs">
+      <script>itwebexperts_payperrentals/fullcalendar2/gcal.js</script>
+   </action>
+   <action method="addJs">
+      <script>itwebexperts_payperrentals/fullcalendar2/lang-all.js</script>
+   </action>
+   <action method="addJs">
+      <script>itwebexperts_payperrentals/qtip/jquery.qtip.js</script>
+   </action>
+   <action method="addJs">
+      <script>itwebexperts_payperrentals/ics/ics.deps.min.js</script>
+   </action>
+   <action method="addJs">
+      <script>itwebexperts_payperrentals/ics/ics.js</script>
+   </action>
+   <action method="addJs">
+      <script>itwebexperts_payperrentals/jquery/jquery.noconflict.js</script>
+   </action>
+   <action method="addItem">
+      <type>js_css</type>
+      <name>itwebexperts_payperrentals/fullcalendar2/fullcalendar.css</name>
+   </action>
+   <action method="addItem">
+      <type>js_css</type>
+      <name>itwebexperts_payperrentals/qtip/jquery.qtip.css</name>
+   </action>
 </reference>

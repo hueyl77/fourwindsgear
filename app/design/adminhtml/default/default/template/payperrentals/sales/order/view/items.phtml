@@ -93,6 +93,26 @@ if (Mage::app()->getRequest()->getParam('noHeader')) {
 <br/>
 
 <script type="text/javascript">
+    function showSignaturePopup(sUrl){
+        oPopup = new Window({
+            id:'popup_window',
+            className: 'magento',
+            url: sUrl,
+            width: 820,
+            height: 600,
+            minimizable: false,
+            maximizable: false,
+            showEffectOptions: {
+                duration: 0.4
+            },
+            hideEffectOptions:{
+                duration: 0.4
+            },
+            destroyOnClose: true
+        });
+        oPopup.setZIndex(100);
+        oPopup.showCenter(true);
+    }
     function getItemsGridData() {
         var params = {};
         <?php /** Use objects for qty and dates, because it send empty elements. For example if product id = 63 it send 62 empty elements and 1 with data */ ?>
@@ -157,6 +177,12 @@ if (Mage::app()->getRequest()->getParam('noHeader')) {
             onSuccess: function (response) {
                 var data = response.responseText.evalJSON();
                 $('eventContent').update(data.content);
+                $jppr('#formProducts').submit(function(){
+                    if($jppr('.elemCheck:checked').length == 0 || $jppr('#new_date').val() == ''){
+                        alert('No Product on order to extend for the selected date!');
+                        return false;
+                    }
+                });
                 contentWin = new Window('dialogWindowProducts',{className:'magento',maximizable: false,windowClassName:'popup-window', resizable: false, hideEffect:Element.hide, showEffect:Element.show, width:'500', height:'400', zIndex:50000, maxZIndex:50000, destroyOnClose: true, onClose:function(){$('eventContent').update();}})
                 contentWin.setContent('eventContent', false, false);
                 contentWin.setTitle('Extend Order ' + incrid);
@@ -199,7 +225,7 @@ if (Mage::app()->getRequest()->getParam('noHeader')) {
                                 onSuccess: function (response) {
                                     var data = response.responseText.evalJSON();
                                     if(data.content != '') {
-                                        $jppr("#extendProducts").html(data.content)
+                                        $jppr("#extendProducts").html(data.content);
                                     }else{
                                         $jppr("#extendProducts").html('No product available for extension!');
                                     }

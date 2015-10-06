@@ -22,7 +22,7 @@
 		closeText: 'Închide', closeStatus: 'Închide fara schimbare',
 		yearStatus: 'Arată un an diferit', monthStatus: 'Arată o luna diferita',
 		weekText: 'Săpt', weekStatus: 'Săptamana anului',
-		dayStatus: 'Selectează D, M d', defaultStatus: 'Selectează o data',
+		dayStatus: 'Selectează D, M d', defaultStatus: 'Selectează o data',initStatus: 'Selectează o data',
 		isRTL: false
 	};
 	$jppr.datepick.setDefaults($jppr.datepick.regional['ro']);

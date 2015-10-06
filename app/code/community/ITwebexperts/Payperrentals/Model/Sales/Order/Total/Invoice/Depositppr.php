@@ -9,7 +9,7 @@ class ITwebexperts_Payperrentals_Model_Sales_Order_Total_Invoice_Depositppr exte
     public function collect(Mage_Sales_Model_Order_Invoice $invoice)
     {
 
-        if(ITwebexperts_Payperrentals_Helper_Config::isChargedDeposit()) {
+        if(Mage::helper('payperrentals/config')->isChargedDeposit()) {
             $order = $invoice->getOrder();
             $feeAmountLeft = floatval($order->getDepositpprAmount() - $order->getDepositpprAmountInvoiced());
             $baseFeeAmountLeft = floatval($order->getBaseDepositpprAmount() - $order->getBaseDepositpprAmountInvoiced());

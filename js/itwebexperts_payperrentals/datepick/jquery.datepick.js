@@ -6,7 +6,7 @@
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
    Please attribute the authors if you use it. */
 
-(function($jppr) { // Hide the namespace
+;(function($) { // Hide the namespace
 
 var PROP_NAME = 'datepick';
 var ie = (function(){
@@ -22,7 +22,7 @@ var ie = (function(){
 }());
 
 /* Date picker manager.
-   Use the singleton instance of this class, $jppr.datepick, to interact with the date picker.
+   Use the singleton instance of this class, $.datepick, to interact with the date picker.
    Settings for (groups of) date pickers are maintained in an instance object,
    allowing multiple different settings on the same page. */
 
@@ -31,7 +31,7 @@ function Datepick() {
 	this._curInst = null; // The current instance in use
 	this._keyEvent = false; // If the last event was a key event
 	this._disabledInputs = []; // List of date picker inputs that have been disabled
-//    $jppr.datepick._tdDates = {};
+//    $.datepick._tdDates = {};
 	this._datepickerShowing = false; // True if the popup picker is showing , false if not
 	this._inDialog = false; // True if showing within a "dialog", false if not
 	this.regional = []; // Available regional settings, indexed by language code
@@ -130,7 +130,7 @@ function Datepick() {
 			// returns a set of custom settings for the date picker
 		beforeShowDay: null, // Function that takes a date and returns an array with
 			// [0] = true if selectable, false if not, [1] = custom CSS class name(s) or '',
-			// [2] = cell title (optional), e.g. $jppr.datepick.noWeekends
+			// [2] = cell title (optional), e.g. $.datepick.noWeekends
 		onChangeMonthYear: null, // Define a callback function when the month or year is changed
 		onHover: null, // Define a callback function when hovering over a day
 		onSelect: null, // Define a callback function when a date is selected
@@ -139,13 +139,13 @@ function Datepick() {
 		altFormat: '', // The date format to use for the alternate field
 		constrainInput: true // The input is constrained by the current date format
 	};
-	$jppr.extend(this._defaults, this.regional['']);
-	this.dpDiv = $jppr('<div style="display: none;"></div>');
+	$.extend(this._defaults, this.regional['']);
+	this.dpDiv = $('<div style="display: none;"></div>');
 }
 
-$jppr.extend(Datepick.prototype, {
+$.extend(Datepick.prototype, {
 	version: '3.7.3', // Current version
-	
+
 	/* Class name added to elements to indicate already configured with a date picker. */
 	markerClassName: 'hasDatepick',
 
@@ -210,18 +210,18 @@ $jppr.extend(Datepick.prototype, {
 	   @param  settings  (object) the new settings to use for this date picker instance */
 	_attachDatepick: function(target, settings) {
 		if (!target.id)
-			target.id = 'dp' + (++$jppr.datepick._uuid);
+			target.id = 'dp' + (++$.datepick._uuid);
 		var nodeName = target.nodeName.toLowerCase();
-		var inst = $jppr.datepick._newInst($jppr(target), (nodeName == 'div' || nodeName == 'span'));
+		var inst = $.datepick._newInst($(target), (nodeName == 'div' || nodeName == 'span'));
 		// Check for settings on the control itself
-		var inlineSettings = ($jppr.fn.metadata ? $jppr(target).metadata() : {});
-		inst.settings = $jppr.extend({}, settings || {}, inlineSettings || {});
+		var inlineSettings = ($.fn.metadata ? $(target).metadata() : {});
+		inst.settings = $.extend({}, settings || {}, inlineSettings || {});
 		if (inst.inline) {
-            $jppr.datepick._inlineDatepick(target, inst);
+            $.datepick._inlineDatepick(target, inst);
 
 		}
 		else
-			$jppr.datepick._connectDatepick(target, inst);
+			$.datepick._connectDatepick(target, inst);
 	},
 
 	/* Create a new instance object.
@@ -230,67 +230,67 @@ $jppr.extend(Datepick.prototype, {
 	_newInst: function(target, inline) {
 		var id = target[0].id.replace(/([^A-Za-z0-9_])/g, '\\\\$1'); // Escape jQuery meta chars
 		return {id: id, input: target, // Associated target
-			cursorDate: $jppr.datepick._daylightSavingAdjust(new Date()), // Current position
+			cursorDate: $.datepick._daylightSavingAdjust(new Date()), // Current position
 			drawMonth: 0, drawYear: 0, // Month being drawn
 			dates: [], // Selected dates
 			inline: inline, // Is datepicker inline or not
-			dpDiv: (!inline ? this.dpDiv : $jppr('<div class="myinline"></div>')), // presentation div
-			siblings: $jppr([])}; // Created siblings (trigger/append)
+			dpDiv: (!inline ? this.dpDiv : $('<div class="myinline"></div>')), // presentation div
+			siblings: $([])}; // Created siblings (trigger/append)
 	},
 
 	/* Attach the date picker to an input field.
 	   @param  target  (element) the target input field or division or span
 	   @param  inst    (object) the instance settings for this datepicker */
 	_connectDatepick: function(target, inst) {
-		var input = $jppr(target);
+		var input = $(target);
 		if (input.hasClass(this.markerClassName))
 			return;
-		var appendText = $jppr.datepick._get(inst, 'appendText');
-		var isRTL = $jppr.datepick._get(inst, 'isRTL');
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+		var appendText = $.datepick._get(inst, 'appendText');
+		var isRTL = $.datepick._get(inst, 'isRTL');
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
 		if (appendText) {
-			var append = $jppr('<span class="' + $jppr.datepick._appendClass[useTR] + '">' + appendText + '</span>');
+			var append = $('<span class="' + $.datepick._appendClass[useTR] + '">' + appendText + '</span>');
 			input[isRTL ? 'before' : 'after'](append);
 			inst.siblings = inst.siblings.add(append);
 		}
-		var showOn = $jppr.datepick._get(inst, 'showOn');
+		var showOn = $.datepick._get(inst, 'showOn');
 		if (showOn == 'focus' || showOn == 'both') // Pop-up date picker when in the marked field
-			input.focus($jppr.datepick._showDatepick);
+			input.focus($.datepick._showDatepick);
 		if (showOn == 'button' || showOn == 'both') { // Pop-up date picker when button clicked
-			var buttonText = $jppr.datepick._get(inst, 'buttonText');
-			var buttonImage = $jppr.datepick._get(inst, 'buttonImage');
-			var trigger = $jppr($jppr.datepick._get(inst, 'buttonImageOnly') ?
-				$jppr('<img/>').addClass($jppr.datepick._triggerClass[useTR]).
+			var buttonText = $.datepick._get(inst, 'buttonText');
+			var buttonImage = $.datepick._get(inst, 'buttonImage');
+			var trigger = $($.datepick._get(inst, 'buttonImageOnly') ?
+				$('<img/>').addClass($.datepick._triggerClass[useTR]).
 					attr({src: buttonImage, alt: buttonText, title: buttonText}) :
-				$jppr('<button type="button"></button>').addClass($jppr.datepick._triggerClass[useTR]).
-					html(buttonImage == '' ? buttonText : $jppr('<img/>').attr(
+				$('<button type="button"></button>').addClass($.datepick._triggerClass[useTR]).
+					html(buttonImage == '' ? buttonText : $('<img/>').attr(
 					{src: buttonImage, alt: buttonText, title: buttonText})));
 			input[isRTL ? 'before' : 'after'](trigger);
 			inst.siblings = inst.siblings.add(trigger);
 			trigger.click(function() {
-				if ($jppr.datepick._datepickerShowing && $jppr.datepick._lastInput == target)
-					$jppr.datepick._hideDatepick();
+				if ($.datepick._datepickerShowing && $.datepick._lastInput == target)
+					$.datepick._hideDatepick();
 				else
-					$jppr.datepick._showDatepick(target);
+					$.datepick._showDatepick(target);
 				return false;
 			});
 		}
-		input.addClass(this.markerClassName).keydown($jppr.datepick._doKeyDown).
-			keypress($jppr.datepick._doKeyPress).keyup($jppr.datepick._doKeyUp);
-		if ($jppr.datepick._get(inst, 'showDefault') && !inst.input.val()) {
-			inst.dates = [$jppr.datepick._getDefaultDate(inst)];
-			$jppr.datepick._showDate(inst);
+		input.addClass(this.markerClassName).keydown($.datepick._doKeyDown).
+			keypress($.datepick._doKeyPress).keyup($.datepick._doKeyUp);
+		if ($.datepick._get(inst, 'showDefault') && !inst.input.val()) {
+			inst.dates = [$.datepick._getDefaultDate(inst)];
+			$.datepick._showDate(inst);
 		}
-		$jppr.datepick._autoSize(inst);
-        $jppr.data(document.body, PROP_NAME+target.id, inst);
+		$.datepick._autoSize(inst);
+        $.data(top.document.body, PROP_NAME+target.id, inst);
 	},
 
 	/* Apply the maximum length for the date format.
 	   @param  inst  (object) the instance settings for this datepicker */
 	_autoSize: function(inst) {
-		if ($jppr.datepick._get(inst, 'autoSize') && !inst.inline) {
+		if ($.datepick._get(inst, 'autoSize') && !inst.inline) {
 			var date = new Date(2009, 12 - 1, 20); // Ensure double digits
-			var dateFormat = $jppr.datepick._get(inst, 'dateFormat');
+			var dateFormat = $.datepick._get(inst, 'dateFormat');
 			if (dateFormat.match(/[DM]/)) {
 				var findMax = function(names) {
 					var max = 0;
@@ -303,12 +303,12 @@ $jppr.extend(Datepick.prototype, {
 					}
 					return maxI;
 				};
-				date.setMonth(findMax($jppr.datepick._get(inst, (dateFormat.match(/MM/) ?
+				date.setMonth(findMax($.datepick._get(inst, (dateFormat.match(/MM/) ?
 					'monthNames' : 'monthNamesShort'))));
-				date.setDate(findMax($jppr.datepick._get(inst, (dateFormat.match(/DD/) ?
+				date.setDate(findMax($.datepick._get(inst, (dateFormat.match(/DD/) ?
 					'dayNames' : 'dayNamesShort'))) + 20 - date.getDay());
 			}
-			inst.input.attr('size', $jppr.datepick._formatDate(inst, date).length);
+			inst.input.attr('size', $.datepick._formatDate(inst, date).length);
 		}
 	},
 
@@ -316,24 +316,24 @@ $jppr.extend(Datepick.prototype, {
 	   @param  target  (element) the target input field or division or span
 	   @param  inst    (object) the instance settings for this datepicker */
 	_inlineDatepick: function(target, inst) {
-		var divSpan = $jppr(target);
+		var divSpan = $(target);
 		if (divSpan.hasClass(this.markerClassName))
 			return;
 		divSpan.addClass(this.markerClassName);
-		$jppr.data(document.body, PROP_NAME+target.id, inst);
-		inst.cursorDate = $jppr.datepick._getDefaultDate(inst);
+		$.data(top.document.body, PROP_NAME+target.id, inst);
+		inst.cursorDate = $.datepick._getDefaultDate(inst);
 		inst.drawMonth = inst.cursorDate.getMonth();
 		inst.drawYear = inst.cursorDate.getFullYear();
-		if ($jppr.datepick._get(inst, 'showDefault'))
-			inst.dates = [$jppr.datepick._getDefaultDate(inst)];
-		$jppr('body',document).append(inst.dpDiv);
-		$jppr.datepick._updateDatepick(inst);
+		if ($.datepick._get(inst, 'showDefault'))
+			inst.dates = [$.datepick._getDefaultDate(inst)];
+		$('body',top.document).append(inst.dpDiv);
+		$.datepick._updateDatepick(inst);
 		// Fix width for dynamic number of date pickers
-		/*inst.dpDiv.width($jppr.datepick._getNumberOfMonths(inst)[1] *
-			$jppr('.' + $jppr.datepick._oneMonthClass[$jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0],
+		/*inst.dpDiv.width($.datepick._getNumberOfMonths(inst)[1] *
+			$('.' + $.datepick._oneMonthClass[$.datepick._get(inst, 'useThemeRoller') ? 1 : 0],
 			inst.dpDiv)[0].offsetWidth + 1);*/
 		divSpan.append(inst.dpDiv);
-		$jppr.datepick._updateAlternate(inst);
+		$.datepick._updateAlternate(inst);
 	},
 
 	/* Pop-up the date picker in a "dialog" box.
@@ -345,102 +345,102 @@ $jppr.extend(Datepick.prototype, {
 	                     (event) with x/y coordinates or
 	                     leave empty for default (screen centre) */
 	_dialogDatepick: function(input, date, onSelect, settings, pos) {
-		var inst = $jppr.datepick._dialogInst; // Internal instance
+		var inst = $.datepick._dialogInst; // Internal instance
 		if (!inst) {
-			var id = 'dp' + (++$jppr.datepick._uuid);
-			$jppr.datepick._dialogInput = $jppr('<input type="text" id="' + id +
+			var id = 'dp' + (++$.datepick._uuid);
+			$.datepick._dialogInput = $('<input type="text" id="' + id +
 				'" style="position: absolute; width: 1px; z-index: -1"/>');
-			$jppr.datepick._dialogInput.keydown($jppr.datepick._doKeyDown);
-			$jppr('body').append($jppr.datepick._dialogInput);
-			inst = $jppr.datepick._dialogInst = $jppr.datepick._newInst($jppr.datepick._dialogInput, false);
+			$.datepick._dialogInput.keydown($.datepick._doKeyDown);
+			$('body').append($.datepick._dialogInput);
+			inst = $.datepick._dialogInst = $.datepick._newInst($.datepick._dialogInput, false);
 			inst.settings = {};
-			$jppr.data($jppr.datepick._dialogInput[0], PROP_NAME, inst);
+			$.data($.datepick._dialogInput[0], PROP_NAME, inst);
 		}
 		extendRemove(inst.settings, settings || {});
-		date = (date && date.constructor == Date ? $jppr.datepick._formatDate(inst, date) : date);
-		$jppr.datepick._dialogInput.val(date);
-		$jppr.datepick._pos = (pos ? (isArray(pos) ? pos : [pos.pageX, pos.pageY]) : null);
-		if (!$jppr.datepick._pos) {
+		date = (date && date.constructor == Date ? $.datepick._formatDate(inst, date) : date);
+		$.datepick._dialogInput.val(date);
+		$.datepick._pos = (pos ? (isArray(pos) ? pos : [pos.pageX, pos.pageY]) : null);
+		if (!$.datepick._pos) {
 			var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
 			var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
-			$jppr.datepick._pos = // Should use actual width/height below
+			$.datepick._pos = // Should use actual width/height below
 				[(document.documentElement.clientWidth / 2) - 100 + scrollX,
 				(document.documentElement.clientHeight / 2) - 150 + scrollY];
 		}
 
 		// Move input on screen for focus, but hidden behind dialog
-		$jppr.datepick._dialogInput.css('left', ($jppr.datepick._pos[0] + 20) + 'px').css('top', $jppr.datepick._pos[1] + 'px');
+		$.datepick._dialogInput.css('left', ($.datepick._pos[0] + 20) + 'px').css('top', $.datepick._pos[1] + 'px');
 		inst.settings.onSelect = onSelect;
-		$jppr.datepick._inDialog = true;
-		this.dpDiv.addClass($jppr.datepick._dialogClass[$jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0]);
-		$jppr.datepick._showDatepick($jppr.datepick._dialogInput[0]);
-		if ($jppr.blockUI)
-			$jppr.blockUI(this.dpDiv);
-		$jppr.data($jppr.datepick._dialogInput[0], PROP_NAME, inst);
+		$.datepick._inDialog = true;
+		this.dpDiv.addClass($.datepick._dialogClass[$.datepick._get(inst, 'useThemeRoller') ? 1 : 0]);
+		$.datepick._showDatepick($.datepick._dialogInput[0]);
+		if ($.blockUI)
+			$.blockUI(this.dpDiv);
+		$.data($.datepick._dialogInput[0], PROP_NAME, inst);
 	},
 
 	/* Detach a datepicker from its control.
 	   @param  target  (element) the target input field or division or span */
 	_destroyDatepick: function(target) {
-		var $target = $jppr(target);
+		var $target = $(target);
 		if (!$target.hasClass(this.markerClassName)) {
 			return;
 		}
-		var inst = $jppr.data(document.body, PROP_NAME + target.id);
+		var inst = $.data(top.document.body, PROP_NAME + target.id);
 
-		$jppr.removeData(target, PROP_NAME);
+		$.removeData(target, PROP_NAME);
 		if (inst.inline)
 			$target.removeClass(this.markerClassName).empty();
 		else {
-			$jppr(inst.siblings).remove();
+			$(inst.siblings).remove();
 			$target.removeClass(this.markerClassName).
-				unbind('focus', $jppr.datepick._showDatepick).unbind('keydown', $jppr.datepick._doKeyDown).
-				unbind('keypress', $jppr.datepick._doKeyPress).unbind('keyup', $jppr.datepick._doKeyUp);
+				unbind('focus', $.datepick._showDatepick).unbind('keydown', $.datepick._doKeyDown).
+				unbind('keypress', $.datepick._doKeyPress).unbind('keyup', $.datepick._doKeyUp);
 		}
 	},
 
 	/* Enable the date picker to a jQuery selection.
 	   @param  target  (element) the target input field or division or span */
 	_enableDatepick: function(target) {
-		var $target = $jppr(target);
+		var $target = $(target);
 		if (!$target.hasClass(this.markerClassName))
 			return;
-		var inst = $jppr.data(document.body, PROP_NAME + target.id);
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+		var inst = $.data(top.document.body, PROP_NAME + target.id);
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
 		if (inst.inline)
-			$target.children('.' + $jppr.datepick._disableClass[useTR]).remove().end().
+			$target.children('.' + $.datepick._disableClass[useTR]).remove().end().
 				find('select').attr('disabled', '').end().
 				find('a').attr('href', 'javascript:void(0)');
 		else {
 			target.disabled = false;
-			inst.siblings.filter('button.' + $jppr.datepick._triggerClass[useTR]).
+			inst.siblings.filter('button.' + $.datepick._triggerClass[useTR]).
 				each(function() { this.disabled = false; }).end().
-				filter('img.' + $jppr.datepick._triggerClass[useTR]).
+				filter('img.' + $.datepick._triggerClass[useTR]).
 				css({opacity: '1.0', cursor: ''});
 		}
-		$jppr.datepick._disabledInputs = $jppr.map($jppr.datepick._disabledInputs,
+		$.datepick._disabledInputs = $.map($.datepick._disabledInputs,
 			function(value) { return (value == target ? null : value); }); // Delete entry
 	},
 
 	/* Disable the date picker to a jQuery selection.
 	   @param  target  (element) the target input field or division or span */
 	_disableDatepick: function(target) {
-		var $target = $jppr(target);
+		var $target = $(target);
 		if (!$target.hasClass(this.markerClassName))
 			return;
-		var inst = $jppr.data(document.body, PROP_NAME + target.id);
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+		var inst = $.data(top.document.body, PROP_NAME + target.id);
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
 		if (inst.inline) {
-			var inline = $target.children('.' + $jppr.datepick._inlineClass[useTR]);
+			var inline = $target.children('.' + $.datepick._inlineClass[useTR]);
 			var offset = inline.offset();
 			var relOffset = {left: 0, top: 0};
 			inline.parents().each(function() {
-				if ($jppr(this).css('position') == 'relative') {
-					relOffset = $jppr(this).offset();
+				if ($(this).css('position') == 'relative') {
+					relOffset = $(this).offset();
 					return false;
 				}
 			});
-			$target.prepend('<div class="' + $jppr.datepick._disableClass[useTR] + '" style="' +
+			$target.prepend('<div class="' + $.datepick._disableClass[useTR] + '" style="' +
 				'width: ' + inline.outerWidth() + 'px; height: ' + inline.outerHeight() +
 				'px; left: ' + (offset.left - relOffset.left) +
 				'px; top: ' + (offset.top - relOffset.top) + 'px;"></div>').
@@ -449,21 +449,21 @@ $jppr.extend(Datepick.prototype, {
 		}
 		else {
 			target.disabled = true;
-			inst.siblings.filter('button.' + $jppr.datepick._triggerClass[useTR]).
+			inst.siblings.filter('button.' + $.datepick._triggerClass[useTR]).
 				each(function() { this.disabled = true; }).end().
-				filter('img.' + $jppr.datepick._triggerClass[useTR]).
+				filter('img.' + $.datepick._triggerClass[useTR]).
 				css({opacity: '0.5', cursor: 'default'});
 		}
-		$jppr.datepick._disabledInputs = $jppr.map($jppr.datepick._disabledInputs,
+		$.datepick._disabledInputs = $.map($.datepick._disabledInputs,
 			function(value) { return (value == target ? null : value); }); // Delete entry
-		$jppr.datepick._disabledInputs.push(target);
+		$.datepick._disabledInputs.push(target);
 	},
 
 	/* Is the first field in a jQuery collection disabled as a datepicker?
 	   @param  target  (element) the target input field or division or span
 	   @return  (boolean) true if disabled, false if enabled */
 	_isDisabledDatepick: function(target) {
-		return (!target ? false : $jppr.inArray(target, $jppr.datepick._disabledInputs) > -1);
+		return (!target ? false : $.inArray(target, $.datepick._disabledInputs) > -1);
 	},
 
 	/* Retrieve the instance data for the target control.
@@ -472,7 +472,7 @@ $jppr.extend(Datepick.prototype, {
 	   @throws  error if a jQuery problem getting data */
 	_getInst: function(target) {
 		try {
-			return $jppr.data(document.body, PROP_NAME + target.id);
+			return $.data(top.document.body, PROP_NAME + target.id);
 		}
 		catch (err) {
 			throw 'Missing instance data for this datepicker';
@@ -488,11 +488,11 @@ $jppr.extend(Datepick.prototype, {
 	   @param  value   (any) the new value for the setting
 	                   (omit if above is an object or to retrieve value) */
 	_optionDatepick: function(target, name, value) {
-		var inst = $jppr.datepick._getInst(target);
+		var inst = $.datepick._getInst(target);
 		if (arguments.length == 2 && typeof name == 'string') {
-			return (name == 'defaults' ? $jppr.extend({}, $jppr.datepick._defaults) :
-				(inst ? (name == 'all' ? $jppr.extend({}, inst.settings) :
-				$jppr.datepick._get(inst, name)) : null));
+			return (name == 'defaults' ? $.extend({}, $.datepick._defaults) :
+				(inst ? (name == 'all' ? $.extend({}, inst.settings) :
+				$.datepick._get(inst, name)) : null));
 		}
 		var settings = name || {};
 		if (typeof name == 'string') {
@@ -500,12 +500,12 @@ $jppr.extend(Datepick.prototype, {
 			settings[name] = value;
 		}
 		if (inst) {
-			if ($jppr.datepick._curInst == inst) {
-				$jppr.datepick._hideDatepick(null, true);
+			if ($.datepick._curInst == inst) {
+				$.datepick._hideDatepick(null, true);
 			}
-			var dates = $jppr.datepick._getDateDatepick(target);
+			var dates = $.datepick._getDateDatepick(target);
 			extendRemove(inst.settings, settings);
-			$jppr.datepick._autoSize(inst);
+			$.datepick._autoSize(inst);
 			extendRemove(inst, {dates: []});
 			var blank = (!dates || isArray(dates));
 			if (isArray(dates))
@@ -515,25 +515,25 @@ $jppr.extend(Datepick.prototype, {
 						break;
 					}
 			if (!blank)
-				$jppr.datepick._setDateDatepick(target, dates);
+				$.datepick._setDateDatepick(target, dates);
 			if (inst.inline)
-				$jppr(target).children('div').removeClass($jppr.datepick._inlineClass.join(' ')).
-					addClass($jppr.datepick._inlineClass[$jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0]);
-			$jppr.datepick._updateDatepick(inst);
+				$(target).children('div').removeClass($.datepick._inlineClass.join(' ')).
+					addClass($.datepick._inlineClass[$.datepick._get(inst, 'useThemeRoller') ? 1 : 0]);
+			$.datepick._updateDatepick(inst);
 		}
 	},
 
 	// Change method deprecated
 	_changeDatepick: function(target, name, value) {
-		$jppr.datepick._optionDatepick(target, name, value);
+		$.datepick._optionDatepick(target, name, value);
 	},
 
 	/* Redraw the date picker attached to an input field or division.
 	   @param  target  (element) the target input field or division or span */
 	_refreshDatepick: function(target) {
-		var inst = $jppr.datepick._getInst(target);
+		var inst = $.datepick._getInst(target);
 		if (inst) {
-			$jppr.datepick._updateDatepick(inst);
+			$.datepick._updateDatepick(inst);
 		}
 	},
 
@@ -542,11 +542,11 @@ $jppr.extend(Datepick.prototype, {
 	   @param  date     (Date) the new date
 	   @param  endDate  (Date) the new end date for a range (optional) */
 	_setDateDatepick: function(target, date, endDate) {
-		var inst = $jppr.datepick._getInst(target);
+		var inst = $.datepick._getInst(target);
 		if (inst) {
-			$jppr.datepick._setDate(inst, date, endDate);
-			$jppr.datepick._updateDatepick(inst);
-			$jppr.datepick._updateAlternate(inst);
+			$.datepick._setDate(inst, date, endDate);
+			$.datepick._updateDatepick(inst);
+			$.datepick._updateAlternate(inst);
 		}
 	},
 
@@ -555,84 +555,84 @@ $jppr.extend(Datepick.prototype, {
 	   @return (Date) the current date or
 	           (Date[2]) the current dates for a range */
 	_getDateDatepick: function(target) {
-		var inst = $jppr.datepick._getInst(target);
+		var inst = $.datepick._getInst(target);
 		if (inst && !inst.inline)
-			$jppr.datepick._setDateFromField(inst);
-		return (inst ? $jppr.datepick._getDate(inst) : null);
+			$.datepick._setDateFromField(inst);
+		return (inst ? $.datepick._getDate(inst) : null);
 	},
 
 	/* Handle keystrokes.
 	   @param  event  (KeyEvent) the keystroke details
 	   @return  (boolean) true to continue, false to discard */
 	_doKeyDown: function(event) {
-		var inst = $jppr.datepick._getInst(event.target);
+		var inst = $.datepick._getInst(event.target);
 		inst.keyEvent = true;
 		var handled = true;
-		var isRTL = $jppr.datepick._get(inst, 'isRTL');
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
-		if ($jppr.datepick._datepickerShowing)
+		var isRTL = $.datepick._get(inst, 'isRTL');
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+		if ($.datepick._datepickerShowing)
 			switch (event.keyCode) {
-				case 9:  $jppr.datepick._hideDatepick();
+				case 9:  $.datepick._hideDatepick();
 						handled = false;
 						break; // Hide on tab out
-				case 13: var sel = $jppr('td.' + $jppr.datepick._dayOverClass[useTR], inst.dpDiv);
+				case 13: var sel = $('td.' + $.datepick._dayOverClass[useTR], inst.dpDiv);
 						if (sel.length == 0)
-							sel = $jppr('td.' + $jppr.datepick._selectedClass[useTR] + ':first', inst.dpDiv);
+							sel = $('td.' + $.datepick._selectedClass[useTR] + ':first', inst.dpDiv);
 						if (sel[0])
-							$jppr.datepick._selectDay(sel[0], event.target, inst.cursorDate.getTime());
+							$.datepick._selectDay(sel[0], event.target, inst.cursorDate.getTime());
 						else
-							$jppr.datepick._hideDatepick();
+							$.datepick._hideDatepick();
 						break; // Select the value on enter
-				case 27: $jppr.datepick._hideDatepick();
+				case 27: $.datepick._hideDatepick();
 						break; // Hide on escape
-				case 33: $jppr.datepick._adjustDate(event.target, (event.ctrlKey ?
-							-$jppr.datepick._get(inst, 'stepBigMonths') :
-							-$jppr.datepick._get(inst, 'stepMonths')), 'M');
+				case 33: $.datepick._adjustDate(event.target, (event.ctrlKey ?
+							-$.datepick._get(inst, 'stepBigMonths') :
+							-$.datepick._get(inst, 'stepMonths')), 'M');
 						break; // Previous month/year on page up/+ ctrl
-				case 34: $jppr.datepick._adjustDate(event.target, (event.ctrlKey ?
-							+$jppr.datepick._get(inst, 'stepBigMonths') :
-							+$jppr.datepick._get(inst, 'stepMonths')), 'M');
+				case 34: $.datepick._adjustDate(event.target, (event.ctrlKey ?
+							+$.datepick._get(inst, 'stepBigMonths') :
+							+$.datepick._get(inst, 'stepMonths')), 'M');
 						break; // Next month/year on page down/+ ctrl
 				case 35: if (event.ctrlKey || event.metaKey)
-							$jppr.datepick._clearDate(event.target);
+							$.datepick._clearDate(event.target);
 						handled = event.ctrlKey || event.metaKey;
 						break; // Clear on ctrl or command + end
 				case 36: if (event.ctrlKey || event.metaKey)
-							$jppr.datepick._gotoToday(event.target);
+							$.datepick._gotoToday(event.target);
 						handled = event.ctrlKey || event.metaKey;
 						break; // Current on ctrl or command + home
 				case 37: if (event.ctrlKey || event.metaKey)
-							$jppr.datepick._adjustDate(event.target, (isRTL ? +1 : -1), 'D');
+							$.datepick._adjustDate(event.target, (isRTL ? +1 : -1), 'D');
 						handled = event.ctrlKey || event.metaKey;
 						// -1 day on ctrl or command + left
 						if (event.originalEvent.altKey)
-							$jppr.datepick._adjustDate(event.target,
-								(event.ctrlKey ? -$jppr.datepick._get(inst, 'stepBigMonths') :
-								-$jppr.datepick._get(inst, 'stepMonths')), 'M');
+							$.datepick._adjustDate(event.target,
+								(event.ctrlKey ? -$.datepick._get(inst, 'stepBigMonths') :
+								-$.datepick._get(inst, 'stepMonths')), 'M');
 						// Next month/year on alt + left/+ ctrl
 						break;
 				case 38: if (event.ctrlKey || event.metaKey)
-							$jppr.datepick._adjustDate(event.target, -7, 'D');
+							$.datepick._adjustDate(event.target, -7, 'D');
 						handled = event.ctrlKey || event.metaKey;
 						break; // -1 week on ctrl or command + up
 				case 39: if (event.ctrlKey || event.metaKey)
-							$jppr.datepick._adjustDate(event.target, (isRTL ? -1 : +1), 'D');
+							$.datepick._adjustDate(event.target, (isRTL ? -1 : +1), 'D');
 						handled = event.ctrlKey || event.metaKey;
 						// +1 day on ctrl or command + right
 						if (event.originalEvent.altKey)
-							$jppr.datepick._adjustDate(event.target,
-								(event.ctrlKey ? +$jppr.datepick._get(inst, 'stepBigMonths') :
-								+$jppr.datepick._get(inst, 'stepMonths')), 'M');
+							$.datepick._adjustDate(event.target,
+								(event.ctrlKey ? +$.datepick._get(inst, 'stepBigMonths') :
+								+$.datepick._get(inst, 'stepMonths')), 'M');
 						// Next month/year on alt + right/+ ctrl
 						break;
 				case 40: if (event.ctrlKey || event.metaKey)
-							$jppr.datepick._adjustDate(event.target, +7, 'D');
+							$.datepick._adjustDate(event.target, +7, 'D');
 						handled = event.ctrlKey || event.metaKey;
 						break; // +1 week on ctrl or command + down
 				default: handled = false;
 			}
 		else if (event.keyCode == 36 && event.ctrlKey) // Display the date picker on ctrl+home
-			$jppr.datepick._showDatepick(this);
+			$.datepick._showDatepick(this);
 		else
 			handled = false;
 		if (handled) {
@@ -647,9 +647,9 @@ $jppr.extend(Datepick.prototype, {
 	   @param  event  (KeyEvent) the keystroke details
 	   @return  (boolean) true to continue, false to discard */
 	_doKeyPress: function(event) {
-		var inst = $jppr.datepick._getInst(event.target);
-		if ($jppr.datepick._get(inst, 'constrainInput')) {
-			var chars = $jppr.datepick._possibleChars(inst);
+		var inst = $.datepick._getInst(event.target);
+		if ($.datepick._get(inst, 'constrainInput')) {
+			var chars = $.datepick._possibleChars(inst);
 			var chr = String.fromCharCode(event.keyCode || event.charCode);
 			return inst.ctrlKey || (chr < ' ' || !chars || chars.indexOf(chr) > -1);
 		}
@@ -659,27 +659,27 @@ $jppr.extend(Datepick.prototype, {
 	   @param  event  (KeyEvent) the keystroke details
 	   @return  (boolean) true to continue */
 	_doKeyUp: function(event) {
-		var inst = $jppr.datepick._getInst(event.target);
+		var inst = $.datepick._getInst(event.target);
 		if (inst.input.val() != inst.lastVal) {
 			try {
-				var separator = ($jppr.datepick._get(inst, 'rangeSelect') ?
-					$jppr.datepick._get(inst, 'rangeSeparator') :
-					($jppr.datepick._get(inst, 'multiSelect') ?
-					$jppr.datepick._get(inst, 'multiSeparator') : ''));
+				var separator = ($.datepick._get(inst, 'rangeSelect') ?
+					$.datepick._get(inst, 'rangeSeparator') :
+					($.datepick._get(inst, 'multiSelect') ?
+					$.datepick._get(inst, 'multiSeparator') : ''));
 				var dates = (inst.input ? inst.input.val() : '');
 				dates = (separator ? dates.split(separator) : [dates]);
 				var ok = true;
 				for (var i = 0; i < dates.length; i++) {
-					if (!$jppr.datepick.parseDate($jppr.datepick._get(inst, 'dateFormat'),
-							dates[i], $jppr.datepick._getFormatConfig(inst))) {
+					if (!$.datepick.parseDate($.datepick._get(inst, 'dateFormat'),
+							dates[i], $.datepick._getFormatConfig(inst))) {
 						ok = false;
 						break;
 					}
 				}
 				if (ok) { // Only if valid
-					$jppr.datepick._setDateFromField(inst);
-					$jppr.datepick._updateAlternate(inst);
-					$jppr.datepick._updateDatepick(inst);
+					$.datepick._setDateFromField(inst);
+					$.datepick._updateAlternate(inst);
+					$.datepick._updateDatepick(inst);
 				}
 			}
 			catch (event) {
@@ -693,11 +693,11 @@ $jppr.extend(Datepick.prototype, {
 	   @param  inst  (object) the instance settings for this datepicker
 	   @return  (string) the set of characters allowed by this format */
 	_possibleChars: function (inst) {
-		var dateFormat = $jppr.datepick._get(inst, 'dateFormat');
-		var chars = ($jppr.datepick._get(inst, 'rangeSelect') ?
-			$jppr.datepick._get(inst, 'rangeSeparator') :
-			($jppr.datepick._get(inst, 'multiSelect') ?
-			$jppr.datepick._get(inst, 'multiSeparator') : ''));
+		var dateFormat = $.datepick._get(inst, 'dateFormat');
+		var chars = ($.datepick._get(inst, 'rangeSelect') ?
+			$.datepick._get(inst, 'rangeSeparator') :
+			($.datepick._get(inst, 'multiSelect') ?
+			$.datepick._get(inst, 'multiSeparator') : ''));
 		var literal = false;
 		// Check whether a format character is doubled
 		var lookAhead = function(match) {
@@ -736,28 +736,28 @@ $jppr.extend(Datepick.prototype, {
 	   @param  id         (string) the ID of the datepicker instance
 	   @param  timestamp  (number) the timestamp for this date */
 	_doMouseOver: function(td, id, timestamp) {
-		var inst = $jppr.datepick._getInst($jppr('#' + id)[0]);
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
-        var useFlicker = $jppr.datepick._get(inst, 'useFlicker');
-		$jppr(td).parents('.datepick-one-month').parent().find('td').
-			removeClass($jppr.datepick._dayOverClass[useTR]);
-		$jppr(td).addClass($jppr.datepick._dayOverClass[useTR]);
+		var inst = $.datepick._getInst($('#' + id)[0]);
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+        var useFlicker = $.datepick._get(inst, 'useFlicker');
+		$(td).parents('.datepick-one-month').parent().find('td').
+			removeClass($.datepick._dayOverClass[useTR]);
+		$(td).addClass($.datepick._dayOverClass[useTR]);
 
         /**
          * create turnover highlight
          */
-        var turnoverBeforeValue = $jppr.datepick._get(inst, 'turnoverBefore');
-        var turnoverAfterValue = $jppr.datepick._get(inst, 'turnoverAfter');
+        var turnoverBeforeValue = $.datepick._get(inst, 'turnoverBefore');
+        var turnoverAfterValue = $.datepick._get(inst, 'turnoverAfter');
         var iCounter = 0;
 
         var arrTurnover = new Array();
-        var tdStart = $jppr(td);
+        var tdStart = $(td);
         var tdPrev;
         var monthNotVisible;
-        var flickerEnabled = useFlicker && $jppr('.calendarSelector').attr('showLegend') == '1';
+        var flickerEnabled = useFlicker && $('.calendarSelector').attr('showLegend') == '1';
         var nrSel = 0;
         if(flickerEnabled) {
-            nrSel = parseInt($jppr('.calendarSelector').attr('nrSel'));
+            nrSel = parseInt($('.calendarSelector').attr('nrSel'));
         }
 
         if(tdStart.hasClass('availabledate')){
@@ -794,7 +794,7 @@ $jppr.extend(Datepick.prototype, {
             }
 
             if(inst.dates.length == 1 || flickerEnabled) {
-                tdStart = $jppr(td);
+                tdStart = $(td);
                 monthNotVisible = false;
                 var counterTotal = parseInt(turnoverAfterValue);
                 if(flickerEnabled){
@@ -827,7 +827,7 @@ $jppr.extend(Datepick.prototype, {
                         tdStart = tdStart.next();
                     }
                     if(iCounter < nrSel){
-                        tdStart.addClass($jppr.datepick._dayOverClass[useTR]);
+                        tdStart.addClass($.datepick._dayOverClass[useTR]);
                     }else {
                         tdStart.addClass('turnover turnoverAfter');
                     }
@@ -838,22 +838,22 @@ $jppr.extend(Datepick.prototype, {
                 arrTurnover[arrTurnover.length - 1].addClass('legend-mail').removeClass('turnoverAfter');
             }
 
-            $jppr(td).data('arrTurnover', arrTurnover);
+            $(td).data('arrTurnover', arrTurnover);
         }
 
-		if ($jppr.datepick._get(inst, 'highlightWeek'))
-			$jppr(td).parent().parent().find('tr').
-				removeClass($jppr.datepick._weekOverClass[useTR]).end().end().
-				addClass($jppr.datepick._weekOverClass[useTR]);
-		if ($jppr(td).text()) {
+		if ($.datepick._get(inst, 'highlightWeek'))
+			$(td).parent().parent().find('tr').
+				removeClass($.datepick._weekOverClass[useTR]).end().end().
+				addClass($.datepick._weekOverClass[useTR]);
+		if ($(td).text()) {
 			var date = new Date(timestamp);
-			if ($jppr.datepick._get(inst, 'showStatus')) {
-				var status = ($jppr.datepick._get(inst, 'statusForDate').apply(
+			if ($.datepick._get(inst, 'showStatus')) {
+				var status = ($.datepick._get(inst, 'statusForDate').apply(
 					(inst.input ? inst.input[0] : null), [date, inst]) ||
-					$jppr.datepick._get(inst, 'initStatus'));
+					$.datepick._get(inst, 'initStatus'));
                 if(useFlicker) {
                     /*TODO calendar legend*/
-                    if ($jppr('#' + inst.id).find('.datePicker').parent().parent().attr('showLegend') == '1') {
+                    if ($('#' + inst.id).find('.datePicker').parent().parent().attr('showLegend') == '1') {
                         status = status + '<br/>' +
                         '<div class="calendar-legend">' +
                         '<ul>' +
@@ -864,10 +864,10 @@ $jppr.extend(Datepick.prototype, {
                         '</div>';
                     }
                 }
-				$jppr('#' + $jppr.datepick._statusId[useTR] + id).html(status);
+				$('#' + $.datepick._statusId[useTR] + id).html(status);
 			}
-			if ($jppr.datepick._get(inst, 'onHover'))
-				$jppr.datepick._doHover(td, '#' + id, date.getFullYear(), date.getMonth());
+			if ($.datepick._get(inst, 'onHover'))
+				$.datepick._doHover(td, '#' + id, date.getFullYear(), date.getMonth());
 		}
 	},
 
@@ -875,23 +875,23 @@ $jppr.extend(Datepick.prototype, {
 	   @param  td  (element) the current cell
 	   @param  id  (string) the ID of the datepicker instance */
 	_doMouseOut: function(td, id) {
-		var inst = $jppr.datepick._getInst($jppr('#' + id)[0]);
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
-        var useFlicker = $jppr.datepick._get(inst, 'useFlicker');
-		$jppr(td).removeClass($jppr.datepick._dayOverClass[useTR]).
-			removeClass($jppr.datepick._weekOverClass[useTR]);
-        if ($jppr(td).data('arrTurnover')) {
-            var arrTurnover = $jppr(td).data('arrTurnover');
+		var inst = $.datepick._getInst($('#' + id)[0]);
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+        var useFlicker = $.datepick._get(inst, 'useFlicker');
+		$(td).removeClass($.datepick._dayOverClass[useTR]).
+			removeClass($.datepick._weekOverClass[useTR]);
+        if ($(td).data('arrTurnover')) {
+            var arrTurnover = $(td).data('arrTurnover');
             var lengthTurnover = arrTurnover.length,
                 elementTurnover = null;
-            $jppr(td).removeClass('legend-start');
+            $(td).removeClass('legend-start');
             for (var i = 0; i < lengthTurnover; i++) {
                 elementTurnover = arrTurnover[i];
                 elementTurnover.removeClass('turnover').
                     removeClass('turnoverBefore').
                     removeClass('turnoverAfter').
-                    removeClass($jppr.datepick._dayOverClass[useTR]).
-                    removeClass($jppr.datepick._weekOverClass[useTR]).
+                    removeClass($.datepick._dayOverClass[useTR]).
+                    removeClass($.datepick._weekOverClass[useTR]).
                     removeClass('legend-mail').
                     removeClass('legend-start');
             }
@@ -899,8 +899,8 @@ $jppr.extend(Datepick.prototype, {
 
         }
     if(useFlicker) {
-        var status = $jppr.datepick._get(inst, 'initStatus');
-        if ($jppr('.calendarSelector').attr('showLegend') == '1') {
+        var status = $.datepick._get(inst, 'initStatus');
+        if ($('.calendarSelector').attr('showLegend') == '1') {
             status = status + '<br/>' +
             '<div class="calendar-legend">' +
             '<ul>' +
@@ -909,14 +909,14 @@ $jppr.extend(Datepick.prototype, {
             '</ul>' +
             '</div>';
         }
-        if ($jppr.datepick._get(inst, 'showStatus'))
-            $jppr('#' + $jppr.datepick._statusId[useTR] + id).html(status);
+        if ($.datepick._get(inst, 'showStatus'))
+            $('#' + $.datepick._statusId[useTR] + id).html(status);
     }else {
-        if ($jppr.datepick._get(inst, 'showStatus'))
-            $jppr('#' + $jppr.datepick._statusId[useTR] + id).html($jppr.datepick._get(inst, 'initStatus'));
+        if ($.datepick._get(inst, 'showStatus'))
+            $('#' + $.datepick._statusId[useTR] + id).html($.datepick._get(inst, 'initStatus'));
     }
-		if ($jppr.datepick._get(inst, 'onHover'))
-			$jppr.datepick._doHover(td, '#' + id);
+		if ($.datepick._get(inst, 'onHover'))
+			$.datepick._doHover(td, '#' + id);
 	},
 
 	/* Hover over a particular day.
@@ -925,15 +925,15 @@ $jppr.extend(Datepick.prototype, {
 	   @param  year   (number) the year for this day
 	   @param  month  (number) the month for this day */
 	_doHover: function(td, id, year, month) {
-		var inst = $jppr.datepick._getInst($jppr(id)[0]);
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
-		if ($jppr(td).hasClass($jppr.datepick._unselectableClass[useTR]))
+		var inst = $.datepick._getInst($(id)[0]);
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+		if ($(td).hasClass($.datepick._unselectableClass[useTR]))
 			return;
-		var onHover = $jppr.datepick._get(inst, 'onHover');
+		var onHover = $.datepick._get(inst, 'onHover');
 		var date = (year ?
-			$jppr.datepick._daylightSavingAdjust(new Date(year, month, $jppr(td).text())) : null);
+			$.datepick._daylightSavingAdjust(new Date(year, month, $(td).text())) : null);
 		onHover.apply((inst.input ? inst.input[0] : null),
-			[(date ? $jppr.datepick._formatDate(inst, date) : ''), date, inst, td]);
+			[(date ? $.datepick._formatDate(inst, date) : ''), date, inst, td]);
 	},
 
 	/* Pop-up the date picker for a given input field.
@@ -941,105 +941,114 @@ $jppr.extend(Datepick.prototype, {
 	                  (event) if triggered by focus */
 	_showDatepick: function(input) {
 		input = input.target || input;
-		if ($jppr.datepick._isDisabledDatepick(input) || $jppr.datepick._lastInput == input) // Already here
+		if ($.datepick._isDisabledDatepick(input) || $.datepick._lastInput == input) // Already here
 			return;
-		var inst = $jppr.datepick._getInst(input);
-		if ($jppr.datepick._curInst &&  $jppr.datepick._curInst != inst) {
-			$jppr.datepick._curInst.dpDiv.stop(true, true);
+		var inst = $.datepick._getInst(input);
+		if ($.datepick._curInst &&  $.datepick._curInst != inst) {
+			$.datepick._curInst.dpDiv.stop(true, true);
 		}
-		var beforeShow = $jppr.datepick._get(inst, 'beforeShow');
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+		var beforeShow = $.datepick._get(inst, 'beforeShow');
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
 		extendRemove(inst.settings, (beforeShow ? beforeShow.apply(input, [input, inst]) : {}));
-		$jppr.datepick._datepickerShowing = true;
-		$jppr.datepick._lastInput = input;
-		$jppr.datepick._setDateFromField(inst);
-		if ($jppr.datepick._inDialog) // Hide cursor
+		$.datepick._datepickerShowing = true;
+		$.datepick._lastInput = input;
+		$.datepick._setDateFromField(inst);
+		if ($.datepick._inDialog) // Hide cursor
 			input.value = '';
-		if (!$jppr.datepick._pos) { // Position below input
-			$jppr.datepick._pos = $jppr.datepick._findPos(input);
-			$jppr.datepick._pos[1] += input.offsetHeight; // Add the height
+		if (!$.datepick._pos) { // Position below input
+			$.datepick._pos = $.datepick._findPos(input);
+			$.datepick._pos[1] += input.offsetHeight; // Add the height
 		}
 		var isFixed = false;
-		$jppr(input).parents().each(function() {
-			isFixed |= $jppr(this).css('position') == 'fixed';
+		$(input).parents().each(function() {
+			isFixed |= $(this).css('position') == 'fixed';
 			return !isFixed;
 		});
-		if (isFixed && $jppr.browser.opera) { // Correction for Opera when fixed and scrolled
-			$jppr.datepick._pos[0] -= document.documentElement.scrollLeft;
-			$jppr.datepick._pos[1] -= document.documentElement.scrollTop;
+		if (isFixed && $.browser.opera) { // Correction for Opera when fixed and scrolled
+			$.datepick._pos[0] -= document.documentElement.scrollLeft;
+			$.datepick._pos[1] -= document.documentElement.scrollTop;
 		}
-		var offset = {left: $jppr.datepick._pos[0], top: $jppr.datepick._pos[1]};
-		$jppr.datepick._pos = null;
+		var offset = {left: $.datepick._pos[0], top: $.datepick._pos[1]};
+		$.datepick._pos = null;
 		// Determine sizing offscreen
 		inst.dpDiv.css({position: 'absolute', display: 'block', top: '-1000px'});
-		$jppr.datepick._updateDatepick(inst);
+		$.datepick._updateDatepick(inst);
 		// Fix width for dynamic number of date pickers
-		inst.dpDiv.width($jppr.datepick._getNumberOfMonths(inst)[1] *
-			$jppr('.' + $jppr.datepick._oneMonthClass[useTR], inst.dpDiv).width(true));
+		inst.dpDiv.width($.datepick._getNumberOfMonths(inst)[1] *
+			$('.' + $.datepick._oneMonthClass[useTR], inst.dpDiv).width(true));
 
 		// And adjust position before showing
-		offset = $jppr.datepick._checkOffset(inst, offset, isFixed);
-		inst.dpDiv.css({position: ($jppr.datepick._inDialog && $jppr.blockUI ?
+		offset = $.datepick._checkOffset(inst, offset, isFixed);
+		inst.dpDiv.css({position: ($.datepick._inDialog && $.blockUI ?
 			'static' : (isFixed ? 'fixed' : 'absolute')), display: 'none',
 			left: offset.left + 'px', top: offset.top + 'px'});
 		if (!inst.inline) {
-			var showAnim = $jppr.datepick._get(inst, 'showAnim');
-			var duration = $jppr.datepick._get(inst, 'duration');
+			var showAnim = $.datepick._get(inst, 'showAnim');
+			var duration = $.datepick._get(inst, 'duration');
 			var postProcess = function() {
-				var borders = $jppr.datepick._getBorders(inst.dpDiv);
-				inst.dpDiv.find('iframe.' + $jppr.datepick._coverClass[useTR]). // IE6- only
+				var borders = $.datepick._getBorders(inst.dpDiv);
+				inst.dpDiv.find('iframe.' + $.datepick._coverClass[useTR]). // IE6- only
 					css({left: -borders[0], top: -borders[1],
 						width: inst.dpDiv.outerWidth(), height: inst.dpDiv.outerHeight()});
 			};
-			if ($jppr.effects && $jppr.effects[showAnim])
-				inst.dpDiv.show(showAnim, $jppr.datepick._get(inst, 'showOptions'), duration, postProcess);
+			if ($.effects && $.effects[showAnim])
+				inst.dpDiv.show(showAnim, $.datepick._get(inst, 'showOptions'), duration, postProcess);
 			else
 				inst.dpDiv[showAnim || 'show'](showAnim ? duration : '', postProcess);
 			if (!showAnim)
 				postProcess();
 			if (inst.input[0].type != 'hidden')
 				inst.input.focus();
-			$jppr.datepick._curInst = inst;
+			$.datepick._curInst = inst;
 		}
 	},
 
 	/* Generate the date picker content.
 	   @param  inst  (object) the instance settings for this datepicker */
 	_updateDatepick: function(inst) {
-		var borders = $jppr.datepick._getBorders($jppr('#'+inst.id +''));
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
-        $jppr('#'+inst.id +'').empty().append($jppr.datepick._generateHTML(inst)).
+		var borders = $.datepick._getBorders($('#'+inst.id +''));
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+        $('#'+inst.id +'').empty().append($.datepick._generateHTML(inst)).
 			css({left: -borders[0], top: -borders[1],
-				width: $jppr('#'+inst.id +'').outerWidth(), height: $jppr('#'+inst.id +'').outerHeight()});
-        $jppr('#'+inst.id +'').wrapInner("<div class='innerdpjppr'></div>");
-        $jppr('#'+inst.id +' .innerdpjppr').addClass(this._inlineClass[
-            $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0]);
+				width: $('#'+inst.id +'').outerWidth(), height: $('#'+inst.id +'').outerHeight()});
+        $('#'+inst.id +'').wrapInner("<div class='innerdpjppr'></div>");
+        $('#'+inst.id +' .innerdpjppr').addClass(this._inlineClass[
+            $.datepick._get(inst, 'useThemeRoller') ? 1 : 0]);
 
 
-		var numMonths = $jppr.datepick._getNumberOfMonths(inst);
+		var numMonths = $.datepick._getNumberOfMonths(inst);
 		if (!inst.inline)
-			inst.dpDiv.attr('id', $jppr.datepick._mainDivId[useTR]);
-        $jppr('#'+inst.id +'').removeClass($jppr.datepick._mainDivClass[1 - useTR]).
-			addClass($jppr.datepick._mainDivClass[useTR]).
-			removeClass($jppr.datepick._multiClass.join(' ')).
-			addClass(numMonths[0] != 1 || numMonths[1] != 1 ? $jppr.datepick._multiClass[useTR] : '').
-			removeClass($jppr.datepick._rtlClass.join(' ')).
-			addClass($jppr.datepick._get(inst, 'isRTL') ? $jppr.datepick._rtlClass[useTR] : '');
+			inst.dpDiv.attr('id', $.datepick._mainDivId[useTR]);
+        $('#'+inst.id +'').removeClass($.datepick._mainDivClass[1 - useTR]).
+			addClass($.datepick._mainDivClass[useTR]).
+			removeClass($.datepick._multiClass.join(' ')).
+			addClass(numMonths[0] != 1 || numMonths[1] != 1 ? $.datepick._multiClass[useTR] : '').
+			removeClass($.datepick._rtlClass.join(' ')).
+			addClass($.datepick._get(inst, 'isRTL') ? $.datepick._rtlClass[useTR] : '');
 
-		if (inst.input && inst.input[0].type != 'hidden' && inst == $jppr.datepick._curInst)
-			$jppr(inst.input).focus();
+		if (inst.input && inst.input[0].type != 'hidden' && inst == $.datepick._curInst)
+			$(inst.input).focus();
 
 
-        $jppr('#'+inst.id +' .innerdpjppr .datepick-one-month, #'+inst.id +' .innerdpjppr .ui-datepicker-group ').css('padding','2px');
+        $('#'+inst.id +' .innerdpjppr .datepick-one-month, #'+inst.id +' .innerdpjppr .ui-datepicker-group').css('padding','2px');
         var widthTotal = 20;
-        if($jppr('#'+inst.id +' .innerdpjppr .datepick-one-month').length > 0){
+        if($('#'+inst.id +' .innerdpjppr .datepick-one-month').length > 0){
             widthTotal = 5;
         }
 
-        $jppr('#'+inst.id +' .innerdpjppr .datepick-one-month, #'+inst.id +' .innerdpjppr .ui-datepicker-group').each(function(){
-            widthTotal+= $jppr(this).actual('outerWidth', { includeMargin : true });
+        $('#'+inst.id +' .innerdpjppr .datepick-one-month, #'+inst.id +' .innerdpjppr .ui-datepicker-group').each(function(){
+            widthTotal+= $(this).actual('outerWidth', { includeMargin : true });
         });
-        $jppr('#'+inst.id +' .innerdpjppr').css('width',widthTotal+'px');
+        $('#'+inst.id +' .innerdpjppr').css('width',widthTotal+'px');
+
+		if($('#'+inst.id +' .innerdpjppr .datepick-one-month').length > 0){
+			$('#' + inst.id + ' .innerdpjppr').parent().css('height', '245px');
+
+		}else {
+			$('#'+inst.id +' .innerdpjppr').parent().css('height','275px');
+			$('#'+inst.id +' .innerdpjppr').parent().css('margin-bottom','40px');
+		}
+
 	},
 
 	/* Retrieve the size of left and top borders for an element.
@@ -1060,23 +1069,23 @@ $jppr.extend(Datepick.prototype, {
 	   @param  isFixed  (boolean) true if control or a parent is 'fixed' in position
 	   @return  (object) the updated offset for the datepicker */
 	_checkOffset: function(inst, offset, isFixed) {
-		var alignment = $jppr.datepick._get(inst, 'alignment');
-		var isRTL = $jppr.datepick._get(inst, 'isRTL');
-		var pos = inst.input ? $jppr.datepick._findPos(inst.input[0]) : null;
+		var alignment = $.datepick._get(inst, 'alignment');
+		var isRTL = $.datepick._get(inst, 'isRTL');
+		var pos = inst.input ? $.datepick._findPos(inst.input[0]) : null;
 		var browserWidth = document.documentElement.clientWidth;
 		var browserHeight = document.documentElement.clientHeight;
 		if (browserWidth == 0)
 			return offset;
 		var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
 		var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
-		var above = pos[1] - ($jppr.datepick._inDialog ? 0 : $jppr('#'+inst.id +'').outerHeight()) -
-			(isFixed && $jppr.browser.opera ? document.documentElement.scrollTop : 0);
+		var above = pos[1] - ($.datepick._inDialog ? 0 : $('#'+inst.id +'').outerHeight()) -
+			(isFixed && $.browser.opera ? document.documentElement.scrollTop : 0);
 		var below = offset.top;
 		var alignL = offset.left;
-		var alignR = pos[0] + (inst.input ? inst.input.outerWidth() : 0) - $jppr('#'+inst.id +'').outerWidth() -
-			(isFixed && $jppr.browser.opera ? document.documentElement.scrollLeft : 0);
-		var tooWide = (offset.left + $jppr('#'+inst.id +'').outerWidth() - scrollX) > browserWidth;
-		var tooHigh = (offset.top + $jppr('#'+inst.id +'').outerHeight() - scrollY) > browserHeight;
+		var alignR = pos[0] + (inst.input ? inst.input.outerWidth() : 0) - $('#'+inst.id +'').outerWidth() -
+			(isFixed && $.browser.opera ? document.documentElement.scrollLeft : 0);
+		var tooWide = (offset.left + $('#'+inst.id +'').outerWidth() - scrollX) > browserWidth;
+		var tooHigh = (offset.top + $('#'+inst.id +'').outerHeight() - scrollY) > browserHeight;
 		if (alignment == 'topLeft') {
 			offset = {left: alignL, top: above};
 		}
@@ -1108,7 +1117,7 @@ $jppr.extend(Datepick.prototype, {
         while (elem && (elem.type == 'hidden' || elem.nodeType != 1)) {
             elem = elem.nextSibling;
         }
-        var position = $jppr(elem).offset();
+        var position = $(elem).offset();
 	    return [position.left, position.top];
 	},
 
@@ -1116,44 +1125,44 @@ $jppr.extend(Datepick.prototype, {
 	   @param  input      (element) the input field attached to the date picker
 	   @param  immediate  (boolean) true to close immediately */
 	_hideDatepick: function(input, immediate) {
-		var inst = $jppr.datepick._curInst;
-		if (!inst || (input && inst != $jppr.data(document.body, PROP_NAME + input.id)))
+		var inst = $.datepick._curInst;
+		if (!inst || (input && inst != $.data(top.document.body, PROP_NAME + input.id)))
 			return false;
-		var rangeSelect = $jppr.datepick._get(inst, 'rangeSelect');
+		var rangeSelect = $.datepick._get(inst, 'rangeSelect');
 		if (rangeSelect && inst.stayOpen)
-			$jppr.datepick._updateInput('#' + inst.id);
+			$.datepick._updateInput('#' + inst.id);
 		inst.stayOpen = false;
-		if ($jppr.datepick._datepickerShowing) {
-			var showAnim = (immediate ? '' : $jppr.datepick._get(inst, 'showAnim'));
-			var duration = $jppr.datepick._get(inst, 'duration');
+		if ($.datepick._datepickerShowing) {
+			var showAnim = (immediate ? '' : $.datepick._get(inst, 'showAnim'));
+			var duration = $.datepick._get(inst, 'duration');
 			var postProcess = function() {
-				$jppr.datepick._tidyDialog(inst);
-				$jppr.datepick._curInst = null;
+				$.datepick._tidyDialog(inst);
+				$.datepick._curInst = null;
 			};
-			if ($jppr.effects && $jppr.effects[showAnim])
-                $jppr('#'+inst.id +'').hide(showAnim, $jppr.datepick._get(inst, 'showOptions'),
+			if ($.effects && $.effects[showAnim])
+                $('#'+inst.id +'').hide(showAnim, $.datepick._get(inst, 'showOptions'),
 					duration, postProcess);
 			else
-                $jppr('#'+inst.id +'')[(showAnim == 'slideDown' ? 'slideUp' : (showAnim == 'fadeIn' ?
+                $('#'+inst.id +'')[(showAnim == 'slideDown' ? 'slideUp' : (showAnim == 'fadeIn' ?
 					'fadeOut' : 'hide'))](showAnim ? duration : '', postProcess);
 			if (duration == '')
 				postProcess();
-			var onClose = $jppr.datepick._get(inst, 'onClose');
+			var onClose = $.datepick._get(inst, 'onClose');
 			if (onClose)  // Trigger custom callback
 				onClose.apply((inst.input ? inst.input[0] : null),
-					[(inst.input ? inst.input.val() : ''), $jppr.datepick._getDate(inst), inst]);
-			$jppr.datepick._datepickerShowing = false;
-			$jppr.datepick._lastInput = null;
+					[(inst.input ? inst.input.val() : ''), $.datepick._getDate(inst), inst]);
+			$.datepick._datepickerShowing = false;
+			$.datepick._lastInput = null;
 			inst.settings.prompt = null;
-			if ($jppr.datepick._inDialog) {
-				$jppr.datepick._dialogInput.css({ position: 'absolute', left: '0', top: '-100px' });
-                $jppr('#'+inst.id +'').removeClass($jppr.datepick._dialogClass[$jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0]);
-				if ($jppr.blockUI) {
-					$jppr.unblockUI();
-					$jppr('body').append(this.dpDiv);
+			if ($.datepick._inDialog) {
+				$.datepick._dialogInput.css({ position: 'absolute', left: '0', top: '-100px' });
+                $('#'+inst.id +'').removeClass($.datepick._dialogClass[$.datepick._get(inst, 'useThemeRoller') ? 1 : 0]);
+				if ($.blockUI) {
+					$.unblockUI();
+					$('body').append(this.dpDiv);
 				}
 			}
-			$jppr.datepick._inDialog = false;
+			$.datepick._inDialog = false;
 		}
 		return false;
 	},
@@ -1161,23 +1170,23 @@ $jppr.extend(Datepick.prototype, {
 	/* Tidy up after a dialog display.
 	   @param  inst  (object) the instance settings for this datepicker */
 	_tidyDialog: function(inst) {
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
-        $jppr('#'+inst.id +'').removeClass($jppr.datepick._dialogClass[useTR]).unbind('.datepick');
-		$jppr('#'+inst.id +' ' + '.' + $jppr.datepick._promptClass[useTR]).remove();
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+        $('#'+inst.id +'').removeClass($.datepick._dialogClass[useTR]).unbind('.datepick');
+		$('#'+inst.id +' ' + '.' + $.datepick._promptClass[useTR]).remove();
 	},
 
 	/* Close date picker if clicked elsewhere.
 	   @param  event  (MouseEvent) the mouse click to check */
 	_checkExternalClick: function(event) {
-		if (!$jppr.datepick._curInst)
+		if (!$.datepick._curInst)
 			return;
-		var $target = $jppr(event.target);
-		var useTR = $jppr.datepick._get($jppr.datepick._curInst, 'useThemeRoller') ? 1 : 0;
-		if (!$target.parents().andSelf().is('#' + $jppr.datepick._mainDivId[useTR]) &&
-				!$target.hasClass($jppr.datepick.markerClassName) &&
-				!$target.parents().andSelf().hasClass($jppr.datepick._triggerClass[useTR]) &&
-				$jppr.datepick._datepickerShowing && !($jppr.datepick._inDialog && $jppr.blockUI))
-			$jppr.datepick._hideDatepick();
+		var $target = $(event.target);
+		var useTR = $.datepick._get($.datepick._curInst, 'useThemeRoller') ? 1 : 0;
+		if (!$target.parents().andSelf().is('#' + $.datepick._mainDivId[useTR]) &&
+				!$target.hasClass($.datepick.markerClassName) &&
+				!$target.parents().andSelf().hasClass($.datepick._triggerClass[useTR]) &&
+				$.datepick._datepickerShowing && !($.datepick._inDialog && $.blockUI))
+			$.datepick._hideDatepick();
 	},
 
 	/* Adjust one of the date sub-fields.
@@ -1185,25 +1194,25 @@ $jppr.extend(Datepick.prototype, {
 	   @param  offset  (number) the amount to change by
 	   @param  period  (string) 'D' for days, 'M' for months, 'Y' for years */
 	_adjustDate: function(id, offset, period) {
-		var inst = $jppr.datepick._getInst($jppr(id)[0]);
-		$jppr.datepick._adjustInstDate(inst, offset, period);
-		$jppr.datepick._updateDatepick(inst);
+		var inst = $.datepick._getInst($(id)[0]);
+		$.datepick._adjustInstDate(inst, offset, period);
+		$.datepick._updateDatepick(inst);
 		return false;
 	},
 
 	/* Show the month for today or the current selection.
 	   @param  id  (string) the ID of the target field */
 	_gotoToday: function(id) {
-		var target = $jppr(id);
-		var inst = $jppr.datepick._getInst(target[0]);
-		if ($jppr.datepick._get(inst, 'gotoCurrent') && inst.dates[0])
+		var target = $(id);
+		var inst = $.datepick._getInst(target[0]);
+		if ($.datepick._get(inst, 'gotoCurrent') && inst.dates[0])
 			inst.cursorDate = new Date(inst.dates[0].getTime());
 		else
-			inst.cursorDate = $jppr.datepick._daylightSavingAdjust(new Date());
+			inst.cursorDate = $.datepick._daylightSavingAdjust(new Date());
 		inst.drawMonth = inst.cursorDate.getMonth();
 		inst.drawYear = inst.cursorDate.getFullYear();
-		$jppr.datepick._notifyChange(inst);
-		$jppr.datepick._adjustDate(target);
+		$.datepick._notifyChange(inst);
+		$.datepick._adjustDate(target);
 		return false;
 	},
 
@@ -1212,11 +1221,11 @@ $jppr.extend(Datepick.prototype, {
 	   @param  select  (element) the select being chosen from
 	   @param  period  (string) 'M' for month, 'Y' for year */
 	_selectMonthYear: function(id, select, period) {
-		var target = $jppr(id);
-		var inst = $jppr.datepick._getInst(target[0]);
+		var target = $(id);
+		var inst = $.datepick._getInst(target[0]);
 		inst.selectingMonthYear = false;
 		var value = parseInt(select.options[select.selectedIndex].value, 10);
-		inst.drawMonth -= $jppr.datepick._get(inst, 'showCurrentAtPos');
+		inst.drawMonth -= $.datepick._get(inst, 'showCurrentAtPos');
 		if (inst.drawMonth < 0) {
 			inst.drawMonth += 12;
 			inst.drawYear--;
@@ -1224,16 +1233,16 @@ $jppr.extend(Datepick.prototype, {
 		inst['selected' + (period == 'M' ? 'Month' : 'Year')] =
 		inst['draw' + (period == 'M' ? 'Month' : 'Year')] = value;
 		inst.cursorDate.setDate(Math.min(inst.cursorDate.getDate(),
-			$jppr.datepick._getDaysInMonth(inst.drawYear, inst.drawMonth)));
+			$.datepick._getDaysInMonth(inst.drawYear, inst.drawMonth)));
 		inst.cursorDate['set' + (period == 'M' ? 'Month' : 'FullYear')](value);
-		$jppr.datepick._notifyChange(inst);
-		$jppr.datepick._adjustDate(target);
+		$.datepick._notifyChange(inst);
+		$.datepick._adjustDate(target);
 	},
 
 	/* Restore input focus after not changing month/year.
 	   @param  id  (string) the ID of the target field */
 	_clickMonthYear: function(id) {
-		var inst = $jppr.datepick._getInst($jppr(id)[0]);
+		var inst = $.datepick._getInst($(id)[0]);
 		if (inst.input && inst.selectingMonthYear && !ie)
 			inst.input.focus();
 		inst.selectingMonthYear = !inst.selectingMonthYear;
@@ -1243,9 +1252,9 @@ $jppr.extend(Datepick.prototype, {
 	   @param  id   (string) the ID of the target field
 	   @param  day  (number) the number of the first day, 0 = Sun, 1 = Mon, ... */
 	_changeFirstDay: function(id, day) {
-		var inst = $jppr.datepick._getInst($jppr(id)[0]);
+		var inst = $.datepick._getInst($(id)[0]);
 		inst.settings.firstDay = day;
-		$jppr.datepick._updateDatepick(inst);
+		$.datepick._updateDatepick(inst);
 		return false;
 	},
 
@@ -1254,31 +1263,31 @@ $jppr.extend(Datepick.prototype, {
 	   @param  id         (string) the ID of the target field
 	   @param  timestamp  (number) the timestamp for this day */
 	_selectDay: function(td, id, timestamp) {
-		var inst = $jppr.datepick._getInst($jppr(id)[0]);
+		var inst = $.datepick._getInst($(id)[0]);
         	inst.curMonth = inst.drawMonth;
         	inst.curYear = inst.drawYear;
 
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
-		//if ($jppr(td).hasClass($jppr.datepick._unselectableClass[useTR]))
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+		//if ($(td).hasClass($.datepick._unselectableClass[useTR]))
 		//	return false;
-		var onDayClick = $jppr.datepick._get(inst, 'onDayClick');
+		var onDayClick = $.datepick._get(inst, 'onDayClick');
 		if (onDayClick){
 			var checkReturn = onDayClick.apply((inst.input ? inst.input[0] : null), [new Date(timestamp), inst, td]);
 			if (checkReturn === false) return false;
 		}
-		var rangeSelect = $jppr.datepick._get(inst, 'rangeSelect');
-		var multiSelect = $jppr.datepick._get(inst, 'multiSelect');
+		var rangeSelect = $.datepick._get(inst, 'rangeSelect');
+		var multiSelect = $.datepick._get(inst, 'multiSelect');
 		if (rangeSelect)
 			inst.stayOpen = !inst.stayOpen;
 		else if (multiSelect)
 			inst.stayOpen = true;
 
         if (inst.stayOpen) {
-			$jppr('#'+inst.id+' .datepick td').removeClass($jppr.datepick._selectedClass[useTR]);
-			$jppr(td).addClass($jppr.datepick._selectedClass[useTR]);
+			$('#'+inst.id+' .datepick td').removeClass($.datepick._selectedClass[useTR]);
+			$(td).addClass($.datepick._selectedClass[useTR]);
 		}
 
-		inst.cursorDate = $jppr.datepick._daylightSavingAdjust(new Date(timestamp));
+		inst.cursorDate = $.datepick._daylightSavingAdjust(new Date(timestamp));
 		var date = new Date(inst.cursorDate.getTime());
 		if (rangeSelect && !inst.stayOpen)
 			inst.dates[1] = date;
@@ -1301,9 +1310,9 @@ $jppr.extend(Datepick.prototype, {
 		}
 		else
 			inst.dates = [date];
-		$jppr.datepick._updateInput('#' + inst.id, true);
+		$.datepick._updateInput('#' + inst.id, true);
 		if (inst.stayOpen || inst.inline){
-			$jppr.datepick._updateDatepick(inst);
+			$.datepick._updateDatepick(inst);
         	}
 		return false;
 	},
@@ -1311,14 +1320,14 @@ $jppr.extend(Datepick.prototype, {
 	/* Erase the input field and hide the date picker.
 	   @param  id  (string) the ID of the target field */
 	_clearDate: function(id) {
-		var target = $jppr(id);
-		var inst = $jppr.datepick._getInst(target[0]);
-		if ($jppr.datepick._get(inst, 'mandatory'))
+		var target = $(id);
+		var inst = $.datepick._getInst(target[0]);
+		if ($.datepick._get(inst, 'mandatory'))
 			return false;
 		inst.stayOpen = false;
-		inst.dates = ($jppr.datepick._get(inst, 'showDefault') ?
-			[$jppr.datepick._getDefaultDate(inst)] : []);
-		$jppr.datepick._updateInput(target);
+		inst.dates = ($.datepick._get(inst, 'showDefault') ?
+			[$.datepick._getDefaultDate(inst)] : []);
+		$.datepick._updateInput(target);
 		return false;
 	},
 
@@ -1327,23 +1336,23 @@ $jppr.extend(Datepick.prototype, {
 	                       (element) the target object
 	   @param  dontUpdate  (boolean, optional) true to not update display */
 	_updateInput: function(id, dontUpdate) {
-		var inst = $jppr.datepick._getInst($jppr(id)[0]);
-		var dateStr = $jppr.datepick._showDate(inst);
-		$jppr.datepick._updateAlternate(inst);
-		var onSelect = $jppr.datepick._get(inst, 'onSelect');
+		var inst = $.datepick._getInst($(id)[0]);
+		var dateStr = $.datepick._showDate(inst);
+		$.datepick._updateAlternate(inst);
+		var onSelect = $.datepick._get(inst, 'onSelect');
 		if (onSelect)
 			onSelect.apply((inst.input ? inst.input[0] : null),
-				[dateStr, $jppr.datepick._getDate(inst), inst]);  // Trigger custom callback
+				[dateStr, $.datepick._getDate(inst), inst]);  // Trigger custom callback
 		else if (inst.input)
 			inst.input.trigger('change'); // Fire the change event
         if (inst.inline && !dontUpdate)
-			$jppr.datepick._updateDatepick(inst);
+			$.datepick._updateDatepick(inst);
 		else if (!inst.stayOpen) {
-			$jppr.datepick._hideDatepick();
-			$jppr.datepick._lastInput = inst.input[0];
+			$.datepick._hideDatepick();
+			$.datepick._lastInput = inst.input[0];
 			if (typeof(inst.input[0]) != 'object')
 				inst.input.focus(); // Restore focus
-			$jppr.datepick._lastInput = null;
+			$.datepick._lastInput = null;
 		}
 		return false;
 	},
@@ -1354,15 +1363,15 @@ $jppr.extend(Datepick.prototype, {
 	_showDate: function(inst) {
 		var dateStr = '';
 		if (inst.input) {
-			dateStr = (inst.dates.length == 0 ? '' : $jppr.datepick._formatDate(inst, inst.dates[0]));
+			dateStr = (inst.dates.length == 0 ? '' : $.datepick._formatDate(inst, inst.dates[0]));
 			if (dateStr) {
-				if ($jppr.datepick._get(inst, 'rangeSelect'))
-					dateStr += $jppr.datepick._get(inst, 'rangeSeparator') +
-						$jppr.datepick._formatDate(inst, inst.dates[1] || inst.dates[0]);
-				else if ($jppr.datepick._get(inst, 'multiSelect'))
+				if ($.datepick._get(inst, 'rangeSelect'))
+					dateStr += $.datepick._get(inst, 'rangeSeparator') +
+						$.datepick._formatDate(inst, inst.dates[1] || inst.dates[0]);
+				else if ($.datepick._get(inst, 'multiSelect'))
 					for (var i = 1; i < inst.dates.length; i++)
-						dateStr += $jppr.datepick._get(inst, 'multiSeparator') +
-							$jppr.datepick._formatDate(inst, inst.dates[i]);
+						dateStr += $.datepick._get(inst, 'multiSeparator') +
+							$.datepick._formatDate(inst, inst.dates[i]);
 			}
 			inst.input.val(dateStr);
 		}
@@ -1372,19 +1381,19 @@ $jppr.extend(Datepick.prototype, {
 	/* Update any alternate field to synchronise with the main field.
 	   @param  inst  (object) the instance settings for this datepicker */
 	_updateAlternate: function(inst) {
-		var altField = $jppr.datepick._get(inst, 'altField');
+		var altField = $.datepick._get(inst, 'altField');
 		if (altField) { // Update alternate field too
-			var altFormat = $jppr.datepick._get(inst, 'altFormat') || $jppr.datepick._get(inst, 'dateFormat');
-			var settings = $jppr.datepick._getFormatConfig(inst);
+			var altFormat = $.datepick._get(inst, 'altFormat') || $.datepick._get(inst, 'dateFormat');
+			var settings = $.datepick._getFormatConfig(inst);
 			var dateStr = this.formatDate(altFormat, inst.dates[0], settings);
-			if (dateStr && $jppr.datepick._get(inst, 'rangeSelect'))
-				dateStr += $jppr.datepick._get(inst, 'rangeSeparator') + this.formatDate(
+			if (dateStr && $.datepick._get(inst, 'rangeSelect'))
+				dateStr += $.datepick._get(inst, 'rangeSeparator') + this.formatDate(
 					altFormat, inst.dates[1] || inst.dates[0], settings);
-			else if ($jppr.datepick._get(inst, 'multiSelect'))
+			else if ($.datepick._get(inst, 'multiSelect'))
 				for (var i = 1; i < inst.dates.length; i++)
-					dateStr += $jppr.datepick._get(inst, 'multiSeparator') +
+					dateStr += $.datepick._get(inst, 'multiSeparator') +
 						this.formatDate(altFormat, inst.dates[i], settings);
-			$jppr(altField).val(dateStr);
+			$(altField).val(dateStr);
 		}
 	},
 
@@ -1413,8 +1422,8 @@ $jppr.extend(Datepick.prototype, {
 	   @param  inst  (object) the current datepicker instance
 	   @return  (string) the status display text for this date */
 	dateStatus: function(date, inst) {
-		return $jppr.datepick.formatDate($jppr.datepick._get(inst, 'dateStatus'),
-			date, $jppr.datepick._getFormatConfig(inst));
+		return $.datepick.formatDate($.datepick._get(inst, 'dateStatus'),
+			date, $.datepick._getFormatConfig(inst));
 	},
 
 	/* Parse a string value into a date object.
@@ -1435,13 +1444,13 @@ $jppr.extend(Datepick.prototype, {
 		if (value == '')
 			return null;
 		settings = settings || {};
-		var shortYearCutoff = settings.shortYearCutoff || $jppr.datepick._defaults.shortYearCutoff;
+		var shortYearCutoff = settings.shortYearCutoff || $.datepick._defaults.shortYearCutoff;
 		shortYearCutoff = (typeof shortYearCutoff != 'string' ? shortYearCutoff :
 			new Date().getFullYear() % 100 + parseInt(shortYearCutoff, 10));
-		var dayNamesShort = settings.dayNamesShort || $jppr.datepick._defaults.dayNamesShort;
-		var dayNames = settings.dayNames || $jppr.datepick._defaults.dayNames;
-		var monthNamesShort = settings.monthNamesShort || $jppr.datepick._defaults.monthNamesShort;
-		var monthNames = settings.monthNames || $jppr.datepick._defaults.monthNames;
+		var dayNamesShort = settings.dayNamesShort || $.datepick._defaults.dayNamesShort;
+		var dayNames = settings.dayNames || $.datepick._defaults.dayNames;
+		var monthNamesShort = settings.monthNamesShort || $.datepick._defaults.monthNamesShort;
+		var monthNames = settings.monthNames || $.datepick._defaults.monthNames;
 		var year = -1;
 		var month = -1;
 		var day = -1;
@@ -1520,7 +1529,7 @@ $jppr.extend(Datepick.prototype, {
 						day = date.getDate();
 						break;
 					case '!':
-						var date = new Date((getNumber('!') - $jppr.datepick._ticksTo1970) / 10000);
+						var date = new Date((getNumber('!') - $.datepick._ticksTo1970) / 10000);
 						year = date.getFullYear();
 						month = date.getMonth() + 1;
 						day = date.getDate();
@@ -1546,14 +1555,14 @@ $jppr.extend(Datepick.prototype, {
 			month = 1;
 			day = doy;
 			do {
-				var dim = $jppr.datepick._getDaysInMonth(year, month - 1);
+				var dim = $.datepick._getDaysInMonth(year, month - 1);
 				if (day <= dim)
 					break;
 				month++;
 				day -= dim;
 			} while (true);
 		}
-		var date = $jppr.datepick._daylightSavingAdjust(new Date(year, month - 1, day));
+		var date = $.datepick._daylightSavingAdjust(new Date(year, month - 1, day));
 		if (date.getFullYear() != year || date.getMonth() + 1 != month || date.getDate() != day)
 			throw 'Invalid date';
 		return date;
@@ -1609,11 +1618,11 @@ $jppr.extend(Datepick.prototype, {
 		if (!date)
 			return '';
 		settings = settings || {};
-		var dayNamesShort = settings.dayNamesShort || $jppr.datepick._defaults.dayNamesShort;
-		var dayNames = settings.dayNames || $jppr.datepick._defaults.dayNames;
-		var monthNamesShort = settings.monthNamesShort || $jppr.datepick._defaults.monthNamesShort;
-		var monthNames = settings.monthNames || $jppr.datepick._defaults.monthNames;
-		var calculateWeek = settings.calculateWeek || $jppr.datepick._defaults.calculateWeek;
+		var dayNamesShort = settings.dayNamesShort || $.datepick._defaults.dayNamesShort;
+		var dayNames = settings.dayNames || $.datepick._defaults.dayNames;
+		var monthNamesShort = settings.monthNamesShort || $.datepick._defaults.monthNamesShort;
+		var monthNames = settings.monthNames || $.datepick._defaults.monthNames;
+		var calculateWeek = settings.calculateWeek || $.datepick._defaults.calculateWeek;
 		// Check whether a format character is doubled
 		var lookAhead = function(match) {
 			var matches = (iFormat + 1 < format.length && format.charAt(iFormat + 1) == match);
@@ -1671,7 +1680,7 @@ $jppr.extend(Datepick.prototype, {
 							output += date.getTime();
 							break;
 						case '!':
-							output += date.getTime() * 10000 + $jppr.datepick._ticksTo1970;
+							output += date.getTime() * 10000 + $.datepick._ticksTo1970;
 							break;
 						case "'":
 							if (lookAhead("'"))
@@ -1692,21 +1701,21 @@ $jppr.extend(Datepick.prototype, {
 	   @return  (any) the property's value */
 	_get: function(inst, name) {
 		return inst.settings[name] !== undefined ?
-			inst.settings[name] : $jppr.datepick._defaults[name];
+			inst.settings[name] : $.datepick._defaults[name];
 	},
 
 	/* Parse existing date and initialise date picker.
 	   @param  inst  (object) the instance settings for this datepicker */
 	_setDateFromField: function(inst) {
-		var dateFormat = $jppr.datepick._get(inst, 'dateFormat');
-		var rangeSelect = $jppr.datepick._get(inst, 'rangeSelect');
-		var multiSelect = $jppr.datepick._get(inst, 'multiSelect');
+		var dateFormat = $.datepick._get(inst, 'dateFormat');
+		var rangeSelect = $.datepick._get(inst, 'rangeSelect');
+		var multiSelect = $.datepick._get(inst, 'multiSelect');
 		inst.lastVal = (inst.input ? inst.input.val() : '');
 		var dates = inst.lastVal;
-		dates = (rangeSelect ? dates.split($jppr.datepick._get(inst, 'rangeSeparator')) :
-			(multiSelect ? dates.split($jppr.datepick._get(inst, 'multiSeparator')) : [dates]));
+		dates = (rangeSelect ? dates.split($.datepick._get(inst, 'rangeSeparator')) :
+			(multiSelect ? dates.split($.datepick._get(inst, 'multiSeparator')) : [dates]));
 		inst.dates = [];
-		var settings = $jppr.datepick._getFormatConfig(inst);
+		var settings = $.datepick._getFormatConfig(inst);
 		for (var i = 0; i < dates.length; i++)
 			try {
 				inst.dates[i] = this.parseDate(dateFormat, dates[i], settings);
@@ -1721,18 +1730,18 @@ $jppr.extend(Datepick.prototype, {
 			inst.dates[1] = inst.dates[0];
 		if (multiSelect && inst.dates.length > multiSelect)
 			inst.dates.splice(multiSelect, inst.dates.length);
-		inst.cursorDate = new Date((inst.dates[0] || $jppr.datepick._getDefaultDate(inst)).getTime());
+		inst.cursorDate = new Date((inst.dates[0] || $.datepick._getDefaultDate(inst)).getTime());
 		inst.drawMonth = inst.cursorDate.getMonth();
 		inst.drawYear = inst.cursorDate.getFullYear();
-		$jppr.datepick._adjustInstDate(inst);
+		$.datepick._adjustInstDate(inst);
 	},
 
 	/* Retrieve the default date shown on opening.
 	   @param  inst  (object) the instance settings for this datepicker
 	   @return  (Date) the default date */
 	_getDefaultDate: function(inst) {
-		return $jppr.datepick._restrictMinMax(inst,
-			$jppr.datepick._determineDate(inst, $jppr.datepick._get(inst, 'defaultDate'), new Date()));
+		return $.datepick._restrictMinMax(inst,
+			$.datepick._determineDate(inst, $.datepick._get(inst, 'defaultDate'), new Date()));
 	},
 
 	/* A date may be specified as an exact value or a relative one.
@@ -1748,14 +1757,14 @@ $jppr.extend(Datepick.prototype, {
 		};
 		var offsetString = function(offset) {
 			try {
-				return $jppr.datepick.parseDate($jppr.datepick._get(inst, 'dateFormat'),
-					offset, $jppr.datepick._getFormatConfig(inst));
+				return $.datepick.parseDate($.datepick._get(inst, 'dateFormat'),
+					offset, $.datepick._getFormatConfig(inst));
 			}
 			catch (e) {
 				// Ignore
 			}
 			var date = (offset.toLowerCase().match(/^c/) ?
-				$jppr.datepick._getDate(inst) : null) || new Date();
+				$.datepick._getDate(inst) : null) || new Date();
 			var year = date.getFullYear();
 			var month = date.getMonth();
 			var day = date.getDate();
@@ -1769,11 +1778,11 @@ $jppr.extend(Datepick.prototype, {
 						day += parseInt(matches[1], 10) * 7; break;
 					case 'm':
 						month += parseInt(matches[1], 10);
-						day = Math.min(day, $jppr.datepick._getDaysInMonth(year, month));
+						day = Math.min(day, $.datepick._getDaysInMonth(year, month));
 						break;
 					case 'y':
 						year += parseInt(matches[1], 10);
-						day = Math.min(day, $jppr.datepick._getDaysInMonth(year, month));
+						day = Math.min(day, $.datepick._getDaysInMonth(year, month));
 						break;
 				}
 				matches = pattern.exec(offset.toLowerCase());
@@ -1791,7 +1800,7 @@ $jppr.extend(Datepick.prototype, {
 			date.setSeconds(0);
 			date.setMilliseconds(0);
 		}
-		return $jppr.datepick._daylightSavingAdjust(date);
+		return $.datepick._daylightSavingAdjust(date);
 	},
 
 	/* Handle switch to/from daylight saving.
@@ -1806,13 +1815,13 @@ $jppr.extend(Datepick.prototype, {
 		return date;
 	},
     _selectDateTdDatepick: function(target, date) {
-        var inst = $jppr.datepick._getInst(target);
-        if (inst /*&& (date.getTime() in $jppr.datepick._tdDates)*/) {
-            if($jppr('#' + inst.id + ' td[itime="'+date.getTime()+'"]')){
-                $jppr.datepick._selectDay($jppr('#' + inst.id + ' td[itime="'+date.getTime()+'"]'),'#' + inst.id, date.getTime());
-                //$jppr.datepick._notifyChange(inst);
-                $jppr.datepick._adjustInstDate(inst);
-                //$jppr.datepick._showDate(inst);
+        var inst = $.datepick._getInst(target);
+        if (inst /*&& (date.getTime() in $.datepick._tdDates)*/) {
+            if($('#' + inst.id + ' td[itime="'+date.getTime()+'"]')){
+                $.datepick._selectDay($('#' + inst.id + ' td[itime="'+date.getTime()+'"]'),'#' + inst.id, date.getTime());
+                //$.datepick._notifyChange(inst);
+                $.datepick._adjustInstDate(inst);
+                //$.datepick._showDate(inst);
             }
         }
     },
@@ -1830,7 +1839,7 @@ $jppr.extend(Datepick.prototype, {
 		var origMonth = inst.cursorDate.getMonth();
 		var origYear = inst.cursorDate.getFullYear();
 		inst.dates = (date.length == 0 ? [] :
-			[$jppr.datepick._restrictMinMax(inst, $jppr.datepick._determineDate(inst, date[0], new Date()))]);
+			[$.datepick._restrictMinMax(inst, $.datepick._determineDate(inst, date[0], new Date()))]);
 		inst.cursorDate = (date.length == 0 ? new Date() :
 			new Date(inst.dates[0].getTime()));
 		if(inst.curMonth){
@@ -1843,18 +1852,18 @@ $jppr.extend(Datepick.prototype, {
 		}else{
 			inst.drawYear = inst.cursorDate.getFullYear();
 		}
-		if ($jppr.datepick._get(inst, 'rangeSelect')) {
+		if ($.datepick._get(inst, 'rangeSelect')) {
 			if (date.length > 0)
 				inst.dates[1] = (date.length < 1 ? inst.dates[0] :
-					$jppr.datepick._restrictMinMax(inst, $jppr.datepick._determineDate(inst, date[1], null)));
+					$.datepick._restrictMinMax(inst, $.datepick._determineDate(inst, date[1], null)));
 		}
-		else if ($jppr.datepick._get(inst, 'multiSelect'))
+		else if ($.datepick._get(inst, 'multiSelect'))
 			for (var i = 1; i < date.length; i++)
-				inst.dates[i] = $jppr.datepick._restrictMinMax(inst, $jppr.datepick._determineDate(inst, date[i], null));
+				inst.dates[i] = $.datepick._restrictMinMax(inst, $.datepick._determineDate(inst, date[i], null));
 		if (origMonth != inst.cursorDate.getMonth() || origYear != inst.cursorDate.getFullYear())
-			$jppr.datepick._notifyChange(inst);
-		$jppr.datepick._adjustInstDate(inst);
-		$jppr.datepick._showDate(inst);
+			$.datepick._notifyChange(inst);
+		$.datepick._adjustInstDate(inst);
+		$.datepick._showDate(inst);
 	},
 
 	/* Retrieve the date(s) directly.
@@ -1864,9 +1873,9 @@ $jppr.extend(Datepick.prototype, {
 	_getDate: function(inst) {
 		var startDate = (!inst.inline && inst.input && inst.input.val() == '' ?
 			null : (inst.dates.length ? inst.dates[0] : null));
-		if ($jppr.datepick._get(inst, 'rangeSelect'))
+		if ($.datepick._get(inst, 'rangeSelect'))
 			return (startDate ? [inst.dates[0], inst.dates[1] || inst.dates[0]] : [null, null]);
-		else if ($jppr.datepick._get(inst, 'multiSelect'))
+		else if ($.datepick._get(inst, 'multiSelect'))
 			return inst.dates.slice(0, inst.dates.length);
 		else
 			return startDate;
@@ -1877,36 +1886,36 @@ $jppr.extend(Datepick.prototype, {
 	   @return  (string) the new HTML for the datepicker */
 	_generateHTML: function(inst) {
 		var today = new Date();
-		today = $jppr.datepick._daylightSavingAdjust(
+		today = $.datepick._daylightSavingAdjust(
 			new Date(today.getFullYear(), today.getMonth(), today.getDate())); // Clear time
-		var showStatus = $jppr.datepick._get(inst, 'showStatus');
-		var initStatus = $jppr.datepick._get(inst, 'initStatus') || '&#xa0;';
-		var isRTL = $jppr.datepick._get(inst, 'isRTL');
-		var useTR = $jppr.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
-        var useFlicker = $jppr.datepick._get(inst, 'useFlicker') ? 1 : 0;
+		var showStatus = $.datepick._get(inst, 'showStatus');
+		var initStatus = $.datepick._get(inst, 'initStatus') || '&#xa0;';
+		var isRTL = $.datepick._get(inst, 'isRTL');
+		var useTR = $.datepick._get(inst, 'useThemeRoller') ? 1 : 0;
+        var useFlicker = $.datepick._get(inst, 'useFlicker') ? 1 : 0;
 		// Build the date picker HTML
-		var clear = ($jppr.datepick._get(inst, 'mandatory') ? '' :
-			'<div class="' + $jppr.datepick._clearClass[useTR] + '"><a href="javascript:void(0)" ' +
+		var clear = ($.datepick._get(inst, 'mandatory') ? '' :
+			'<div class="' + $.datepick._clearClass[useTR] + '"><a href="javascript:void(0)" ' +
 			'onclick="$jppr.datepick._clearDate(\'#' + inst.id + '\');"' +
-			$jppr.datepick._addStatus(useTR, showStatus, inst.id, $jppr.datepick._get(inst, 'clearStatus'), initStatus) +
-			'>' + $jppr.datepick._get(inst, 'clearText') + '</a></div>');
-		var controls = '<div class="' + $jppr.datepick._controlClass[useTR] + '">' + (isRTL ? '' : clear) +
-			'<div class="' + $jppr.datepick._closeClass[useTR] + '"><a href="javascript:void(0)" ' +
+			$.datepick._addStatus(useTR, showStatus, inst.id, $.datepick._get(inst, 'clearStatus'), initStatus) +
+			'>' + $.datepick._get(inst, 'clearText') + '</a></div>');
+		var controls = '<div class="' + $.datepick._controlClass[useTR] + '">' + (isRTL ? '' : clear) +
+			'<div class="' + $.datepick._closeClass[useTR] + '"><a href="javascript:void(0)" ' +
 			'onclick="$jppr.datepick._hideDatepick();"' +
-			$jppr.datepick._addStatus(useTR, showStatus, inst.id, $jppr.datepick._get(inst, 'closeStatus'), initStatus) +
-			'>' + $jppr.datepick._get(inst, 'closeText') + '</a></div>' + (isRTL ? clear : '')  + '</div>';
-		var prompt = $jppr.datepick._get(inst, 'prompt');
-		var closeAtTop = $jppr.datepick._get(inst, 'closeAtTop');
-		var hideIfNoPrevNext = $jppr.datepick._get(inst, 'hideIfNoPrevNext');
-		var navigationAsDateFormat = $jppr.datepick._get(inst, 'navigationAsDateFormat');
-		var showBigPrevNext = $jppr.datepick._get(inst, 'showBigPrevNext');
-		var numMonths = $jppr.datepick._getNumberOfMonths(inst);
-		var showCurrentAtPos = $jppr.datepick._get(inst, 'showCurrentAtPos');
-		var stepMonths = $jppr.datepick._get(inst, 'stepMonths');
-		var stepBigMonths = $jppr.datepick._get(inst, 'stepBigMonths');
+			$.datepick._addStatus(useTR, showStatus, inst.id, $.datepick._get(inst, 'closeStatus'), initStatus) +
+			'>' + $.datepick._get(inst, 'closeText') + '</a></div>' + (isRTL ? clear : '')  + '</div>';
+		var prompt = $.datepick._get(inst, 'prompt');
+		var closeAtTop = $.datepick._get(inst, 'closeAtTop');
+		var hideIfNoPrevNext = $.datepick._get(inst, 'hideIfNoPrevNext');
+		var navigationAsDateFormat = $.datepick._get(inst, 'navigationAsDateFormat');
+		var showBigPrevNext = $.datepick._get(inst, 'showBigPrevNext');
+		var numMonths = $.datepick._getNumberOfMonths(inst);
+		var showCurrentAtPos = $.datepick._get(inst, 'showCurrentAtPos');
+		var stepMonths = $.datepick._get(inst, 'stepMonths');
+		var stepBigMonths = $.datepick._get(inst, 'stepBigMonths');
 		var isMultiMonth = (numMonths[0] != 1 || numMonths[1] != 1);
-		var minDate = $jppr.datepick._getMinMaxDate(inst, 'min', true);
-		var maxDate = $jppr.datepick._getMinMaxDate(inst, 'max');
+		var minDate = $.datepick._getMinMaxDate(inst, 'min', true);
+		var maxDate = $.datepick._getMinMaxDate(inst, 'max');
 		var drawMonth = inst.drawMonth - showCurrentAtPos;
 		var drawYear = inst.drawYear;
 		if (drawMonth < 0) {
@@ -1914,10 +1923,10 @@ $jppr.extend(Datepick.prototype, {
 			drawYear--;
 		}
 		if (maxDate) { // Don't show past maximum unless also restricted by minimum
-			var maxDraw = $jppr.datepick._daylightSavingAdjust(new Date(maxDate.getFullYear(),
+			var maxDraw = $.datepick._daylightSavingAdjust(new Date(maxDate.getFullYear(),
 				maxDate.getMonth() - (numMonths[0] * numMonths[1]) + 1, maxDate.getDate()));
 			maxDraw = (minDate && maxDraw < minDate ? minDate : maxDraw);
-			while ($jppr.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth, 1)) > maxDraw) {
+			while ($.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth, 1)) > maxDraw) {
 				drawMonth--;
 				if (drawMonth < 0) {
 					drawMonth = 11;
@@ -1932,112 +1941,112 @@ $jppr.extend(Datepick.prototype, {
 			inst.drawYear++;
 		}
 		// Controls and links
-		var prevText = $jppr.datepick._get(inst, 'prevText');
+		var prevText = $.datepick._get(inst, 'prevText');
 		prevText = (!navigationAsDateFormat ? prevText : this.formatDate(prevText,
-			$jppr.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth - stepMonths, 1)),
-			$jppr.datepick._getFormatConfig(inst)));
-		var prevBigText = (showBigPrevNext ? $jppr.datepick._get(inst, 'prevBigText') : '');
+			$.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth - stepMonths, 1)),
+			$.datepick._getFormatConfig(inst)));
+		var prevBigText = (showBigPrevNext ? $.datepick._get(inst, 'prevBigText') : '');
 		prevBigText = (!navigationAsDateFormat ? prevBigText : this.formatDate(prevBigText,
-			$jppr.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth - stepBigMonths, 1)),
-			$jppr.datepick._getFormatConfig(inst)));
-		var prev = '<div class="' + $jppr.datepick._prevClass[useTR] + '">' +
-			($jppr.datepick._canAdjustMonth(inst, -1, drawYear, drawMonth) ?
+			$.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth - stepBigMonths, 1)),
+			$.datepick._getFormatConfig(inst)));
+		var prev = '<div class="' + $.datepick._prevClass[useTR] + '">' +
+			($.datepick._canAdjustMonth(inst, -1, drawYear, drawMonth) ?
 			(showBigPrevNext ? '<a href="javascript:void(0)" onclick="$jppr.datepick._adjustDate(\'#' +
 			inst.id + '\', -' + stepBigMonths + ', \'M\');"' +
-			$jppr.datepick._addStatus(useTR, showStatus, inst.id, $jppr.datepick._get(inst, 'prevBigStatus'), initStatus) +
+			$.datepick._addStatus(useTR, showStatus, inst.id, $.datepick._get(inst, 'prevBigStatus'), initStatus) +
 			'>' + prevBigText + '</a>' : '') +
 			'<a href="javascript:void(0)" onclick="$jppr.datepick._adjustDate(\'#' +
 			inst.id + '\', -' + stepMonths + ', \'M\');"' +
-			$jppr.datepick._addStatus(useTR, showStatus, inst.id, $jppr.datepick._get(inst, 'prevStatus'), initStatus) +
+			$.datepick._addStatus(useTR, showStatus, inst.id, $.datepick._get(inst, 'prevStatus'), initStatus) +
 			'>' + prevText + '</a>' :
 			(hideIfNoPrevNext ? '&#xa0;' : (showBigPrevNext ? '<label>' + prevBigText + '</label>' : '') +
 			'<label>' + prevText + '</label>')) + '</div>';
-		var nextText = $jppr.datepick._get(inst, 'nextText');
+		var nextText = $.datepick._get(inst, 'nextText');
 		nextText = (!navigationAsDateFormat ? nextText : this.formatDate(nextText,
-			$jppr.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth + stepMonths, 1)),
-			$jppr.datepick._getFormatConfig(inst)));
-		var nextBigText = (showBigPrevNext ? $jppr.datepick._get(inst, 'nextBigText') : '');
+			$.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth + stepMonths, 1)),
+			$.datepick._getFormatConfig(inst)));
+		var nextBigText = (showBigPrevNext ? $.datepick._get(inst, 'nextBigText') : '');
 		nextBigText = (!navigationAsDateFormat ? nextBigText : this.formatDate(nextBigText,
-			$jppr.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth + stepBigMonths, 1)),
-			$jppr.datepick._getFormatConfig(inst)));
-		var next = '<div class="' + $jppr.datepick._nextClass[useTR] + '">' +
-			($jppr.datepick._canAdjustMonth(inst, +1, drawYear, drawMonth) ?
+			$.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth + stepBigMonths, 1)),
+			$.datepick._getFormatConfig(inst)));
+		var next = '<div class="' + $.datepick._nextClass[useTR] + '">' +
+			($.datepick._canAdjustMonth(inst, +1, drawYear, drawMonth) ?
 			'<a href="javascript:void(0)" onclick="$jppr.datepick._adjustDate(\'#' +
 			inst.id + '\', +' + stepMonths + ', \'M\');"' +
-			$jppr.datepick._addStatus(useTR, showStatus, inst.id, $jppr.datepick._get(inst, 'nextStatus'), initStatus) +
+			$.datepick._addStatus(useTR, showStatus, inst.id, $.datepick._get(inst, 'nextStatus'), initStatus) +
 			'>' + nextText + '</a>' +
 			(showBigPrevNext ? '<a href="javascript:void(0)" onclick="$jppr.datepick._adjustDate(\'#' +
 			inst.id + '\', +' + stepBigMonths + ', \'M\');"' +
-			$jppr.datepick._addStatus(useTR, showStatus, inst.id, $jppr.datepick._get(inst, 'nextBigStatus'), initStatus) +
+			$.datepick._addStatus(useTR, showStatus, inst.id, $.datepick._get(inst, 'nextBigStatus'), initStatus) +
 			'>' + nextBigText + '</a>' : '') :
 			(hideIfNoPrevNext ? '&#xa0;' : '<label>' + nextText + '</label>' +
 			(showBigPrevNext ? '<label>' + nextBigText + '</label>' : ''))) + '</div>';
-		var currentText = $jppr.datepick._get(inst, 'currentText');
-		var gotoDate = ($jppr.datepick._get(inst, 'gotoCurrent') && inst.dates[0] ? inst.dates[0] : today);
+		var currentText = $.datepick._get(inst, 'currentText');
+		var gotoDate = ($.datepick._get(inst, 'gotoCurrent') && inst.dates[0] ? inst.dates[0] : today);
 		currentText = (!navigationAsDateFormat ? currentText :
-			this.formatDate(currentText, gotoDate, $jppr.datepick._getFormatConfig(inst)));
+			this.formatDate(currentText, gotoDate, $.datepick._getFormatConfig(inst)));
 		var html = (closeAtTop && !inst.inline ? controls : '') +
-			'<div class="' + $jppr.datepick._linksClass[useTR] + '">' + (isRTL ? next : prev) +
-			'<div class="' + $jppr.datepick._currentClass[useTR] + '">' + ($jppr.datepick._isInRange(inst, gotoDate) ?
+			'<div class="' + $.datepick._linksClass[useTR] + '">' + (isRTL ? next : prev) +
+			'<div class="' + $.datepick._currentClass[useTR] + '">' + ($.datepick._isInRange(inst, gotoDate) ?
 			'<a href="javascript:void(0)" onclick="$jppr.datepick._gotoToday(\'#' + inst.id + '\');"' +
-			$jppr.datepick._addStatus(useTR, showStatus, inst.id, $jppr.datepick._get(inst, 'currentStatus'), initStatus) + '>' +
+			$.datepick._addStatus(useTR, showStatus, inst.id, $.datepick._get(inst, 'currentStatus'), initStatus) + '>' +
 			currentText + '</a>' : (hideIfNoPrevNext ? '&#xa0;' : '<label>' + currentText + '</label>')) +
 			'</div>' + (isRTL ? prev : next) + '</div>' +
-			(prompt ? '<div class="' + $jppr.datepick._promptClass[useTR] + '"><span>' +
+			(prompt ? '<div class="' + $.datepick._promptClass[useTR] + '"><span>' +
 			prompt + '</span></div>' : '');
-		var firstDay = parseInt($jppr.datepick._get(inst, 'firstDay'), 10);
+		var firstDay = parseInt($.datepick._get(inst, 'firstDay'), 10);
 		firstDay = (isNaN(firstDay) ? 0 : firstDay);
-		var changeFirstDay = $jppr.datepick._get(inst, 'changeFirstDay');
-		var dayNames = $jppr.datepick._get(inst, 'dayNames');
-		var dayNamesShort = $jppr.datepick._get(inst, 'dayNamesShort');
-		var dayNamesMin = $jppr.datepick._get(inst, 'dayNamesMin');
-		var monthNames = $jppr.datepick._get(inst, 'monthNames');
-		var beforeShowDay = $jppr.datepick._get(inst, 'beforeShowDay');
-		var showOtherMonths = $jppr.datepick._get(inst, 'showOtherMonths');
-		var selectOtherMonths = $jppr.datepick._get(inst, 'selectOtherMonths');
-		var showWeeks = $jppr.datepick._get(inst, 'showWeeks');
-		var calculateWeek = $jppr.datepick._get(inst, 'calculateWeek') || this.iso8601Week;
-		var weekStatus = $jppr.datepick._get(inst, 'weekStatus');
-		var status = (showStatus ? $jppr.datepick._get(inst, 'dayStatus') || initStatus : '');
-		var dateStatus = $jppr.datepick._get(inst, 'statusForDate') || this.dateStatus;
-		var defaultDate = $jppr.datepick._getDefaultDate(inst);
+		var changeFirstDay = $.datepick._get(inst, 'changeFirstDay');
+		var dayNames = $.datepick._get(inst, 'dayNames');
+		var dayNamesShort = $.datepick._get(inst, 'dayNamesShort');
+		var dayNamesMin = $.datepick._get(inst, 'dayNamesMin');
+		var monthNames = $.datepick._get(inst, 'monthNames');
+		var beforeShowDay = $.datepick._get(inst, 'beforeShowDay');
+		var showOtherMonths = $.datepick._get(inst, 'showOtherMonths');
+		var selectOtherMonths = $.datepick._get(inst, 'selectOtherMonths');
+		var showWeeks = $.datepick._get(inst, 'showWeeks');
+		var calculateWeek = $.datepick._get(inst, 'calculateWeek') || this.iso8601Week;
+		var weekStatus = $.datepick._get(inst, 'weekStatus');
+		var status = (showStatus ? $.datepick._get(inst, 'dayStatus') || initStatus : '');
+		var dateStatus = $.datepick._get(inst, 'statusForDate') || this.dateStatus;
+		var defaultDate = $.datepick._getDefaultDate(inst);
 		for (var row = 0; row < numMonths[0]; row++) {
 			for (var col = 0; col < numMonths[1]; col++) {
-				var cursorDate = $jppr.datepick._daylightSavingAdjust(
+				var cursorDate = $.datepick._daylightSavingAdjust(
 					new Date(drawYear, drawMonth, inst.cursorDate.getDate()));
-				html += '<div class="' + $jppr.datepick._oneMonthClass[useTR] +
-					(col == 0 && !useTR ? ' ' + $jppr.datepick._newRowClass[useTR] : '') + '">' +
-					$jppr.datepick._generateMonthYearHeader(inst, drawMonth, drawYear, minDate, maxDate,
+				html += '<div class="' + $.datepick._oneMonthClass[useTR] +
+					(col == 0 && !useTR ? ' ' + $.datepick._newRowClass[useTR] : '') + '">' +
+					$.datepick._generateMonthYearHeader(inst, drawMonth, drawYear, minDate, maxDate,
 					cursorDate, row > 0 || col > 0, useTR, showStatus, initStatus, monthNames) + // Draw month headers
-					'<table class="' + $jppr.datepick._tableClass[useTR] + '" cellpadding="0" cellspacing="0"><thead>' +
-					'<tr class="' + $jppr.datepick._tableHeaderClass[useTR] + '">' + (showWeeks ? '<th' +
-					$jppr.datepick._addStatus(useTR, showStatus, inst.id, weekStatus, initStatus) + '>' +
-					$jppr.datepick._get(inst, 'weekHeader') + '</th>' : '');
+					'<table class="' + $.datepick._tableClass[useTR] + '" cellpadding="0" cellspacing="0"><thead>' +
+					'<tr class="' + $.datepick._tableHeaderClass[useTR] + '">' + (showWeeks ? '<th' +
+					$.datepick._addStatus(useTR, showStatus, inst.id, weekStatus, initStatus) + '>' +
+					$.datepick._get(inst, 'weekHeader') + '</th>' : '');
 				for (var dow = 0; dow < 7; dow++) { // Days of the week
 					var day = (dow + firstDay) % 7;
 					var dayStatus = (!showStatus || !changeFirstDay ? '' :
 						status.replace(/DD/, dayNames[day]).replace(/D/, dayNamesShort[day]));
 					html += '<th' + ((dow + firstDay + 6) % 7 < 5 ? '' :
-						' class="' + $jppr.datepick._weekendClass[useTR] + '"') + '>' +
+						' class="' + $.datepick._weekendClass[useTR] + '"') + '>' +
 						(!changeFirstDay ? '<span' +
-						$jppr.datepick._addStatus(useTR, showStatus, inst.id, dayNames[day], initStatus) :
+						$.datepick._addStatus(useTR, showStatus, inst.id, dayNames[day], initStatus) :
 						'<a href="javascript:void(0)" onclick="$jppr.datepick._changeFirstDay(\'#' +
 						inst.id + '\', ' + day + ');"' +
-						$jppr.datepick._addStatus(useTR, showStatus, inst.id, dayStatus, initStatus)) +
+						$.datepick._addStatus(useTR, showStatus, inst.id, dayStatus, initStatus)) +
 						' title="' + dayNames[day] + '">' +
 						dayNamesMin[day] + (changeFirstDay ? '</a>' : '</span>') + '</th>';
 				}
 				html += '</tr></thead><tbody>';
-				var daysInMonth = $jppr.datepick._getDaysInMonth(drawYear, drawMonth);
+				var daysInMonth = $.datepick._getDaysInMonth(drawYear, drawMonth);
 				if (drawYear == inst.cursorDate.getFullYear() && drawMonth == inst.cursorDate.getMonth())
 					inst.cursorDate.setDate(Math.min(inst.cursorDate.getDate(), daysInMonth));
-				var leadDays = ($jppr.datepick._getFirstDayOfMonth(drawYear, drawMonth) - firstDay + 7) % 7;
+				var leadDays = ($.datepick._getFirstDayOfMonth(drawYear, drawMonth) - firstDay + 7) % 7;
 				var numRows = (isMultiMonth ? 6 : Math.ceil((leadDays + daysInMonth) / 7));
-				var printDate = $jppr.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth, 1 - leadDays));
+				var printDate = $.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth, 1 - leadDays));
 				for (var dRow = 0; dRow < numRows; dRow++) { // Create datepicker rows
-					html += '<tr class="' + $jppr.datepick._weekRowClass[useTR] + '">' +
-						(showWeeks ? '<td class="' + $jppr.datepick._weekColClass[useTR] + '"' +
-						$jppr.datepick._addStatus(useTR, showStatus, inst.id, weekStatus, initStatus) + '>' +
+					html += '<tr class="' + $.datepick._weekRowClass[useTR] + '">' +
+						(showWeeks ? '<td class="' + $.datepick._weekColClass[useTR] + '"' +
+						$.datepick._addStatus(useTR, showStatus, inst.id, weekStatus, initStatus) + '>' +
 						calculateWeek(printDate) + '</td>' : '');
 					for (var dow = 0; dow < 7; dow++) { // Create datepicker days
 						var daySettings = (beforeShowDay ?
@@ -2045,29 +2054,29 @@ $jppr.extend(Datepick.prototype, {
 						var otherMonth = (printDate.getMonth() != drawMonth);
 						var unselectable = (otherMonth && !selectOtherMonths) || !daySettings[0] ||
 							(minDate && printDate < minDate) || (maxDate && printDate > maxDate);
-						var selected = ($jppr.datepick._get(inst, 'rangeSelect') && inst.dates[0] &&
+						var selected = ($.datepick._get(inst, 'rangeSelect') && inst.dates[0] &&
 							printDate.getTime() >= inst.dates[0].getTime() &&
 							printDate.getTime() <= (inst.dates[1] || inst.dates[0]).getTime());
 						for (var i = 0; i < inst.dates.length; i++)
 							selected = selected || (inst.dates[i] &&
 								printDate.getTime() == inst.dates[i].getTime());
 						var empty = otherMonth && !showOtherMonths;
-						
-						html += '<td itime="'+printDate.getTime()+'" class="' + $jppr.datepick._dayClass[useTR] +
-							((dow + firstDay + 6) % 7 >= 5 ? ' ' + $jppr.datepick._weekendClass[useTR] : '') + // Highlight weekends
-							(otherMonth ? ' ' + $jppr.datepick._otherMonthClass[useTR] : '') + // Highlight days from other months
+
+						html += '<td itime="'+printDate.getTime()+'" class="' + $.datepick._dayClass[useTR] +
+							((dow + firstDay + 6) % 7 >= 5 ? ' ' + $.datepick._weekendClass[useTR] : '') + // Highlight weekends
+							(otherMonth ? ' ' + $.datepick._otherMonthClass[useTR] : '') + // Highlight days from other months
 							((printDate.getTime() == cursorDate.getTime() &&
 							drawMonth == inst.cursorDate.getMonth() && inst.keyEvent) || // User pressed key
 							(defaultDate.getTime() == printDate.getTime() &&
 							defaultDate.getTime() == cursorDate.getTime()) ?
 							// Or defaultDate is selected printedDate and defaultDate is cursorDate
-							' ' + $jppr.datepick._dayOverClass[useTR] : '') + // Highlight selected day
-							(unselectable ? ' ' + $jppr.datepick._unselectableClass[useTR] :
-							' ' + $jppr.datepick._selectableClass[useTR]) +  // Highlight unselectable days
+							' ' + $.datepick._dayOverClass[useTR] : '') + // Highlight selected day
+							(unselectable ? ' ' + $.datepick._unselectableClass[useTR] :
+							' ' + $.datepick._selectableClass[useTR]) +  // Highlight unselectable days
 							(empty ? '' : ' ' + daySettings[1] + // Highlight custom dates
-							(selected ? ' ' + $jppr.datepick._selectedClass[useTR] : '') + // Currently selected
+							(selected ? ' ' + $.datepick._selectedClass[useTR] : '') + // Currently selected
 							// Highlight today (if different)
-							(printDate.getTime() == today.getTime() ? ' ' + $jppr.datepick._todayClass[useTR] : '')) + '"' +
+							(printDate.getTime() == today.getTime() ? ' ' + $.datepick._todayClass[useTR] : '')) + '"' +
 							(!empty && daySettings[2] ? ' title="' + daySettings[2] + '"' : '') + // Cell title
 							(unselectable ? '' : ' onmouseover="' + '$jppr.datepick._doMouseOver(this,\'' +
 							inst.id + '\',' + printDate.getTime() + ')"' +
@@ -2079,7 +2088,7 @@ $jppr.extend(Datepick.prototype, {
 							printDate.getDate() + '</a>')) + '</td>';
 						printDate.setDate(printDate.getDate() + 1);
 
-						printDate = $jppr.datepick._daylightSavingAdjust(printDate);
+						printDate = $.datepick._daylightSavingAdjust(printDate);
 					}
 					html += '</tr>';
 				}
@@ -2091,10 +2100,10 @@ $jppr.extend(Datepick.prototype, {
 				html += '</tbody></table></div>';
 			}
 			if (useTR)
-				html += '<div class="' + $jppr.datepick._newRowClass[useTR] + '"></div>';
+				html += '<div class="' + $.datepick._newRowClass[useTR] + '"></div>';
 		}
         if(useFlicker) {
-            if ($jppr('.calendarSelector').attr('showLegend') == '1') {
+            if ($('.calendarSelector').attr('showLegend') == '1') {
                 initStatus = initStatus + '<br/>' +
                 '<div class="calendar-legend">' +
                 '<ul>' +
@@ -2104,12 +2113,12 @@ $jppr.extend(Datepick.prototype, {
                 '</div>';
             }
         }
-		html += (showStatus ? '<div style="clear: both;"></div><div id="' + $jppr.datepick._statusId[useTR] +
-			inst.id +'" class="ui-widget ui-widget-content ui-corner-all ui-state-error ' + $jppr.datepick._statusClass[useTR] + '">' + initStatus + '</div>' : '') +
+		html += (showStatus ? '<div style="clear: both;"></div><div id="' + $.datepick._statusId[useTR] +
+			inst.id +'" class="ui-widget ui-widget-content ui-corner-all ui-state-error ' + $.datepick._statusClass[useTR] + '">' + initStatus + '</div>' : '') +
 			(!closeAtTop && !inst.inline ? controls : '') +
 			'<div style="clear: both;"></div>' +
 			(ie && ie < 7 && !inst.inline ?
-			'<iframe src="javascript:false;" class="' + $jppr.datepick._coverClass[useTR] + '"></iframe>' : '');
+			'<iframe src="javascript:false;" class="' + $.datepick._coverClass[useTR] + '"></iframe>' : '');
 		inst.keyEvent = false;
 		return html;
 	},
@@ -2129,24 +2138,24 @@ $jppr.extend(Datepick.prototype, {
 	   @return  (string) the HTML for the month and year */
 	_generateMonthYearHeader: function(inst, drawMonth, drawYear, minDate, maxDate,
 			cursorDate, secondary, useTR, showStatus, initStatus, monthNames) {
-		var minDraw = $jppr.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth, 1));
+		var minDraw = $.datepick._daylightSavingAdjust(new Date(drawYear, drawMonth, 1));
 		minDate = (minDate && minDraw < minDate ? minDraw : minDate);
-		var changeMonth = $jppr.datepick._get(inst, 'changeMonth');
-		var changeYear = $jppr.datepick._get(inst, 'changeYear');
-		var showMonthAfterYear = $jppr.datepick._get(inst, 'showMonthAfterYear');
-		var html = '<div class="' + $jppr.datepick._monthYearClass[useTR] + '">';
+		var changeMonth = $.datepick._get(inst, 'changeMonth');
+		var changeYear = $.datepick._get(inst, 'changeYear');
+		var showMonthAfterYear = $.datepick._get(inst, 'showMonthAfterYear');
+		var html = '<div class="' + $.datepick._monthYearClass[useTR] + '">';
 		var monthHtml = '';
 		// Month selection
 		if (secondary || !changeMonth)
-			monthHtml += '<span class="' + $jppr.datepick._monthClass[useTR] + '">' +
+			monthHtml += '<span class="' + $.datepick._monthClass[useTR] + '">' +
 				monthNames[drawMonth] + '</span>';
 		else {
 			var inMinYear = (minDate && minDate.getFullYear() == drawYear);
 			var inMaxYear = (maxDate && maxDate.getFullYear() == drawYear);
-			monthHtml += '<select class="' + $jppr.datepick._monthSelectClass[useTR] + '" ' +
+			monthHtml += '<select class="' + $.datepick._monthSelectClass[useTR] + '" ' +
 				'onchange="$jppr.datepick._selectMonthYear(\'#' + inst.id + '\', this, \'M\');" ' +
 				'onclick="$jppr.datepick._clickMonthYear(\'#' + inst.id + '\');"' +
-				$jppr.datepick._addStatus(useTR, showStatus, inst.id, $jppr.datepick._get(inst, 'monthStatus'),
+				$.datepick._addStatus(useTR, showStatus, inst.id, $.datepick._get(inst, 'monthStatus'),
 				initStatus) + '>';
 			for (var month = 0; month < 12; month++) {
 				if ((!inMinYear || month >= minDate.getMonth()) &&
@@ -2161,10 +2170,10 @@ $jppr.extend(Datepick.prototype, {
 			html += monthHtml + (secondary || !changeMonth || !changeYear ? '&#xa0;' : '');
 		// Year selection
 		if (secondary || !changeYear)
-			html += '<span class="' + $jppr.datepick._yearClass[useTR] + '">' + drawYear + '</span>';
+			html += '<span class="' + $.datepick._yearClass[useTR] + '">' + drawYear + '</span>';
 		else {
 			// Determine range of years to display
-			var years = $jppr.datepick._get(inst, 'yearRange').split(':');
+			var years = $.datepick._get(inst, 'yearRange').split(':');
 			var thisYear = new Date().getFullYear();
 			var determineYear = function(value) {
 				var year = (value.match(/c[+-].*/) ? drawYear + parseInt(value.substring(1), 10) :
@@ -2176,10 +2185,10 @@ $jppr.extend(Datepick.prototype, {
 			var endYear = Math.max(year, determineYear(years[1] || ''));
 			year = (minDate ? Math.max(year, minDate.getFullYear()) : year);
 			endYear = (maxDate ? Math.min(endYear, maxDate.getFullYear()) : endYear);
-			html += '<select class="' + $jppr.datepick._yearSelectClass[useTR] + '" ' +
+			html += '<select class="' + $.datepick._yearSelectClass[useTR] + '" ' +
 				'onchange="$jppr.datepick._selectMonthYear(\'#' + inst.id + '\', this, \'Y\');" ' +
 				'onclick="$jppr.datepick._clickMonthYear(\'#' + inst.id + '\');"' +
-				$jppr.datepick._addStatus(useTR, showStatus, inst.id, $jppr.datepick._get(inst, 'yearStatus'),
+				$.datepick._addStatus(useTR, showStatus, inst.id, $.datepick._get(inst, 'yearStatus'),
 				initStatus) + '>';
 			for (; year <= endYear; year++) {
 				html += '<option value="' + year + '"' +
@@ -2188,7 +2197,7 @@ $jppr.extend(Datepick.prototype, {
 			}
 			html += '</select>';
 		}
-		html += $jppr.datepick._get(inst, 'yearSuffix');
+		html += $.datepick._get(inst, 'yearSuffix');
 		if (showMonthAfterYear)
 			html += (secondary || !changeMonth || !changeYear ? '&#xa0;' : '') + monthHtml;
 		html += '</div>'; // Close datepicker_header
@@ -2203,9 +2212,9 @@ $jppr.extend(Datepick.prototype, {
 	   @param  initStatus  (string) the default status message
 	   @return  (string) hover actions for the status messages */
 	_addStatus: function(useTR, showStatus, id, text, initStatus) {
-		return (showStatus ? ' onmouseover="$jppr(\'#' + $jppr.datepick._statusId[useTR] + id +
+		return (showStatus ? ' onmouseover="$jppr(\'#' + $.datepick._statusId[useTR] + id +
 			'\').html(\'' + (text || initStatus) + '\');" ' +
-			'onmouseout="$jppr(\'#' + $jppr.datepick._statusId[useTR] + id +
+			'onmouseout="$jppr(\'#' + $.datepick._statusId[useTR] + id +
 			'\').html(\'' + initStatus + '\');"' : '');
 	},
 
@@ -2217,14 +2226,14 @@ $jppr.extend(Datepick.prototype, {
 		var yearMonth = inst.drawYear + '/' + inst.drawMonth;
 		var year = inst.drawYear + (period == 'Y' ? offset : 0);
 		var month = inst.drawMonth + (period == 'M' ? offset : 0);
-		var day = Math.min(inst.cursorDate.getDate(), $jppr.datepick._getDaysInMonth(year, month)) +
+		var day = Math.min(inst.cursorDate.getDate(), $.datepick._getDaysInMonth(year, month)) +
 			(period == 'D' ? offset : 0);
-		inst.cursorDate = $jppr.datepick._restrictMinMax(inst,
-			$jppr.datepick._daylightSavingAdjust(new Date(year, month, day)));
+		inst.cursorDate = $.datepick._restrictMinMax(inst,
+			$.datepick._daylightSavingAdjust(new Date(year, month, day)));
 		inst.drawMonth = inst.cursorDate.getMonth();
 		inst.drawYear = inst.cursorDate.getFullYear();
 		if (yearMonth != inst.drawYear + '/' + inst.drawMonth)
-			$jppr.datepick._notifyChange(inst);
+			$.datepick._notifyChange(inst);
 	},
 
 	/* Ensure a date is within any min/max bounds.
@@ -2232,8 +2241,8 @@ $jppr.extend(Datepick.prototype, {
 	   @param  date  (Date) the date to check
 	   @return  (Date) the restricted date */
 	_restrictMinMax: function(inst, date) {
-		var minDate = $jppr.datepick._getMinMaxDate(inst, 'min', true);
-		var maxDate = $jppr.datepick._getMinMaxDate(inst, 'max');
+		var minDate = $.datepick._getMinMaxDate(inst, 'min', true);
+		var maxDate = $.datepick._getMinMaxDate(inst, 'max');
 		date = (minDate && date < minDate ? new Date(minDate.getTime()) : date);
 		date = (maxDate && date > maxDate ? new Date(maxDate.getTime()) : date);
 		return date;
@@ -2242,11 +2251,11 @@ $jppr.extend(Datepick.prototype, {
 	/* Notify change of month/year.
 	   @param  inst  (object) the instance settings for this datepicker */
 	_notifyChange: function(inst) {
-		var onChange = $jppr.datepick._get(inst, 'onChangeMonthYear');
+		var onChange = $.datepick._get(inst, 'onChangeMonthYear');
 		if (onChange)
 			onChange.apply((inst.input ? inst.input[0] : null),
 				[inst.cursorDate.getFullYear(), inst.cursorDate.getMonth() + 1,
-				$jppr.datepick._daylightSavingAdjust(new Date(
+				$.datepick._daylightSavingAdjust(new Date(
 				inst.cursorDate.getFullYear(), inst.cursorDate.getMonth(), 1)), inst]);
 	},
 
@@ -2254,7 +2263,7 @@ $jppr.extend(Datepick.prototype, {
 	   @param  inst  (object) the instance settings for this datepicker
 	   @return  (number[2]) the number of rows and columns to display */
 	_getNumberOfMonths: function(inst) {
-		var numMonths = $jppr.datepick._get(inst, 'numberOfMonths');
+		var numMonths = $.datepick._get(inst, 'numberOfMonths');
 		return (numMonths == null ? [1, 1] :
 			(typeof numMonths == 'number' ? [1, numMonths] : numMonths));
 	},
@@ -2266,8 +2275,8 @@ $jppr.extend(Datepick.prototype, {
 	   @param  checkRange  (boolean) true to allow override for a range minimum
 	   @return  (Date) the minimum/maximum date or null if none */
 	_getMinMaxDate: function(inst, minMax, checkRange) {
-		var date = $jppr.datepick._determineDate(inst, $jppr.datepick._get(inst, minMax + 'Date'), null);
-		var rangeMin = $jppr.datepick._getRangeMin(inst);
+		var date = $.datepick._determineDate(inst, $.datepick._get(inst, minMax + 'Date'), null);
+		var rangeMin = $.datepick._getRangeMin(inst);
 		return (checkRange && rangeMin && (!date || rangeMin > date) ? rangeMin : date);
 	},
 
@@ -2275,7 +2284,7 @@ $jppr.extend(Datepick.prototype, {
 	   @param  inst  (object) the instance settings for this datepicker
 	   @return  (Date) the temporary minimum or null */
 	_getRangeMin: function(inst) {
-		return ($jppr.datepick._get(inst, 'rangeSelect') && inst.dates[0] &&
+		return ($.datepick._get(inst, 'rangeSelect') && inst.dates[0] &&
 			!inst.dates[1] ? inst.dates[0] : null);
 	},
 
@@ -2302,12 +2311,12 @@ $jppr.extend(Datepick.prototype, {
 	   @param  curMonth  (number) the current month (0 to 11)
 	   @return  (boolean) true if prev/next allowed, false if not */
 	_canAdjustMonth: function(inst, offset, curYear, curMonth) {
-		var numMonths = $jppr.datepick._getNumberOfMonths(inst);
-		var date = $jppr.datepick._daylightSavingAdjust(new Date(curYear,
+		var numMonths = $.datepick._getNumberOfMonths(inst);
+		var date = $.datepick._daylightSavingAdjust(new Date(curYear,
 			curMonth + (offset < 0 ? offset : numMonths[0] * numMonths[1]), 1));
 		if (offset < 0)
-			date.setDate($jppr.datepick._getDaysInMonth(date.getFullYear(), date.getMonth()));
-		return $jppr.datepick._isInRange(inst, date);
+			date.setDate($.datepick._getDaysInMonth(date.getFullYear(), date.getMonth()));
+		return $.datepick._isInRange(inst, date);
 	},
 
 	/* Is the given date in the accepted range?
@@ -2316,8 +2325,8 @@ $jppr.extend(Datepick.prototype, {
 	   @return  (boolean) true if the date is in the allowed minimum/maximum, false if not */
 	_isInRange: function(inst, date) {
 		// During range selection, use minimum of selected date and range start
-		var minDate = $jppr.datepick._getRangeMin(inst) || $jppr.datepick._getMinMaxDate(inst, 'min');
-		var maxDate = $jppr.datepick._getMinMaxDate(inst, 'max');
+		var minDate = $.datepick._getRangeMin(inst) || $.datepick._getMinMaxDate(inst, 'min');
+		var maxDate = $.datepick._getMinMaxDate(inst, 'max');
 		return ((!minDate || date >= minDate) && (!maxDate || date <= maxDate));
 	},
 
@@ -2325,9 +2334,9 @@ $jppr.extend(Datepick.prototype, {
 	   @param  inst  (object) the instance settings for this datepicker
 	   @return  (object) the settings subset */
 	_getFormatConfig: function(inst) {
-		return {shortYearCutoff: $jppr.datepick._get(inst, 'shortYearCutoff'),
-			dayNamesShort: $jppr.datepick._get(inst, 'dayNamesShort'), dayNames: $jppr.datepick._get(inst, 'dayNames'),
-			monthNamesShort: $jppr.datepick._get(inst, 'monthNamesShort'), monthNames: $jppr.datepick._get(inst, 'monthNames')};
+		return {shortYearCutoff: $.datepick._get(inst, 'shortYearCutoff'),
+			dayNamesShort: $.datepick._get(inst, 'dayNamesShort'), dayNames: $.datepick._get(inst, 'dayNames'),
+			monthNamesShort: $.datepick._get(inst, 'monthNamesShort'), monthNames: $.datepick._get(inst, 'monthNames')};
 	},
 
 	/* Format the given date for display.
@@ -2340,8 +2349,8 @@ $jppr.extend(Datepick.prototype, {
 		if (!year)
 			inst.dates[0] = new Date(inst.cursorDate.getTime());
 		var date = (year ? (typeof year == 'object' ? year :
-			$jppr.datepick._daylightSavingAdjust(new Date(year, month, day))) : inst.dates[0]);
-		return this.formatDate($jppr.datepick._get(inst, 'dateFormat'), date, $jppr.datepick._getFormatConfig(inst));
+			$.datepick._daylightSavingAdjust(new Date(year, month, day))) : inst.dates[0]);
+		return this.formatDate($.datepick._get(inst, 'dateFormat'), date, $.datepick._getFormatConfig(inst));
 	}
 });
 
@@ -2350,7 +2359,7 @@ $jppr.extend(Datepick.prototype, {
    @param  props   (object) the new settings
    @return  (object) the updated object */
 function extendRemove(target, props) {
-	$jppr.extend(target, props);
+	$.extend(target, props);
 	for (var name in props)
 		if (props[name] == null || props[name] == undefined)
 			target[name] = props[name];
@@ -2368,28 +2377,28 @@ function isArray(a) {
    @param  options  (string) a command, optionally followed by additional parameters or
                     (object) settings for attaching new datepicker functionality
    @return  (jQuery) jQuery object */
-$jppr.fn.datepick = function(options){
+$.fn.datepick = function(options){
 	var otherArgs = Array.prototype.slice.call(arguments, 1);
 	if (typeof options == 'string' && (options == 'isDisabled' ||
 			options == 'getDate' || options == 'settings'))
-		return $jppr.datepick['_' + options + 'Datepick'].
-			apply($jppr.datepick, [this[0]].concat(otherArgs));
+		return $.datepick['_' + options + 'Datepick'].
+			apply($.datepick, [this[0]].concat(otherArgs));
 	if (options == 'option' && arguments.length == 2 && typeof arguments[1] == 'string')
-		return $jppr.datepick['_' + options + 'Datepick'].
-			apply($jppr.datepick, [this[0]].concat(otherArgs));
+		return $.datepick['_' + options + 'Datepick'].
+			apply($.datepick, [this[0]].concat(otherArgs));
 
     return typeof options == 'string' ?
-			$jppr.datepick['_' + options + 'Datepick'].
-				apply($jppr.datepick, [this[0]].concat(otherArgs)) :
-			$jppr.datepick._attachDatepick(this[0], options);
+			$.datepick['_' + options + 'Datepick'].
+				apply($.datepick, [this[0]].concat(otherArgs)) :
+			$.datepick._attachDatepick(this[0], options);
 };
 
-$jppr.datepick = new Datepick(); // Singleton instance
+$.datepick = new Datepick(); // Singleton instance
 
-$jppr(function() {
+$(function() {
 
-	$jppr(window.document).mousedown($jppr.datepick._checkExternalClick).
-		find('body').append($jppr.datepick.dpDiv);
+	$(window.top.document).mousedown($.datepick._checkExternalClick).
+		find('body').append($.datepick.dpDiv);
 });
 
 })(jQuery);

@@ -238,7 +238,11 @@ class ITwebexperts_Payperrentals_Helper_Inventory extends Mage_Core_Helper_Abstr
             $disabledDays = ITwebexperts_Payperrentals_Helper_Data::getDisabledDays($id);
             $disabledDaysStart = ITwebexperts_Payperrentals_Helper_Data::getDisabledDaysStart();
             $disabledDaysEnd = ITwebexperts_Payperrentals_Helper_Data::getDisabledDaysEnd();
-            $paddingDays = ITwebexperts_Payperrentals_Helper_Data::getProductPaddingDays($id, $currentTimestamp);
+            //$paddingDays = ITwebexperts_Payperrentals_Helper_Data::getProductPaddingDays($id, $currentTimestamp);
+            $paddingDays = ITwebexperts_Payperrentals_Helper_Data::getFirstAvailableDateRange($id, null, false, true);
+            if(!$paddingDays) {
+               return true;
+            }
             $blockedDates = ITwebexperts_Payperrentals_Helper_Data::getDisabledDates($id);
             foreach ($blockedDates as $dateFormatted) {
                 if (date('Y-m-d',strtotime($dateFormatted)) == date('Y-m-d',strtotime($stDate))
@@ -305,61 +309,12 @@ class ITwebexperts_Payperrentals_Helper_Inventory extends Mage_Core_Helper_Abstr
         );
 
         $reserveOrderCollection = Mage::getModel('payperrentals/reservationorders')->getCollection();
-        if (ITwebexperts_Payperrentals_Helper_Config::useReserveInventoryDropoffPickup()) {
-            $exprReturn = "IFNULL(IF(`return_date`<>'0000-00-00 00:00:00', IFNULL(`return_date`,`end_turnover_after`), `end_turnover_after`), `end_turnover_after`)";
-            $exprSend = "IFNULL(IF(`send_date`<>'0000-00-00 00:00:00', IFNULL(`send_date`,`start_turnover_before`), `start_turnover_before`), `start_turnover_before`)";
-            $expr
-                = "(SELECT IFNULL(IF(`pickup`<>'0000-00-00 00:00:00', IFNULL(`pickup`,".$exprReturn."), ".$exprReturn."), ".$exprReturn.")) as `ends_date`";
-            $expr2
-                = "(SELECT IFNULL(IF(`dropoff`<>'0000-00-00 00:00:00', IFNULL(`dropoff`,".$exprSend."), ".$exprSend."), ".$exprSend.")) as `starts_date`";
-            $sendReturnJoinConditionAr = array(
-                'main_table.sendreturn_id = srt.id',
-            );
-            $reserveOrderCollection->getSelect()
-                ->joinLeft(
-                    array('srt' => $reserveOrderCollection->getTable('payperrentals/sendreturn')),
-                    implode(' AND ', $sendReturnJoinConditionAr),
-                    array(
-                        'send_date' => 'srt.send_date',
-                        'return_date' => 'srt.return_date'
-                    ));
-            $reserveOrderCollection->getSelect()->columns(new Zend_Db_Expr($expr));
-            $reserveOrderCollection->getSelect()->columns(new Zend_Db_Expr($expr2));
-        }else
-        if (ITwebexperts_Payperrentals_Helper_Config::useReserveInventorySendReturn()) {
-            $expr
-                = "(SELECT IFNULL(IF(`return_date`<>'0000-00-00 00:00:00', IFNULL(`return_date`,`end_turnover_after`), `end_turnover_after`), `end_turnover_after`)) as `ends_date`";
-            $expr2
-                = "(SELECT IFNULL(IF(`send_date`<>'0000-00-00 00:00:00', IFNULL(`send_date`,`start_turnover_before`), `start_turnover_before`), `start_turnover_before`)) as `starts_date`";
-            $sendReturnJoinConditionAr = array(
-                'main_table.sendreturn_id = srt.id',
-            );
-            $reserveOrderCollection->getSelect()
-                ->joinLeft(
-                    array('srt' => $reserveOrderCollection->getTable('payperrentals/sendreturn')),
-                    implode(' AND ', $sendReturnJoinConditionAr),
-                    array(
-                        'send_date' => 'srt.send_date',
-                        'return_date' => 'srt.return_date'
-                    ));
-            $reserveOrderCollection->getSelect()->columns(new Zend_Db_Expr($expr));
-            $reserveOrderCollection->getSelect()->columns(new Zend_Db_Expr($expr2));
-        }
         $reserveOrderCollection->addProductIdsFilter($productId);
-
-
-        if (ITwebexperts_Payperrentals_Helper_Config::useReserveInventorySendReturn() || ITwebexperts_Payperrentals_Helper_Config::useReserveInventoryDropoffPickup()) {
-            $reserveOrderCollection->addHavingFilter(
-                "starts_date <= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate($enDate)
-                . "' AND ends_date >= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate($stDate) . "'"
-            );
-
-        } else {
-            $reserveOrderCollection->addSelectFilter(
+        $reserveOrderCollection->addSelectFilter(
                 "start_turnover_before <= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate($enDate)
                 . "' AND end_turnover_after >= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate($stDate) . "'"
-            );
-        }
+        );
+
         Mage::dispatchEvent('ppr_before_filter_order', array('collection' => $reserveOrderCollection));
 
         if (!is_null($resOrders)) {
@@ -388,20 +343,28 @@ class ITwebexperts_Payperrentals_Helper_Inventory extends Mage_Core_Helper_Abstr
         }
         $configHelper = Mage::helper('payperrentals/config');
         foreach ($reservedCollection as $iReserved) {
-            if (ITwebexperts_Payperrentals_Helper_Config::useReserveInventorySendReturn() || ITwebexperts_Payperrentals_Helper_Config::useReserveInventoryDropoffPickup()) {
-                if($iReserved->getStartsDate()) {
-                    $start = strtotime($iReserved->getStartsDate());
-                }else{
-                    $start = strtotime($iReserved->getStartTurnoverBefore());
+
+
+            $start = strtotime($iReserved->getStartTurnoverBefore());
+            $end = strtotime($iReserved->getEndTurnoverAfter());
+            if (Mage::helper('payperrentals/config')->useReserveInventoryDropoffPickup()) {
+                if($iReserved->getDropoff()){
+                    $start = strtotime($iReserved->getDropoff());
                 }
-                if($iReserved->getEndsDate()) {
-                    $end = strtotime($iReserved->getEndsDate());
-                }else{
-                    $end = strtotime($iReserved->getEndTurnoverAfter());
+                if($iReserved->getPickup()){
+                    $end = strtotime($iReserved->getPickup());
                 }
-            }else{
-                $start = strtotime($iReserved->getStartTurnoverBefore());
-                $end = strtotime($iReserved->getEndTurnoverAfter());
+            }
+
+            if (Mage::helper('payperrentals/config')->useReserveInventorySendReturn()) {
+                $sendReturnCollection = Mage::getModel('payperrentals/sendreturn')->getCollection();
+                $sendReturnCollection->addSelectFilter("resorder_id=" . $iReserved->getId());
+                $sendReturnCollection->addSelectFilter(
+                    "return_date <= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate($end, true) . "' AND return_date <> '0000-00-00 00:00:00'"
+                );
+                $sendReturnCollection->getSelect()
+                    ->order('main_table.return_date DESC');
+
             }
             //a required option for bundle products is to have prices defined when times is enabled.
             //So use times and prices should be defined for all components of bundle products.
@@ -415,23 +378,47 @@ class ITwebexperts_Payperrentals_Helper_Inventory extends Mage_Core_Helper_Abstr
             } else {
                 $timeIncrement = 3600 * 24;
             }
-
+            $returnsArray = array();
+            if(isset($sendReturnCollection)){
+                foreach($sendReturnCollection as $sendReturnItem){
+                    if($timeIncrement !== 3600 * 24) {
+                        $dateReturn = date('Y-m-d H:i', strtotime($sendReturnItem->getReturnDate()));
+                    }else{
+                        $dateReturn = date('Y-m-d', strtotime($sendReturnItem->getReturnDate())).' 00:00';
+                    }
+                    if(strtotime($dateReturn) < $start){
+                        $dateReturn = date('Y-m-d', $start).' 00:00';
+                    }
+                    if(!isset($returnsArray[$sendReturnItem->getProductId()][$dateReturn])) {
+                        $returnsArray[$sendReturnItem->getProductId()][$dateReturn] = $sendReturnItem->getQty();
+                    }else{
+                        $returnsArray[$sendReturnItem->getProductId()][$dateReturn] += $sendReturnItem->getQty();
+                    }
+                }
+            }
+            $qtyReturnedArray = array();
             while ($start < $end) {
                 if($timeIncrement !== 3600 * 24) {
                     $dateFormatted = date('Y-m-d H:i', $start);
                 }else{
                     $dateFormatted = date('Y-m-d', $start).' 00:00';
                 }
+                if(!isset($qtyReturnedArray[$iReserved->getProductId()])){
+                    $qtyReturnedArray[$iReserved->getProductId()] = 0;
+                }
+                if(isset($returnsArray[$iReserved->getProductId()]) && array_key_exists($dateFormatted, $returnsArray[$iReserved->getProductId()]) !== false){
+                    $qtyReturnedArray[$iReserved->getProductId()] = $returnsArray[$sendReturnItem->getProductId()][$dateFormatted];
+                }
                 if (!isset($booked[$iReserved->getProductId()][$dateFormatted])) {
                     $vObject = new Varien_Object();
-                    $vObject->setQty($iReserved->getQty());
+                    $vObject->setQty($iReserved->getQty() - $qtyReturnedArray[$iReserved->getProductId()]);
                     if ($isOrder) {
                         $vObject->setOrders(array($iReserved->getOrderId()));
                     }
                     $booked[$iReserved->getProductId()][$dateFormatted] = $vObject;
                 } else {
                     $vObject = $booked[$iReserved->getProductId()][$dateFormatted];
-                    $vObject->setQty($vObject->getQty() + $iReserved->getQty());
+                    $vObject->setQty($vObject->getQty() + $iReserved->getQty() - $qtyReturnedArray[$iReserved->getProductId()]);
                     if ($isOrder) {
                         $orderArr = $vObject->getOrders();
                         $orderArr = array_merge($orderArr, array($iReserved->getOrderId()));
@@ -685,8 +672,16 @@ class ITwebexperts_Payperrentals_Helper_Inventory extends Mage_Core_Helper_Abstr
                 $maxQtyReserved = 1000000;
                 if (isset($bookedArray[$productId])) {
                     foreach ($bookedArray[$productId] as $dateFormatted => $vObject) {
-                        if (strtotime($dateFormatted) >= strtotime($startDate)
-                            && strtotime($dateFormatted) <= strtotime($endDate)
+                        if(date('H:i', strtotime($dateFormatted)) == '00:00'){
+                            $timeStart = strtotime($dateFormatted);
+                            $timeEnd = strtotime($dateFormatted) + 86340;
+                        }else{
+                            $timeStart = strtotime($dateFormatted);
+                            $timeEnd = strtotime($dateFormatted) + 3600;
+                        }
+
+                        if ($timeStart <= strtotime($endDate)
+                            && $timeEnd >= strtotime($startDate)
                         ) {
                             if ($maxQtyReserved > ($maxQty - $vObject->getQty())) {
                                 $maxQtyReserved = $maxQty - $vObject->getQty();
@@ -902,12 +897,26 @@ class ITwebexperts_Payperrentals_Helper_Inventory extends Mage_Core_Helper_Abstr
         }
     }
 
-    public static function getSerialsByProduct($productid, $orderid)
+    public static function getSerialsByProduct($productid, $orderid, $orderItemId = null)
     {
-        $sendreturnColl = Mage::getModel('payperrentals/sendreturn')->getCollection()->addOrderIdFilter($orderid);
-        $sendreturnColl->addFieldToFilter('product_id', $productid);
-        $serials = $sendreturnColl->getFirstItem()->getSn();
+        $productids = array($productid);
+        if(!is_null($orderItemId)){
+            $salesOrderItem = Mage::getModel('sales/order_item')->getCollection()
+                ->addFieldToFilter('parent_item_id', $orderItemId);
+            foreach($salesOrderItem as $oItem){
+                $productids[] = $oItem->getProductId();
+            }
+        }
+        $sendreturnColl = Mage::getModel('payperrentals/sendreturn')->getCollection()
+            ->addOrderIdFilter($orderid);
+        $sendreturnColl->addFieldToFilter('product_id', array('in' => $productids))
+        ->addFieldToFilter('return_date', array('0000-00-00 00:00:00', '1970-01-01 00:00:00'));
+        $sendreturnColl->getSelect()
+        ->columns('SUM(qty) as qty_shipped, SUM(qty_parent) as qty_parent_total, CONCAT_WS(",",sn) as sn_all')
+        ->group(array('resorder_id','product_id'));
+        $serials = $sendreturnColl->getFirstItem()->getSnAll();
         $serials = explode(',', $serials);
+
         return $serials;
     }
 
@@ -918,7 +927,7 @@ class ITwebexperts_Payperrentals_Helper_Inventory extends Mage_Core_Helper_Abstr
         $minQty = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_min_quantity');
         $useGlobalMin = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'use_global_min_qty');
         if($useGlobalMin){
-            return ITwebexperts_Payperrentals_Helper_Config::getMinQtyAllowed();
+            return Mage::helper('payperrentals/config')->getMinQtyAllowed();
         }
         if($minQty == ''){
             return 1;
@@ -933,7 +942,7 @@ class ITwebexperts_Payperrentals_Helper_Inventory extends Mage_Core_Helper_Abstr
         $maxQty = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_max_quantity');
         $useGlobalMax = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'use_global_max_qty');
         if($useGlobalMax){
-            return ITwebexperts_Payperrentals_Helper_Config::getMaxQtyAllowed();
+            return Mage::helper('payperrentals/config')->getMaxQtyAllowed();
         }
         if($maxQty == ''){
             return 10000;
@@ -1181,6 +1190,168 @@ class ITwebexperts_Payperrentals_Helper_Inventory extends Mage_Core_Helper_Abstr
     }
 
     /**
+     * @param array $serialNumbersForOrderItem
+     */
+
+    private function updateSerialNumbersStatus($serialNumbersForOrderItem)
+    {
+        foreach ($serialNumbersForOrderItem as $serial) {
+            Mage::getResourceSingleton('payperrentals/serialnumbers')
+                ->updateStatusBySerial($serial, 'O');
+        }
+    }
+
+    /**
+     * @param ITwebexperts_Payperrentals_Model_Reservationorders $reservationOrder
+     * @param array $serialNumbers
+     * @param array $orderItems
+     * @param int $reservationId
+     *
+     * @return array
+     */
+    private function getAllTheSerialNumbersForOrder($reservationOrder, $serialNumbers, $orderItems, $reservationId, $shipQty)
+    {
+        /** @var $payperrentalsUseSerials bool */
+        $payperrentalsUseSerials = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId(
+            $reservationOrder->getProductId(), 'payperrentals_use_serials'
+        );
+
+        /** @var array $serialNumbersForOrderItems */
+        $serialNumbersForOrderItems = array();
+
+        /**
+         * Get a list of manually entered serial numbers in the shipment form
+         */
+        if ($payperrentalsUseSerials) {
+            foreach ($serialNumbers as $salesOrderItemId => $serialArr) {
+                if ($salesOrderItemId == $orderItems[$reservationId]) {
+                    foreach ($serialArr as $enteredSerial) {
+                        if ($enteredSerial != '') {
+                            if(!in_array($enteredSerial, $serialNumbersForOrderItems)) {
+                                $serialNumbersForOrderItems[] = $enteredSerial;
+                            }
+                        }
+                    }
+                }
+            }
+
+            /*
+            * Completes the array of entered serial numbers with non broken and not under maintenance serial numbers
+            * */
+
+            if (count($serialNumbersForOrderItems) < $shipQty) {
+                $collectionSerials = Mage::getModel('payperrentals/serialnumbers')
+                    ->getCollection()
+                    ->addEntityIdFilter($reservationOrder->getProductId())
+                    ->addSelectFilter(
+                        "NOT FIND_IN_SET(sn, '" . implode(',', $serialNumbersForOrderItems)
+                        . "') AND (status = 'A')"
+                    );
+
+                $j = 0;
+                foreach ($collectionSerials as $item) {
+                    /** @var $item ITwebexperts_Payperrentals_Model_Serialnumbers */
+                    if(!in_array($item->getSn(), $serialNumbersForOrderItems)) {
+                        $serialNumbersForOrderItems[] = $item->getSn();
+                        if ($j >= $shipQty - count($serialNumbersForOrderItems)) {
+                            break;
+                        }
+                        $j++;
+                    }
+                }
+
+            }
+
+            $this->updateSerialNumbersStatus($serialNumbersForOrderItems);
+        }
+        return $serialNumbersForOrderItems;
+    }
+
+
+    public function processShipment($collectionReservations, $serialNumbers, $orderItems, $items = null, $shipItemsArray = null, $qtys){
+
+        foreach ($collectionReservations as $reservationOrder) {
+
+            /** @var $reservationOrder ITwebexperts_Payperrentals_Model_Reservationorders */
+            $reservationId = $reservationOrder->getId();
+
+            if(!is_null($items)) {
+                $shipqty = 0;
+                $shipqtyparent = 0;
+                foreach ($items as $item) {
+                    if ($item->getProductId() == $reservationOrder->getProductId()) {
+                        $shipqty = $item->getQty();
+                        if ($item->getOrderItem()->getParentItem()) {
+                            $parentItemId = $item->getOrderItem()->getParentItem()->getId();
+                            if (isset($shipItemsArray['items'][$parentItemId])) {
+                                $shipqtyparent = $shipItemsArray['items'][$parentItemId];
+                            } else {
+                                $shipqtyparent = 1;
+                            }
+                        }
+                        break;
+                    }
+                }
+            } else{
+                $shipqty = $qtys[$orderItems[$reservationId]];
+                $shipqtyparent = 0;
+                $salesOrderItem = Mage::getModel('sales/order_item')->getCollection()
+                    ->addFieldToFilter('item_id', $orderItems[$reservationId]);
+                if($salesOrderItem->getFirstItem()->getParentItemId()){
+                    $shipqtyparent = 1;
+                }
+            }
+            $serialNumbersForOrder = $this->getAllTheSerialNumbersForOrder(
+                $reservationOrder, $serialNumbers, $orderItems, $reservationId, $shipqty
+            );
+            $serialNumberForOrderAsString = implode(',', $serialNumbersForOrder);
+
+            $sendDatetime = date('Y-m-d H:i:s', Mage::getModel('core/date')->timestamp(time()));
+            Mage::getModel('payperrentals/sendreturn')
+                ->setOrderId($reservationOrder->getOrderId())
+                ->setProductId($reservationOrder->getProductId())
+                ->setResStartdate($reservationOrder->getStartDate())
+                ->setResEnddate($reservationOrder->getEndDate())
+                ->setSendDate($sendDatetime)
+                ->setQty($shipqty)
+                ->setSn($serialNumberForOrderAsString)
+                ->setQtyParent($shipqtyparent)
+                ->setResorderId($reservationId)
+                ->save();
+
+            /*get current shipped qty*/
+            $collectionSendReturn = Mage::getModel('payperrentals/sendreturn')
+                ->getCollection()
+                ->addSelectFilter("resorder_id = '" . $reservationId . "'")
+                ->addSelectFilter("send_date <> '0000-00-00 00:00:00'");
+            $collectionSendReturn->getSelect()
+                ->columns('SUM(qty) as qty_shipped')
+                ->group('resorder_id');
+
+            Mage::getResourceSingleton('payperrentals/reservationorders')->updateShippedQty(
+                $reservationId, (($collectionSendReturn->getFirstItem()->getQtyShipped()?$collectionSendReturn->getFirstItem()->getQtyShipped():0))
+            );
+
+            $order = Mage::getModel('sales/order')->load($reservationOrder->getOrderId());
+            //$order->setSendDatetime($sendDatetime);
+            //$order->save();
+
+            $product = Mage::getModel('catalog/product')->load($reservationOrder->getProductId());
+            if ($reservationOrder->getStartdate() != '0000-00-00 00:00:00') {
+                $sendPerCustomer[$order->getCustomerEmail()][$reservationOrder->getOrderId()][$product->getId()]['name'] = $product->getName();
+                $sendPerCustomer[$order->getCustomerEmail()][$reservationOrder->getOrderId()][$product->getId()]['serials'] = $serialNumberForOrderAsString;
+                $sendPerCustomer[$order->getCustomerEmail()][$reservationOrder->getOrderId()][$product->getId()]['start_date'] = $reservationOrder->getStartDate();
+                $sendPerCustomer[$order->getCustomerEmail()][$reservationOrder->getOrderId()][$product->getId()]['end_date'] = $reservationOrder->getEndDate();
+                $sendPerCustomer[$order->getCustomerEmail()][$reservationOrder->getOrderId()][$product->getId()]['send_date'] = $sendDatetime;
+
+            }
+        }
+        if(isset($sendPerCustomer)) {
+            ITwebexperts_Payperrentals_Helper_Emails::sendEmail('send', $sendPerCustomer);
+        }
+    }
+
+    /**
      * Returns items, used from ReturnContoller since we have 2 Return Controllers one for
      * Vendors one for regular Payperrentals we use the same function instead of repeating in controller
      *
@@ -1190,31 +1361,81 @@ class ITwebexperts_Payperrentals_Helper_Inventory extends Mage_Core_Helper_Abstr
 
     public function processReturn($_sendItems){
         /* @var $sendReturns ITwebexperts_Payperrentals_Model_Mysql4_Sendreturn_Collection */
-        $_sendReturns = Mage::getResourceModel('payperrentals/sendreturn_collection');
-        $_sendReturns->addFieldToFilter('id', array('in' => $_sendItems));
-        $_returnTime = date('Y-m-d H:i:s', (int)Mage::getModel('core/date')->timestamp(time()));
-        foreach ($_sendReturns as $_sendReturn) {
-            $_sendReturn->setReturnDate($_returnTime);
-            $_serialNumbers = $_sendReturn->getSn() ? explode(',', $_sendReturn->getSn()) : array();
-            foreach ($_serialNumbers as $serial) {
+        $sendReturnCollection = Mage::getModel('payperrentals/sendreturn')->getCollection();
+        $sendReturnCollection->addFieldToFilter('id', array('in' => $_sendItems));
+        $returnTime = date('Y-m-d H:i:s', (int)Mage::getModel('core/date')->timestamp(time()));
+        $qtyArray = Mage::app()->getRequest()->getParam('qty');
+        if(Mage::app()->getRequest()->getParam('sn')) {
+            $snArray = Mage::app()->getRequest()->getParam('sn');
+        }
+        foreach ($sendReturnCollection as $sendReturn) {
+            $returnqtyparent = 0;
+            $returnqty = 1;
+            if(isset($qtyArray[$sendReturn->getId()])){
+                $returnqty = $qtyArray[$sendReturn->getId()];
+                if($sendReturn->getQtyParent()) {
+                    if($qtyArray[$sendReturn->getId()]  % $sendReturn->getQty() == 0) {
+                        $returnqtyparent = intval($qtyArray[$sendReturn->getId()] / $sendReturn->getQty());
+                    }else{
+                        Mage::throwException('Cannot return shipment');
+                        return false;
+                    }
+                }
+            }
+           //$serialNumbersArray = $sendReturn->getSn()? explode(',', $sendReturn->getSn()) : array();
+            $serialNumbers = array();
+            if(isset($snArray[$sendReturn->getId()])){
+                foreach($snArray[$sendReturn->getId()] as $snItem){
+                    //if(in_array($snItem, $serialNumbersArray)){
+                        $serialNumbers[] = $snItem;
+                        if(count($serialNumbers) >= $returnqty) break;
+                   // }
+                }
+            }else{
+                $serialNumbers = array();
+            }
+            Mage::getModel('payperrentals/sendreturn')
+                ->setOrderId($sendReturn->getOrderId())
+                ->setProductId($sendReturn->getProductId())
+                ->setResStartdate($sendReturn->getResStartdate())
+                ->setResEnddate($sendReturn->getResEnddate())
+                ->setReturnDate($returnTime)
+                ->setQty($returnqty)//here needs a check this should always be true
+                ->setSn(implode(',',$serialNumbers))
+                ->setQtyParent($returnqtyparent)
+                ->setResorderId($sendReturn->getResorderId())
+                ->save();
+
+            foreach ($serialNumbers as $serial) {
                 Mage::getResourceSingleton('payperrentals/serialnumbers')
                     ->updateStatusBySerial($serial, 'A');
             }
-            $_sendReturn->save();
+            /*get current return qty*/
+            $collectionSendReturn = Mage::getModel('payperrentals/sendreturn')
+                ->getCollection()
+                ->addSelectFilter("resorder_id = '" . $sendReturn->getResorderId() . "'")
+                ->addSelectFilter("return_date <> '0000-00-00 00:00:00'");
+            $collectionSendReturn->getSelect()
+                ->columns('SUM(qty) as qty_returned')
+                ->group('resorder_id');
 
-            $order = Mage::getModel('sales/order')->load($_sendReturn->getOrderId());
+            Mage::getResourceSingleton('payperrentals/reservationorders')->updateReturnedQty(
+                $sendReturn->getResorderId(), (($collectionSendReturn->getFirstItem()->getQtyReturned()?$collectionSendReturn->getFirstItem()->getQtyReturned():0))
+            );
 
-            $product = Mage::getModel('catalog/product')->load($_sendReturn->getProductId());
-            if ($_sendReturn->getResStartdate() != '0000-00-00 00:00:00') {
+            $order = Mage::getModel('sales/order')->load($sendReturn->getOrderId());
+
+            $product = Mage::getModel('catalog/product')->load($sendReturn->getProductId());
+            if ($sendReturn->getResStartdate() != '0000-00-00 00:00:00') {
                 $returnPerCustomer[$order->getCustomerEmail()]['is_queue'] = false;
-                $returnPerCustomer[$order->getCustomerEmail()][$_sendReturn->getOrderId()][$product->getId()]['name'] = $product->getName();
-                $returnPerCustomer[$order->getCustomerEmail()][$_sendReturn->getOrderId()][$product->getId()]['serials'] = $_sendReturn->getSn();
-                $returnPerCustomer[$order->getCustomerEmail()][$_sendReturn->getOrderId()][$product->getId()]['start_date'] = $_sendReturn->getResStartdate();
-                $returnPerCustomer[$order->getCustomerEmail()][$_sendReturn->getOrderId()][$product->getId()]['end_date'] = $_sendReturn->getResEnddate();
-                $returnPerCustomer[$order->getCustomerEmail()][$_sendReturn->getOrderId()][$product->getId()]['send_date'] = $_sendReturn->getSendDate();
-                $returnPerCustomer[$order->getCustomerEmail()][$_sendReturn->getOrderId()][$product->getId()]['return_date'] = $_returnTime;
+                $returnPerCustomer[$order->getCustomerEmail()][$sendReturn->getOrderId()][$product->getId()]['name'] = $product->getName();
+                $returnPerCustomer[$order->getCustomerEmail()][$sendReturn->getOrderId()][$product->getId()]['serials'] = $sendReturn->getSn();
+                $returnPerCustomer[$order->getCustomerEmail()][$sendReturn->getOrderId()][$product->getId()]['start_date'] = $sendReturn->getResStartdate();
+                $returnPerCustomer[$order->getCustomerEmail()][$sendReturn->getOrderId()][$product->getId()]['end_date'] = $sendReturn->getResEnddate();
+                $returnPerCustomer[$order->getCustomerEmail()][$sendReturn->getOrderId()][$product->getId()]['send_date'] = $sendReturn->getSendDate();
+                $returnPerCustomer[$order->getCustomerEmail()][$sendReturn->getOrderId()][$product->getId()]['return_date'] = $returnTime;
             }
-            ITwebexperts_Payperrentals_Helper_Inventory::updateInventory($_sendReturn->getProductId());
+            ITwebexperts_Payperrentals_Helper_Inventory::updateInventory($sendReturn->getProductId());
         }
         if(isset($returnPerCustomer)) {
             ITwebexperts_Payperrentals_Helper_Emails::sendEmail('return', $returnPerCustomer);

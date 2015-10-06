@@ -32,7 +32,7 @@ class ITwebexperts_Payperrentals_Model_Product_Type_Grouped extends Mage_Catalog
         $hasShipping = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($this->getProduct($product)->getId(),'payperrentals_has_shipping');
         $isReservation = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($this->getProduct($product)->getId(),'is_reservation');
         if($isReservation != ITwebexperts_Payperrentals_Model_Product_Isreservation::STATUS_DISABLED && $isReservation != ITwebexperts_Payperrentals_Model_Product_Isreservation::STATUS_NOTSET) {
-            return ((ITwebexperts_Payperrentals_Helper_Config::removeShipping())
+            return ((Mage::helper('payperrentals/config')->removeShipping())
                 || ($hasShipping
                     == ITwebexperts_Payperrentals_Model_Product_Hasshipping::STATUS_DISABLED));
         }else{

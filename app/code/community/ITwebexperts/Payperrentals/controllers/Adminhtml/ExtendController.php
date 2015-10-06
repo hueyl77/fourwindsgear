@@ -86,8 +86,7 @@ class ITwebexperts_Payperrentals_Adminhtml_ExtendController extends Mage_Adminht
 
             $product = Mage::getModel('catalog/product')->load($item->getProductId());
 
-            $quote->addProduct($product, $buyRequest);
-            $itemNew = $quote->getItembyProduct($product);
+            $itemNew = $quote->addProduct($product, $buyRequest);
             $itemNew->calcRowTotal();
             $quote->collectTotals();
         }

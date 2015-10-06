@@ -32,29 +32,21 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Html_Sendreturngrid extends Mag
     protected function _prepareCollection()
     {
 		$isIncludeNotSent = $this->getRequest()->getParam('include_not_sent');
-//		$isIncludeSent = $this->getRequest()->getParam('include_sent');
 		$isIncludeNotReturned = $this->getRequest()->getParam('include_not_returned');
-//		$isIncludeReturned = $this->getRequest()->getParam('include_returned');
-        $resource = Mage::getSingleton('core/resource');
-			$this->_collection = Mage::getModel('payperrentals/reservationorders')->getCollection();
+
+        	$resource = Mage::getSingleton('core/resource');
+			$this->_collection = Mage::getModel('payperrentals/sendreturn')->getCollection();
 			$this->_collection->getSelect()->joinLeft(array('sfo'=>$resource->getTableName('sales/order')), 'main_table.order_id = '.'sfo.entity_id','*');
-			$this->_collection->getSelect()->joinLeft(array('sendreturn'=>$resource->getTableName('payperrentals/sendreturn')), 'sendreturn_id = '.'sendreturn.id',array('send_date','return_date','qty','sn'));
-			$this->_collection->getSelect()->where('product_type = ?',ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE);
+			//$this->_collection->getSelect()->joinLeft(array('reservationorders'=>$resource->getTableName('payperrentals/reservationorders')), 'main_table.resorder_id = '.'reservationorders.id',array(''));
+			//$this->_collection->getSelect()->where('product_type = ?',ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE);
 			if(!$isIncludeNotSent){
-                $this->_collection->addFieldToFilter('sendreturn.send_date',array('notnull'=>true));
+                $this->_collection->addFieldToFilter('main_table.send_date',array('notnull'=>true));
 			}
-//			if($isIncludeSent){
-//				$this->_collection->getSelect()->where('main_table.sendreturn_id != ?','0');
-//			}
 			if(!$isIncludeNotReturned && !$isIncludeNotSent){
-                $this->_collection->addFieldToFilter('sendreturn.return_date',array('notnull'=>true));
-                $this->_collection->addFieldToFilter('sendreturn.return_date',array('neq'=>'0000-00-00 00:00:00'));
-                $this->_collection->addFieldToFilter('sendreturn.return_date',array('neq'=>'1970-01-01 00:00:00'));
-				//$this->_collection->getSelect()->where('sendreturn.return_date = ?','0000-00-00 00:00:00');
+                $this->_collection->addFieldToFilter('main_table.return_date',array('notnull'=>true));
+                $this->_collection->addFieldToFilter('main_table.return_date',array('neq'=>'0000-00-00 00:00:00'));
+                $this->_collection->addFieldToFilter('main_table.return_date',array('neq'=>'1970-01-01 00:00:00'));
 			}
-//			if($isIncludeReturned){
-//				$this->_collection->getSelect()->where('sendreturn.return_date != ?','0000-00-00 00:00:00');
-//			}
         if(urldecode($this->getRequest()->getParam('store'))) {
             $this->_collection->getSelect()->where('store_id=?', $this->getRequest()->getParam('store'));
         }
@@ -142,7 +134,7 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Html_Sendreturngrid extends Mag
           'header'    => Mage::helper('payperrentals')->__('Reservation Start'),
           'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
           'align'     =>'left',
-          'index'     => 'start_date',
+          'index'     => 'res_startdate',
 		  'renderer'  => new ITwebexperts_Payperrentals_Block_Adminhtml_Html_Renderer_Datetime(),
 		  'width'		=> '100px'
       ));
@@ -152,7 +144,7 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Html_Sendreturngrid extends Mag
 		  'header'    => Mage::helper('payperrentals')->__('Reservation End'),
           'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
 		  'align'     =>'left',
-		  'index'     => 'end_date',
+		  'index'     => 'res_enddate',
 		  'renderer'  => new ITwebexperts_Payperrentals_Block_Adminhtml_Html_Renderer_Datetime(),
 		  'width'		=> '100px'
 	  ));
@@ -209,7 +201,6 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Html_Sendreturngrid extends Mag
 //        $this->$collection->
 //        return $this;
 //    }
-
 
     /**
      * @param $row

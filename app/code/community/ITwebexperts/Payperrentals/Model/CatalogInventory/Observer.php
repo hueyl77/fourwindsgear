@@ -291,7 +291,6 @@ class ITwebexperts_Payperrentals_Model_CatalogInventory_Observer extends Mage_Ca
             ) {
                 $quoteItem->setData('qty', $result->getOrigQty());
             }
-
             if($result->getQty()) {
                 $qty = $result->getQty();
                 if($quoteItem->getParentItem()) {

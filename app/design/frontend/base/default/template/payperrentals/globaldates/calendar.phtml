@@ -1,77 +1,30 @@
+<?php if (ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDatesShoppingCart()):?>
 
-<?php
-
-if (ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDatesShoppingCart()):?>
-<?php
-
-$templatePhpInitialisations = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/php_initialisations.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));
-
-$templateJsInitialisations = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/js_initialisations.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));
-
-
-$templateGlobalCalendarFunctions = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar_functions.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));
-
-
-$templateStyles = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/styles.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));
-
-$templateGlobalCalendar = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));
-
-?>
-
-<?php require($templatePhpInitialisations); ?>
-<?php $_useTimes = ITwebexperts_Payperrentals_Helper_Config::useGlobalShoppingCartWithTime(); ?>
-<?php require($templateJsInitialisations); ?>
-<?php require($templateGlobalCalendar); ?>
-<?php require($templateGlobalCalendarFunctions); ?>
-<?php require($templateStyles); ?>
-<script type="text/javascript">
-    if(typeof $jppr('<?php echo $_jsContainerPrefix ?>').data('wait_price') === 'undefined'){
-        $jppr('<?php echo $_jsContainerPrefix ?>').data('wait_price', 1);
-        calculatePrice<?php echo $_jsFunctionPrefix ?> = function (selfObj) {
-            $jppr('.errorShow').text('');
-            $jppr('.datesShow').text('');
-            $jppr('#btn-update-global-dates').removeAttr('disabled');
-            $jppr('#btn-update-global-dates').attr('style', 'opacity:1')
-            $jppr.ajax({
-                cache: false,
-                dataType: 'json',
-                type: 'post',
-                url: '<?php echo Mage::getUrl("payperrentals_front/ajax/checkPriceForCart/")?>',
-                data: $jppr('<?php echo $_jsContainerPrefix; ?>').find('*').serialize(),
-                success: function (data) {
-                    if (data.noAllDate == false) {
-                        if (data.noHaveAmount != undefined && data.noHaveAmount != '') {
-                            var message = 'Products ' + data.noHaveAmount.replace('|||', ', ') + ' not have amount for selected date';
-                            $jppr('<?php echo $_jsContainerPrefix; ?> .errorShow').text(message);
-                            $jppr('#btn-update-global-dates').attr('disabled', 'disabled');
-                            $jppr('#btn-update-global-dates').attr('style', 'opacity:0.5')
-                        }
-                        if (data.useGlobalDisabled != undefined && data.useGlobalDisabled != '') {
-                            var message = 'Global event dates disabled for products ' + data.useGlobalDisabled.replace('|||', ', ');
-                            $jppr('<?php echo $_jsContainerPrefix; ?> .datesShow').text(message);
-                        }
-                    }
-                    $jppr('<?php echo $_jsContainerPrefix ?>').removeData('wait_price');
-                }
-            });
+    <?php
+        $_useFlicker = Mage::helper('payperrentals/config')->getThemeStyle(Mage::app()->getStore()->getId()) == ITwebexperts_Payperrentals_Model_Source_Themestyle::RTRW_STYLE;
+        $_localeCode = substr(Mage::app()->getLocale()->getLocaleCode(), 0, strpos(Mage::app()->getLocale()->getLocaleCode(), '_'));
+        if(!$_useFlicker){
+            $_langCode = $_localeCode;
+        }else{
+            $_langCode = 'flick';
         }
-    }
-    $jppr(document).ready(function(){
+    ?>
+    <script type="text/javascript">
+        jsMagentoUrl = '<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS);?>';
+        langCode = '<?php echo $_langCode;?>';
+    </script>
+
+    <script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/utils/require.js'; ?>"></script>
+    <script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/utils/frontendApp.js'; ?>"></script>
+    <script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) . 'mage/adminhtml/events.js'; ?>"></script>
+
+<?php $_useTimes = Mage::helper('payperrentals/config')->useGlobalShoppingCartWithTime(); ?>
+ <div id="shoppingCartCalendar">
+    <?php echo Mage::helper('payperrentals/calendar')->getCalendar(null, $_useTimes);?>
+ </div>
+<script type="text/javascript">
+
+    /*$jppr(window).load(function(){
         var htmlBut = $jppr('<div style="display: inline-block;vertical-align: middle;padding-top: 5px;" class="nearCalendar"><div class="calendar-button-container" style="display: inline-block;margin-right: 10px;">'+
             '<button id="btn-update-global-dates" type="submit" class="button">'+
             '<span>'+
@@ -80,16 +33,14 @@ $templateGlobalCalendar = Mage::getDesign()->getTemplateFilename('payperrentals/
         '</button>'+
         '</div> <div class="datesShow"></div>'+
          '<div class="errorShow"></div></div>');
-        //console.log(htmlBut);
-        $jppr('<?php echo $_jsContainerPrefix; ?>').wrapInner('<form action="<?php echo $this->getUrl('payperrentals_front/globaldates/update') ?>" method="post" id="formWrap"></form>');
-        //htmlBut.insertAfter( $jppr('<?php echo $_jsContainerPrefix; ?> .dateView'));
+        $jppr(currentCalendar).wrapInner('<form action="<?php echo $this->getUrl('payperrentals_front/globaldates/update') ?>" method="post" id="formWrap"></form>');
         $jppr('#formWrap').append(htmlBut);
-        $jppr('<?php echo $_jsContainerPrefix; ?> .btn-resfreshCalendar').parent().appendTo( $jppr('<?php echo $_jsContainerPrefix; ?> .nearCalendar'));
-        $jppr('<?php echo $_jsContainerPrefix; ?> .dateSelectedCalendar').css('display', 'inline-block');
-        $jppr('<?php echo $_jsContainerPrefix; ?> .dateSelectedCalendar').css('width', '450px');
-        $jppr('<?php echo $_jsContainerPrefix; ?> .dateSelectedCalendar').css('vertical-align', 'middle');
-        $jppr('<?php echo $_jsContainerPrefix; ?> .dateView').css('width','100%');
+        $jppr(currentCalendar).find(' .btn-resfreshCalendar').parent().appendTo( $jppr(currentCalendar).find(' .nearCalendar'));
+        $jppr(currentCalendar).find(' .dateSelectedCalendar').css('display', 'inline-block');
+        $jppr(currentCalendar).find(' .dateSelectedCalendar').css('width', '450px');
+        $jppr(currentCalendar).find(' .dateSelectedCalendar').css('vertical-align', 'middle');
+        $jppr(currentCalendar).find(' .dateView').css('width','100%');
 
-    });
+    });*/
 </script>
 <?php endif; ?>

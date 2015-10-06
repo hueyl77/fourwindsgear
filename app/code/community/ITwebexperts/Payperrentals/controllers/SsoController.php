@@ -15,7 +15,7 @@ class ITwebexperts_Payperrentals_SsoController extends Mage_Core_Controller_Fron
     {
 
         $concatString = '';
-        $decrypt_key = Mage::getStoreConfig(self::XML_PATH_SSO_ENCRYPTION_KEY);
+        $decrypt_key = Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Sso::XML_PATH_SSO_ENCRYPTION_KEY);
         $keyArray = array();
         $nrDecryptedKey = strlen($decrypt_key);
         for ($i = 0; $i < $nrDecryptedKey; $i++) {

@@ -5145,14 +5145,6 @@
    </reference>
 </customer_logged_in>
 <default>
-   <reference name="head">
-      <action method="addJs">
-         <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
-      </action>
-      <action method="addJs">
-         <script>itwebexperts_payperrentals/utils/frontendButtons.js</script>
-      </action>
-   </reference>
    <reference name="top.links">
       <action method="addLink" ifconfig="payperrentals/rental/show_rental_link" translate="label title" module="payperrentals">
          <label>Rental Queue</label>
@@ -5162,6 +5154,12 @@
          <urlParams/>
          <position>10</position>
       </action>
+   </reference>
+   <reference name="after_body_start">
+      <block type="core/template" name="ppr.body.start" alias="pprheader" template="payperrentals/html/header.phtml"/>
+   </reference>
+   <reference name="before_body_end">
+      <block type="core/template" name="ppr.body.end" alias="pprfooter" template="payperrentals/html/footer.phtml"/>
    </reference>
    <reference name="topppr.container">
       <block type="core/template" name="top.messageppr" as="topMessagePPR" template="payperrentals/catalog/topmessageppr.phtml"/>
@@ -5293,6 +5291,41 @@
       <block type="payperrentals/sales_order_total" name="payperrentals.sales.order.total"/>
    </reference>
 </sales_email_order_items>
+<sales_pdf_order_items>
+   <block type="sales/order_email_items" name="items" template="payperrentals/contractpdf/email/order/items.phtml">
+      <action method="addItemRender">
+         <type>default</type>
+         <block>payperrentals/sales_order_items_renderer</block>
+         <template>payperrentals/contractpdf/email/order/items/order/default.phtml</template>
+      </action>
+      <action method="addItemRender">
+         <type>bundle</type>
+         <block>payperrentals/sales_order_items_renderer_bundle</block>
+         <template>payperrentals/bundle/email/order/items/order/default.phtml</template>
+      </action>
+      <action method="addItemRender">
+         <type>grouped</type>
+         <block>sales/order_email_items_order_grouped</block>
+         <template>email/order/items/order/default.phtml</template>
+      </action>
+      <block type="core/template" name="order_totals_wrapper" as="order_totals" template="payperrentals/contractpdf/email/order/items/order/wrapper.phtml">
+         <block type="sales/order_totals" name="order_totals" template="sales/order/totals.phtml">
+            <action method="setLabelProperties">
+               <value>colspan="3" width="90%" align="right" style="padding:3px 9px"</value>
+            </action>
+            <action method="setValueProperties">
+               <value>align="right" width="10%" style="padding:3px 9px"</value>
+            </action>
+            <block type="tax/sales_order_tax" name="tax" template="tax/order/tax.phtml">
+               <action method="setIsPlaneMode">
+                  <value>1</value>
+               </action>
+            </block>
+         </block>
+      </block>
+   </block>
+   <block type="core/text_list" name="additional.product.info"/>
+</sales_pdf_order_items>
 <sales_email_order_invoice_items>
    <reference name="items">
       <action method="setTemplate">
@@ -5451,6 +5484,20 @@
    </reference>
 </checkout_cart_index>
 <checkout_onepage_index>
+   <reference name="head">
+      <action method="addJs">
+         <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
+      </action>
+      <action method="addJs">
+         <script>itwebexperts_payperrentals/jSignature/modernizr.js</script>
+      </action>
+      <action method="addJs">
+         <script>itwebexperts_payperrentals/jSignature/jSignature.min.noconflict.js</script>
+      </action>
+      <action method="addJs">
+         <script>itwebexperts_payperrentals/jSignature/jquery.noconflict.js</script>
+      </action>
+   </reference>
    <reference name="content">
       <block type="core/template" name="jsonepage" template="payperrentals/checkout/jsonepage.phtml"/>
    </reference>
@@ -5489,6 +5536,9 @@
          <block>payperrentals/checkout_item_renderer_bundle</block>
          <template>checkout/onepage/review/item.phtml</template>
       </action>
+   </reference>
+   <reference name="checkout.onepage.review.info.items.after">
+      <block type="payperrentals/checkout_onepage_review_signature" template="payperrentals/checkout/onepage/review/signature.phtml" name="payperrentals_sales_signature" as="payperrentals_sales_signature"/>
    </reference>
 </checkout_onepage_review>
 <checkout_multishipping_addresses>
@@ -5680,18 +5730,6 @@
    <label>Extend Order</label>
    <update handle="customer_account"/>
    <reference name="head">
-      <action method="addJs">
-         <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
-      </action>
-      <action method="addJs">
-         <script>itwebexperts_payperrentals/jquery/jquery-ui.min.js</script>
-      </action>
-      <action method="addJs">
-         <script>itwebexperts_payperrentals/jquery/timepicker/jquery-ui-timepicker-addon.min.js</script>
-      </action>
-      <action method="addJs">
-         <script>itwebexperts_payperrentals/jquery/jquery.noconflict.js</script>
-      </action>
       <action method="addItem">
          <type>js_css</type>
          <name>itwebexperts_payperrentals/jquery/jquery-ui.min.css</name>
@@ -5722,6 +5760,29 @@
       </action>
    </reference>
 </customer_account_index>
+<payperrentals_front_signature_sign>
+   <update handle="customer_account"/>
+   <reference name="head">
+      <action method="addJs">
+         <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
+      </action>
+      <action method="addJs">
+         <script>itwebexperts_payperrentals/jSignature/modernizr.js</script>
+      </action>
+      <action method="addJs">
+         <script>itwebexperts_payperrentals/jSignature/jSignature.min.noconflict.js</script>
+      </action>
+      <action method="addJs">
+         <script>itwebexperts_payperrentals/jSignature/jSignature.UndoButton.js</script>
+      </action>
+      <action method="addJs">
+         <script>itwebexperts_payperrentals/jSignature/jquery.noconflict.js</script>
+      </action>
+   </reference>
+   <reference name="content">
+      <block type="payperrentals/signature_view" name="payperrentals_sales_signature" template="payperrentals/signature/view.phtml"/>
+   </reference>
+</payperrentals_front_signature_sign>
 <default>
    <reference name="head">
       <action method="addCss">

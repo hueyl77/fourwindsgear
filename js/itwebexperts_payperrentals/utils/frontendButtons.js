@@ -349,7 +349,6 @@ $jpprTop(document).ready(function () {
             var jButton = $jpprTop('<button type="button" title="' + butName + '" style="margin-bottom:5px;" class="button btn-cart btn-cart-res" onclick="setLocation(\'' + location + '\')"><span><span>' + butName + '</span></span></button>');
             nextDiv.after(jButton);
                 nextDiv.remove();
-
             });
         }else{
             $jpprTop('.ppr_attr_butname_global').each(function () {

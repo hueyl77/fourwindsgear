@@ -4,8 +4,6 @@
  * @var $_row ITwebexperts_Rshipping_Model_Rshipping
  */
 ?>
-<?php $_jsContainerPrefix = $this->getJsContainerPostfix(); ?>
-<?php $_jsFunctionPrefix = $this->getJsFunctionPostfix(); ?>
 <?php $_rentalShipping = (Mage::getSingleton('checkout/session')->hasData('rental_shipping')) ? Mage::getSingleton('checkout/session')->getData('rental_shipping') : null ?>
 <?php $_configHelper = Mage::helper('rshipping/config'); ?>
 <?php $_storeId = Mage::app()->getStore()->getId(); ?>
@@ -91,69 +89,62 @@
                 </span>
             <?php Mage::register('ship_not_avail', true); ?>
         <?php endif; ?>
-
         <script type="text/javascript">
-            //<![CDATA[
-            document.observe("dom:loaded", function () {
-                /* observe shipping method select box change*/
-                if (typeof $selfID<?php echo $_jsFunctionPrefix ?> == 'undefined') {
-                    $selfID<?php echo $_jsFunctionPrefix ?> = $jppr('<?php echo $_jsContainerPrefix ?>');
+            require(['jppr'], function(myNonGlobaljQuery) {
+                if ($jppr(currentCalendar).find(' select[name=shipping_method_select_box]').val() == 'flatrate_flatrate') {
+                    $jppr(currentCalendar).find(' input[name=shipping_method]').val($jppr(currentCalendar).find(' select[name=shipping_method_select_box]').val());
                 }
 
-                if ($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box]').val() == 'flatrate_flatrate') {
-                    $jppr('<?php echo $_jsContainerPrefix ?> input[name=shipping_method]').val($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box]').val());
-                }
-
-                $jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box_additional]').change(function () {
+                $jppr(currentCalendar).find(' select[name=shipping_method_select_box_additional]').change(function () {
                     $jppr('.btn-resfreshCalendar').trigger('click');
-                    $jppr('<?php echo $_jsContainerPrefix ?> input[name=shipping_method]').val($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box_additional]').val());
-                    updateBookedDates<?php echo $_jsFunctionPrefix ?>($selfID<?php echo $_jsFunctionPrefix ?>);
+                    $jppr(currentCalendar).find(' input[name=shipping_method]').val($jppr(currentCalendar).find(' select[name=shipping_method_select_box_additional]').val());
+                    updateBookedDates();
                 });
-                $jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box]').change(function () {
+                $jppr(currentCalendar).find(' select[name=shipping_method_select_box]').change(function () {
                     $jppr('.btn-resfreshCalendar').trigger('click');
-                    if ($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box]').val() == 'null') {
-                        $jppr('<?php echo $_jsContainerPrefix ?> input[name=shipping_method]').val($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box_additional]').val());
-                        $jppr('<?php echo $_jsContainerPrefix ?> .additional-shipping').show();
-                        if ($jppr('<?php echo $_jsContainerPrefix ?> #zip_code').val() == '') {
-                            $jppr('<?php echo $_jsContainerPrefix ?> .readStartDate, <?php echo $_jsContainerPrefix ?> .readEndDate').attr('disabled', true);
+                    if ($jppr(currentCalendar).find(' select[name=shipping_method_select_box]').val() == 'null') {
+                        $jppr(currentCalendar).find(' input[name=shipping_method]').val($jppr(currentCalendar).find(' select[name=shipping_method_select_box_additional]').val());
+                        $jppr(currentCalendar).find(' .additional-shipping').show();
+                        if ($jppr(currentCalendar).find(' #zip_code').val() == '') {
+                            $jppr(currentCalendar).find(' .readStartDate, .readEndDate').attr('disabled', true);
                             if($jppr('.datesblock .calendarSelector .datesSelector').length == 0) {
                                 $jppr('.dateSelectedCalendar').hide();
                                 $jppr('.zip-select-panel').show();
                             }
                         }
-                        //updateBookedDates($selfID);
                     } else {
-                        $jppr('<?php echo $_jsContainerPrefix ?> input[name=shipping_method]').val($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box]').val());
-                        $jppr('<?php echo $_jsContainerPrefix ?> .additional-shipping').hide();
-                        $jppr('<?php echo $_jsContainerPrefix ?> .additional-shipping-methods').hide();
-                        updateBookedDates<?php echo $_jsFunctionPrefix ?>($selfID<?php echo $_jsFunctionPrefix ?>);
+                        $jppr(currentCalendar).find(' input[name=shipping_method]').val($jppr(currentCalendar).find(' select[name=shipping_method_select_box]').val());
+                        $jppr(currentCalendar).find(' .additional-shipping').hide();
+                        $jppr(currentCalendar).find(' .additional-shipping-methods').hide();
+                        updateBookedDates();
                     }
                 });
 
-                $jppr('<?php echo $_jsContainerPrefix ?> #zip-submit').click(function () {
-                    $jppr('<?php echo $_jsContainerPrefix ?> .errorShow').html('').hide();
-                    if ($jppr('<?php echo $_jsContainerPrefix ?> #zip_code').val() == '' || $jppr('<?php echo $_jsContainerPrefix ?> #zip_code').val() == undefined) {
+                $jppr(currentCalendar).find(' #zip-submit').click(function () {
+                    $jppr(currentCalendar).find(' .errorShow').html('').hide();
+                    if ($jppr(currentCalendar).find(' #zip_code').val() == '' || $jppr(currentCalendar).find(' #zip_code').val() == undefined) {
                         if($jppr('.datesblock .calendarSelector .datesSelector').length == 0) {
                             $jppr('.dateSelectedCalendar').hide();
                             $jppr('.zip-select-panel').show();
                         }
-                        $jppr('<?php echo $_jsContainerPrefix ?> .errorShow').html('<?php echo $this->__("Please specify zip code") ?>').show();
+                        $jppr(currentCalendar).find(' .errorShow').html('<?php echo $this->__("Please specify zip code") ?>').show();
                     } else {
                         /*TODO add ajax save zip code*/
-                        $jppr('<?php echo $_jsContainerPrefix ?> input[name=shipping_method]').val($jppr('<?php echo $_jsContainerPrefix ?> select[name=shipping_method_select_box_additional]').val());
-                        $jppr('<?php echo $_jsContainerPrefix ?> .additional-shipping-methods').show();
-                        updateBookedDates<?php echo $_jsFunctionPrefix ?>($selfID<?php echo $_jsFunctionPrefix ?>);
+                        $jppr(currentCalendar).find(' input[name=shipping_method]').val($jppr(currentCalendar).find(' select[name=shipping_method_select_box_additional]').val());
+                        $jppr(currentCalendar).find(' .additional-shipping-methods').show();
+                        updateBookedDates();
                         if($jppr('.datesblock .calendarSelector .datesSelector').length == 0) {
                             $jppr('.dateSelectedCalendar').show();
                             $jppr('.zip-select-panel').hide();
                         }
-                        $jppr('<?php echo $_jsContainerPrefix ?> .readStartDate, <?php echo $_jsContainerPrefix ?> .readEndDate').attr('disabled', false);
+                        $jppr(currentCalendar).find(' .readStartDate, .readEndDate').attr('disabled', false);
 
-                        $jppr('<?php echo $_jsContainerPrefix ?> .selectedDayRadio:checked').trigger('click');
+                        $jppr(currentCalendar).find(' .selectedDayRadio:checked').trigger('click');
                     }
                 });
             });
-            //]]>
         </script>
+
+
     </div>
 <?php endif; ?>

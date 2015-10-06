@@ -52,5 +52,4 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Sendreturnhistory extends Mage_
             return 'checked';
         }
     }
-
 }

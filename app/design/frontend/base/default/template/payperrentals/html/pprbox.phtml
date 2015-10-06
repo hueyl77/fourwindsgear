@@ -16,39 +16,10 @@ $use_right	=	Mage::getStoreConfig('payperrentals/global/use_pprbox_right',Mage::
 $use_header	=	Mage::getStoreConfig('payperrentals/global/use_pprbox_header',Mage::app()->getStore());
 $use_homepage	=	Mage::getStoreConfig('payperrentals/global/use_pprbox_homepage',Mage::app()->getStore());
 $use_styling	=	Mage::getStoreConfig('payperrentals/calendar_widget/use_pprbox_style',Mage::app()->getStore());
-
 $isFrontendGlobal = true;
-$templatePhpInitialisations = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/php_initialisations.phtml', array(
-    '_area' => 'frontend',
-    '_relative' => false
-));
-$templateGlobalCalendarFunctions = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar_functions.phtml', array(
-    '_area' => 'frontend',
-    '_relative' => false
-));
-
-$templateJsInitialisations = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/js_initialisations.phtml', array(
-    '_area' => 'frontend',
-    '_relative' => false
-));
-
-$templateStyles = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/styles.phtml', array(
-    '_area' => 'frontend',
-    '_relative' => false
-));
-
-$templateGlobalCalendar = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar.phtml', array(
-    '_area' => 'frontend',
-    '_relative' => false
-));
-?>
-
-<?php
-
 $is_homepage = Mage::getBlockSingleton('page/html_header')->getIsHomePage();
 $is_product_view = (Mage::registry('current_product'));
 $block = $this->getNameInLayout();
-
 
 if($block == 'left.pprbox' && !$use_left){
     return;
@@ -67,9 +38,9 @@ if($block == 'header.pprbox' && !$use_homepage && $is_homepage){
 if($block == 'header.pprbox' && $use_homepage && !$is_homepage){
     return;
 }
-if($is_product_view && ITwebexperts_Payperrentals_Helper_Config::showCalendarOnProductInfo()){
-    return;
-}
+//if($is_product_view && Mage::helper('payperrentals/config')->showCalendarOnProductInfo()){
+  //  return;
+//}
 $request = $this->getRequest();
 $module = $request->getModuleName();
 $controller = $request->getControllerName();
@@ -78,94 +49,35 @@ $action = $request->getActionName();
 if($module == 'checkout' && $controller == 'cart' && $action == 'index'){
     return;
 }
-
 ?>
-
-<?php require($templatePhpInitialisations); ?>
-<?php
-if (!($_selectedArray !== false || ITwebexperts_Payperrentals_Helper_Config::useListButtons())){
-    $_useTimes = ITwebexperts_Payperrentals_Helper_Config::useGlobalDatesWithTime();
-}else{
-    $_useTimes = 0;
-}
-
-?>
-<?php require($templateJsInitialisations); ?>
-
     <script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/utils/jquery.hiddenposition.js'; ?>"></script>
     <script type="text/javascript">
 
-    <?php //I should have eventDates too and when not enabled should not show the calendar only the events ?>
-    $jppr(document).ready(function(){
-
-        <?php if($is_homepage && $use_styling):?>
-        var offset = $jppr('#hp-search-block').offset();
-        $jppr('#hp-search-block').css("left", ($jppr(window).width() / 2 - 400) + "px");
-        $jppr('#hp-search-block').css("top", (offset.top + 90) + "px");
-
-        $jppr('#hp-size').click(function(){
-            if($jppr('#sizes').css('display') == 'none'){
-                $jppr('#sizes').css('display','block');
-            }else{
-                $jppr('#sizes').css('display','none');
-            }
-        });
-        $jppr('#size-close').click(function(){
-            $jppr('#sizes').css('display','none');
-        });
-        $jppr('.size').click(function(){
-            if(!$jppr(this).hasClass('size-selected')){
-                $jppr(this).addClass('size-selected');
-            }else{
-                $jppr(this).removeClass('size-selected');
-            }
-        });
-        $jppr('#hp-search-btn').click(function(){
-            var urlString = '';
-            var attrName = $jppr('#attrName').val();
-            $jppr('.size-selected').each(function(){
-                urlString += attrName+'[]='+$jppr(this).attr('theval')+'&';
-            });
-            if(urlString != ''){
-                window.location.href = 'catalogsearch/advanced/result/?'+urlString;
-            }else{
-                window.location.href = '<?php echo $categoryMainUrl;?>';
-            }
-            return false;
-        });
-        $jppr('.calendarSelector').removeAttr('showLegend');
-        $jppr('.calendarSelector').removeAttr('nrSel');
-        $jppr('.calendarSelector .btn-resfreshCalendar').css('display','none');
-        $jppr('.calendarSelector .dateSelectorStart label').css('display','none');
-
-       /* $jppr('#fromdate').datepick({ monthsToShow: 1
-        })
-            ;*/
-
-        <?php endif;?>
-    });
-
-
+    currentCalendar = '.datesblock';
     function followCategory(url, force)
     {
         //replace jscontainerprefix with a js variable which contains either of the too if on product view page .reservationCalendarDiv .calendarSelector
         if(typeof force === 'undefined' || force == false) {
         <?php if ($_product && $_product->getHideEndDate() || Mage::getStoreConfig('payperrentals/listing/hide_end_date_product')): ?>
-        if($jppr('<?php echo $_jsContainerPrefix ?> .readStartDate').val() == ''){
+        if($jppr(currentCalendar).find('.readStartDate').val() == ''){
             alert('Please select starting date!');
             return false;
         }
         <?php else: ?>
-        if($jppr('<?php echo $_jsContainerPrefix ?> .readEndDate').val() == '' || $jppr('<?php echo $_jsContainerPrefix ?> .readStartDate').val() == '' ){
+        if($jppr(currentCalendar).find('.readEndDate').val() == '' || $jppr(currentCalendar).find('.readStartDate').val() == '' ){
             alert('Please select both dates!');
             return false;
         }
-        if($jppr('<?php echo $_jsContainerPrefix ?> .readStartDate').val() == $jppr('<?php echo $_jsContainerPrefix ?> .readEndDate').val() && $jppr('<?php echo $_jsContainerPrefix ?> .start_time').val() == $jppr('<?php echo $_jsContainerPrefix ?> .end_time').val()){
+        if($jppr(currentCalendar).find('.readStartDate').val() == $jppr(currentCalendar).find('.readEndDate').val() && $jppr(currentCalendar).find('.start_time').val() == $jppr(currentCalendar).find('.end_time').val()){
             alert('You have selected invalid rental times. The End Time needs to be later than the Start Time!');
             return false;
         }
         <?php endif; ?>
-
+            varienGlobalEvents.attachEventHandler('update_initial_global_success', function(data){
+                if(typeof data.url !== "undefined"){
+                    window.location = data.url;
+                }
+            });
         updateInitialsGlobal(url);
         }else{
             window.location.href=url;
@@ -173,13 +85,9 @@ if (!($_selectedArray !== false || ITwebexperts_Payperrentals_Helper_Config::use
         return false;
 
     }
-    varienGlobalEvents.attachEventHandler('update_initial_global_success', function(data){
-        if(typeof data.url !== "undefined"){
-            window.location = data.url;
-        }
-    });
 
-    <?php if(ITwebexperts_Payperrentals_Helper_Config::disableClickingRentIfDatesNotSelected()): ?>
+
+    <?php if(Mage::helper('payperrentals/config')->disableClickingRentIfDatesNotSelected()): ?>
     $jppr(window).load(function(){
         $jppr('.btn-cart-res[onclick]').each(function(){
             $jppr(this).data('onclick', this.onclick);
@@ -205,8 +113,6 @@ if (!($_selectedArray !== false || ITwebexperts_Payperrentals_Helper_Config::use
             <div id="hp-search-title" class="head2">LET'S GET DRESSED</div>
             <div id="hp-search-subtitle"></div>
             <div class="rescal-datepicker-wrapper">
-                <?php require($templateGlobalCalendar); ?>
-                <?php require($templateGlobalCalendarFunctions); ?>
             </div>
             <?php if($attrName != ''): ?>
             <div class="flr pretty-checkbox-set">
@@ -450,10 +356,6 @@ if (!($_selectedArray !== false || ITwebexperts_Payperrentals_Helper_Config::use
         }
 
     </style>
-    <?php require($templateStyles); ?>
-    <script type="text/javascript">
-
-    </script>
 <?php else:?>
 
 <?php if(!$use_header || $is_homepage):?>
@@ -470,10 +372,10 @@ if (!($_selectedArray !== false || ITwebexperts_Payperrentals_Helper_Config::use
         <div class="vertical-nav-container-global <?php if($is_homepage): ?>block-pprdates-vertical-nav-container-homepage <?php endif;?>">
             <div class="vertical-nav <?php if($is_homepage): ?>block-pprdates-vertical-nav-homepage <?php endif;?>">
                 <div class="datesblock" style="<?php if(!$use_header || $is_homepage):?> float:left;<?php else: ?> <?php endif;?>">
-                    <?php require($templateGlobalCalendar); ?>
-                    <?php if(!$is_product_view || $is_product_view && !ITwebexperts_Payperrentals_Helper_Config::showCalendarOnProductInfo()): ?>
-                        <?php require($templateGlobalCalendarFunctions); ?>
-                    <?php endif; ?>
+
+                    <?php //if(!$is_product_view || $is_product_view && !Mage::helper('payperrentals/config')->showCalendarOnProductInfo()): ?>
+                    <?php echo $this->getCalendar(); ?>
+                    <?php //endif; ?>
 
                     <?php // if(!$is_homepage) {
 
@@ -572,15 +474,8 @@ if (!($_selectedArray !== false || ITwebexperts_Payperrentals_Helper_Config::use
                 background:none;
                 border:0;
             }
-            .block-pprdates-homepage-topcontainer{
-               /* left: 600px;
-                position: relative;
-                top: 20px;*/
-            }
+
             .vertical-nav-container-global .btn-cart{
-                /*left: 600px;
-                position: relative;
-                top: 20px;*/
                 margin-top: 10px;
             }
 
@@ -588,15 +483,15 @@ if (!($_selectedArray !== false || ITwebexperts_Payperrentals_Helper_Config::use
                 width:auto !important;
             }
             <?php if ($use_header): ?>
-            .dateView{
+            .datesblock .dateView{
                 display: inline-block !important;
                 width: 600px !important;
                 margin-right:30%;
             }
-            .btn-resfreshCalendar{
+            .datesblock .btn-resfreshCalendar{
                 display: none;
             }
-            .calendarSelector{
+            .datesblock .calendarSelector{
                 display: inline-block;
             }
             .vertical-nav-container-global{
@@ -606,18 +501,18 @@ if (!($_selectedArray !== false || ITwebexperts_Payperrentals_Helper_Config::use
                 position:relative;
                 z-index:100000;
             }
-            .dateStartLine{
+            .datesblock .dateStartLine{
                 width:250px;
                 display: inline-block;
             }
-            .dateSelectorStart label{
+            .datesblock .dateSelectorStart label{
                 display: inline-block;
             }
-            .dateSelectorEnd label{
+            .datesblock .dateSelectorEnd label{
                 display: inline-block;
             }
 
-            .dateEndLine{
+            .datesblock .dateEndLine{
                 width:250px;
                 display: inline-block;
             }
@@ -626,14 +521,13 @@ if (!($_selectedArray !== false || ITwebexperts_Payperrentals_Helper_Config::use
                 width:550px;
                 margin-top: 11px;
             }
-            .legend-detail-container{
+            .datesblock .legend-detail-container{
                 display: none;
             }
 
             <?php endif; ?>
 
         </style>
-    <?php require($templateStyles); ?>
 <?php if(!$use_header  || $is_homepage): ?>
     <?php if($is_homepage): ?>
             </div>

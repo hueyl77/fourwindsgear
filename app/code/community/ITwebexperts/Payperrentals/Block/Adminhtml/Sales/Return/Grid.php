@@ -12,7 +12,7 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Sales_Return_Grid extends Mage_
 
     protected function _getCollectionClass()
     {
-        return 'sales/order_shipment_grid_collection';
+        return 'payperrentals/sendreturn_collection';
     }
 
     /**
@@ -29,17 +29,11 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Sales_Return_Grid extends Mage_
 
     public function setCollection($collection)
     {
-        $collection->getSelect()->join(array('s' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')),
+        $collection->addFieldToFilter('return_date', array("neq"=>'0000-00-00 00:00:00'));
+        $collection->getSelect()->joinLeft(array('s' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')),
             'main_table.order_id = s.entity_id',
-            array('start_datetime','end_datetime', 'send_datetime', 'return_datetime'));
-        // Join send return table and remove rows that are blank dates for return
-        $collection->getSelect()->join(array('s2' => Mage::getSingleton('core/resource')->getTableName('payperrentals/sendreturn')),
-            'main_table.order_id = s2.order_id', array('return_date'));
-        $collection->addAttributeToFilter('return_date', array("neq"=>'0000-00-00 00:00:00'));
-        $expr
-            = "(SELECT IFNULL(IF(s2.`return_date`<>'0000-00-00 00:00:00', IFNULL(s2.`return_date`,s2.`res_enddate`), s2.`res_enddate`), s2.`res_enddate`)) as `ends_date`";
-        $collection->getSelect()->columns(new Zend_Db_Expr($expr));
-        $collection->getSelect()->group('s.entity_id');
+            array('start_datetime','end_datetime', 'send_datetime', 'return_datetime','increment_id','created_at'));
+
         parent::setCollection($collection);
     }
 
@@ -51,27 +45,28 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Sales_Return_Grid extends Mage_
             'type'      => 'datetime',
         ));
 
-        $this->addColumn('order_increment_id', array(
+        $this->addColumn('increment_id', array(
             'header'    => Mage::helper('sales')->__('Order #'),
-            'index'     => 'order_increment_id',
+            'index'     => 'increment_id',
             'type'      => 'text',
         ));
 
-        $this->addColumn('order_created_at', array(
+        $this->addColumn('created_at', array(
             'header'    => Mage::helper('sales')->__('Order Date'),
-            'index'     => 'order_created_at',
+            'index'     => 'created_at',
             'type'      => 'datetime',
         ));
 
-        $this->addColumn('shipping_name', array(
-            'header' => Mage::helper('sales')->__('Ship to Name'),
-            'index' => 'shipping_name',
+        $this->addColumn('qty', array(
+            'header' => Mage::helper('sales')->__('Qty'),
+            'index' => 'qty',
+            'type'  => 'number',
         ));
 
-        $this->addColumn('total_qty', array(
-            'header' => Mage::helper('sales')->__('Total Qty'),
-            'index' => 'total_qty',
-            'type'  => 'number',
+        $this->addColumn('sn', array(
+            'header' => Mage::helper('sales')->__('Serials'),
+            'index' => 'sn',
+            'type'      => 'text'
         ));
 
         $this->addColumnAfter('start_datetime', array(
@@ -89,22 +84,6 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Sales_Return_Grid extends Mage_
             'render' => 'ITwebexperts_Payperrentals_Block_Adminhtml_Html_Renderer_Datetime',
             'filter_index' => 'end_datetime',
         ), 'start_datetime');
-
-        $this->addColumnAfter('send_datetime', array(
-            'header' => Mage::helper('sales')->__('Dropoff Date'),
-            'index' => 'send_datetime',
-            'type'  => 'datetime',
-            'render' => 'ITwebexperts_Payperrentals_Block_Adminhtml_Html_Renderer_Datetime',
-            'filter_index' => 'send_datetime',
-        ), 'end_datetime');
-
-        $this->addColumnAfter('return_datetime', array(
-            'header' => Mage::helper('sales')->__('Pickup Date'),
-            'index' => 'return_datetime',
-            'type'  => 'datetime',
-            'render' => 'ITwebexperts_Payperrentals_Block_Adminhtml_Html_Renderer_Datetime',
-            'filter_index' => 'return_datetime',
-        ), 'send_datetime');
 
         $this->addColumnAfter('create_latefee', array(
                 'header'   => Mage::helper('payperrentals')->__('Is Late'),

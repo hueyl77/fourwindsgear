@@ -3,7 +3,7 @@
 		<script type="text/javascript">
         (function($){
             $(document).ready(function($){
-                $('#jm-slide-55fd0d4e6922f').jmSlider({
+                $('#jm-slide-5611cf5e5b780').jmSlider({
                     animation: 'hrzslide', 						//[slide, fade, slice], slide and fade for old compactible
                     interval: 8000,								//interval - time for between animation
                     duration: 500,								//duration - time for animation
@@ -40,7 +40,7 @@
 	</script>
 
 <div class="block jm-slideshow jm-slideshow-horizontal">
-        <div class="jm-slidewrap" id="jm-slide-55fd0d4e6922f" style="visibility:hidden;">
+        <div class="jm-slidewrap" id="jm-slide-5611cf5e5b780" style="visibility:hidden;">
             <div class="jm-slide-main-wrap">
                 <div class="jm-slide-main">
                                                         <div class="jm-slide-item"><img src="http://fourwindsgear.com/media/jmslideshow/1.jpg" alt="" width="1300" height="600"/>                                                                        </div>
@@ -60,13 +60,13 @@
             
                             <div class="jm-slide-descs">
                                             <div class="jm-slide-desc">
-                            <div class="desc-slide"><span class="text-title">Rent Camping Gears</span><span class="text-desc">Rent quality camping gears cheaply</span><a href="#" class="readmore">Rent now</a></div>                                                    </div>
+                            <div class="desc-slide"><span class="text-title">Rent Camping Gear</span><span class="text-desc">Rent quality camping gear cheaply</span><a href="/camping-gear.html" class="readmore">Rent now</a></div>                                                    </div>
                                             <div class="jm-slide-desc">
-                            <div class="desc-slide"><span class="text-title">Convenient  Shipping</span><span class="text-desc">Ship directly to your home or destination</span><a href="#" class="readmore">Rent now</a></div>                                                    </div>
+                            <div class="desc-slide"><span class="text-title">Convenient  Shipping</span><span class="text-desc">Ship directly to your home or destination</span><a href="/camping-gear.html" class="readmore">Rent now</a></div>                                                    </div>
                                             <div class="jm-slide-desc">
-                            <div class="desc-slide"><span class="text-title">Go Camping!</span><span class="text-desc">Enjoy your trip without worrying about buying the right gears</span><a href="#" class="readmore">Rent now</a></div>                                                    </div>
+                            <div class="desc-slide"><span class="text-title">Go Camping!</span><span class="text-desc">Enjoy your trip without worrying about buying the right gear</span><a href="/camping-gear.html" class="readmore">Rent now</a></div>                                                    </div>
                                             <div class="jm-slide-desc">
-                            <div class="desc-slide"><span class="text-title">Ship it back</span><span class="text-desc">Ship back your gear in the provided shipping label</span><a href="#" class="readmore">Rent now</a></div>                                                    </div>
+                            <div class="desc-slide"><span class="text-title">Ship it back</span><span class="text-desc">Ship back your gear in the provided shipping label</span><a href="/camping-gear.html" class="readmore">Rent now</a></div>                                                    </div>
                                     </div>
                 </div>
 </div></div>

@@ -48,16 +48,13 @@ foreach($salesCollection as $order){
 
 /*start update turnovers --not checking the case if there are no turnovers, normally they should be setup*/
 $reservationOrdersModel = Mage::getModel("payperrentals/reservationorders");
-$reservationOrdersCollection = $reservationOrdersModel->getCollection()
-    /*->addFieldToFilter("DATE_FORMAT(end_turnover_after,'%H:%i:%s')", array(
-            'eq' => '00:00:00',
-        ))*/;
+$reservationOrdersCollection = $reservationOrdersModel->getCollection();
+$write = Mage::getSingleton('core/resource')->getConnection('core_write');
 foreach($reservationOrdersCollection as $resObj) {
     $orderItem = Mage::getModel('sales/order_item')->load($resObj->getOrderItemId());
     $options = $orderItem->getProductOptions();
     if(isset($options['info_buyRequest'])) {
         $turnoverAr = ITwebexperts_Payperrentals_Helper_Data::getTurnoverFromQuoteItemOrBuyRequest($resObj->getProductId(), $options['info_buyRequest'], $resObj->getStartDate(), $resObj->getEndDate());
-        $write = Mage::getSingleton('core/resource')->getConnection('core_write');
         $write->query("update " . Mage::getSingleton('core/resource')->getTableName('payperrentals/reservationorders') . " set start_turnover_before=? where id=?", array($turnoverAr['before'], $resObj->getId()));
         $write->query("update " . Mage::getSingleton('core/resource')->getTableName('payperrentals/reservationorders') . " set end_turnover_after=? where id=?", array($turnoverAr['after'], $resObj->getId()));
     }
@@ -105,6 +102,18 @@ if(count($reservationOrdersCollection)) {
         //$write->query("DELETE FROM `".Mage::getSingleton('core/resource')->getTableName('payperrentals/reservationorders')."` WHERE `order_id`=".$reservationItem->getOrderId());
     }
 }
+
+/*update sendreturn with resorder_id*/
+$reservationOrdersModel1 = Mage::getModel("payperrentals/reservationorders");
+$reservationOrdersCollection1 = $reservationOrdersModel1->getCollection()
+    ->addFieldToFilter('sendreturn_id > 0');
+foreach($reservationOrdersCollection1 as $resObj) {
+    $write->query("update " . Mage::getSingleton('core/resource')->getTableName('payperrentals/sendreturn') . " set resorder_id=? where id=?", array($resObj->getId(), $resObj->getSendreturnId()));
+}
+
+$write->query("update " . Mage::getSingleton('core/resource')->getTableName('payperrentals/reservationorders') . " set sendreturn_id=?", array(0));
+
+/*end updatesendreturn*/
 ?>
 
 <div class="content-header">

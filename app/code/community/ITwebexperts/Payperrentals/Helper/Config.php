@@ -53,7 +53,6 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
     const XML_PATH_TURNOVER_BEFORE_NUMBER = 'payperrentals/appearance_turnover/turnover_before_number';
     
     const XML_PATH_TURNOVER_BEFORE_TYPE = 'payperrentals/appearance_turnover/turnover_before_type';
-
     const XML_PATH_EXCLUDE_DISABLED_DAYS_FROM_TURNOVER = 'payperrentals/appearance_turnover/exclude_disabled_from_turnover';
     
     const XML_PATH_HIDE_BOOKED_IN_GRID = 'payperrentals/appearance_inventory/hide_booked_inventory_grid';
@@ -87,7 +86,6 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
     const XML_PATH_CATEGORY_MEMBERSHIP = 'payperrentals/rental/category_membership';
     
     const XML_PATH_FORCE_USE_TIMES = 'payperrentals/create_order_admin/admin_time_dropdown';
-    
     const XML_PATH_DEPOSIT_CHECKOUT = 'payperrentals/deposit/deposit_checkout';
 
     const XML_PATH_SHOW_MIN_MAX_DETAILS_PAGE = 'payperrentals/appearance_period/show_min_max_details_page';
@@ -108,6 +106,10 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
     const XML_PATH_PRICE_NO_DISABLED_DAYS = 'payperrentals/store/price_no_disabled_days';
     const XML_PATH_REMOVE_SHIPPING = 'payperrentals/checkout_options/remove_shipping';
     const XML_PATH_DEPOSIT_TYPE = 'payperrentals/checkout_options/deposit_type';
+    const XML_PATH_GLOBAL_DEPOSIT_PER_ORDER = 'payperrentals/checkout_options/deposit_per_order';
+    const XML_PATH_GLOBAL_DEPOSIT_PER_PRODUCT = 'payperrentals/checkout_options/global_deposit_per_product';
+    const XML_PATH_FORCE_DAMAGE_WAIVER = 'payperrentals/checkout_options/force_damage_waiver';
+    const XML_PATH_GLOBAL_DAMAGE_WAIVER = 'payperrentals/checkout_options/global_damage_waiver';
     const XML_PATH_HIDE_ADDRESSES = 'payperrentals/advanced_not_used/hide_addresses';
     const XML_PATH_USE_LIST_BUTTONS = 'payperrentals/global/use_list_buttons';
     const XML_PATH_GLOBAL_DATES_WITH_TIME = 'payperrentals/global/use_pprbox_shopping_cart_time';
@@ -119,6 +121,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
     const XML_PATH_MIN_QTY_ALLOWED = 'payperrentals/appearance_period/min_qty_allowed';
     const XML_PATH_MAX_QTY_ALLOWED = 'payperrentals/appearance_period/max_qty_allowed';
     const XML_PATH_TIME_INCREMENT = 'payperrentals/calendar_options/time_increment';
+    const XML_PATH_FUTURE_LIMIT = 'payperrentals/calendar_options/future_limit';
     const XML_PATH_ADDTIME_NUMBER = 'payperrentals/appearance_price/addtime_number';
     const XML_PATH_ADDTIME_TYPE = 'payperrentals/appearance_price/addtime_type';
     const XML_PATH_DISABLED_DAYS_WEEK = 'payperrentals/store/disabled_days_week';
@@ -152,11 +155,40 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
     const XML_PATH_ALLOW_ADMIN_OVERBOOK = 'payperrentals/overbooking_admin/allow_admin_overbook';
 
     const XML_PATH_ALL_PRODUCTS_SAME_DATES = 'payperrentals/calendar_options/enforce_same_dates';
+    const XML_PATH_SHOW_CALENDAR_NO_INPUTS = 'payperrentals/calendar_options/show_calendar_no_inputs';
+
     const XML_PATH_TURNOVER = 'payperrentals/admin_calendarreport/enddate';
     const XML_PATH_LISTING_SHOWPRICE = 'payperrentals/listing/show_price';
     const XML_PATH_ADDRESSFIRST = 'payperrentals/rental/addressfirst';
     const XML_PATH_INCLUDEPRODUCT = 'payperrentals/rental/includeproduct';
+    const XML_PATH_DIGITALSIGNATURE = 'payperrentals/contract/digitalsignature';
+    const XML_PATH_ATTACHCONTRACT = 'payperrentals/contract/attachorder';
+    const XML_PATH_CHECKOUTSIGNATURE = 'payperrentals/contract/checkoutsignature';
+    const XML_PATH_SHOWSERIALS = 'payperrentals/adminproductgrid/showserials';
 
+
+    /**
+     * Show serial numbers on admin product grid
+     *
+     * @return bool
+     */
+    public function showSerialsColumn()
+    {
+        if (Mage::getStoreConfig(self::XML_PATH_SHOWSERIALS) != 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public function enabledDigitalSignature()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_DIGITALSIGNATURE);
+    }
+
+    public function enabledCheckoutSignature()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_CHECKOUTSIGNATURE);
+    }
 
     /**
      * Include product name on rental queue ship labels
@@ -207,7 +239,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
     /**
      * @return bool
      */
-    public static function reserveInventoryNoInvoice()
+    public function reserveInventoryNoInvoice()
     {
         if (Mage::getStoreConfig(self::XML_PATH_RESERVE_INVENTORY_NOINVOICE) != 0) {
             return true;
@@ -220,7 +252,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      *
      * @return bool
      */
-    public static function reserveByStatus()
+    public function reserveByStatus()
     {
         if (Mage::getStoreConfig(self::XML_PATH_USE_RESERVEBY_STATUS) != 0) {
             return true;
@@ -231,7 +263,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
     /**
      * @return bool
      */
-    public static function useReserveInventorySendReturn()
+    public function useReserveInventorySendReturn()
     {
         if (Mage::getStoreConfig(self::XML_PATH_USE_RESERVE_INVENTORY_SEND_RETURN)
             != 0
@@ -244,7 +276,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
     /**
      * @return bool
      */
-    public static function useReserveInventoryDropoffPickup()
+    public function useReserveInventoryDropoffPickup()
     {
         if (Mage::getStoreConfig(self::XML_PATH_USE_RESERVE_INVENTORY_DROPOFF_PICKUP)
             != 0
@@ -259,7 +291,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      *
 *@return array|bool
      */
-    public static function getFixedSelection()
+    public function getFixedSelection()
     {
         if (Mage::getStoreConfig(self::XML_PATH_FIXED_SELECTION) != '') {
             $arr = explode(',', Mage::getStoreConfig(self::XML_PATH_FIXED_SELECTION));
@@ -277,7 +309,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      *
 *@return bool
  */
-    public static function isNextHourSelection()
+    public function isNextHourSelection()
     {
         if (Mage::getStoreConfig(self::XML_PATH_HOUR_NEXT_DAY) != '') {
             $nextHour = strtotime(
@@ -297,7 +329,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      *
 *@return bool
  */
-    public static function isAddStartDate()
+    public function isAddStartDate()
     {
         if (Mage::getStoreConfig(self::XML_PATH_ADD_START_DATE) != 0) {
             return true;
@@ -309,7 +341,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      *
         *@return bool
     */
-    public static function NoCalendarUseTodayAsStartDate()
+    public function NoCalendarUseTodayAsStartDate()
     {
         if (Mage::getStoreConfig(self::XML_PATH_NO_CALENDAR_USE_TODAY_WITH_FIXED) != 0) {
             return true;
@@ -321,7 +353,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      *
      *@return bool
      */
-    public static function countPriceForDisabledDays()
+    public function countPriceForDisabledDays()
     {
         if (Mage::getStoreConfig(self::XML_PATH_PRICE_NO_DISABLED_DAYS) != 0) {
             return false;
@@ -332,7 +364,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      *
 *@return bool
  */
-    public static function removeShipping()
+    public function removeShipping()
     {
         if (Mage::getStoreConfig(self::XML_PATH_REMOVE_SHIPPING) != 0) {
             return true;
@@ -343,7 +375,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      *
 *@return bool
  */
-    public static function hideAdminAddresses()
+    public function hideAdminAddresses()
     {
         if (Mage::getStoreConfig(self::XML_PATH_HIDE_ADDRESSES) != 0) {
             return true;
@@ -355,7 +387,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      * This feature is disabled for the moment because is not tested.
      *@return bool
     */
-    public static function useNonSequential()
+    public function useNonSequential()
     {
         /*if (Mage::getStoreConfig(self::XML_PATH_USE_NONSEQUENTIAL) != 0) {
             return true;
@@ -363,7 +395,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         return false;
     }
 
-    public static function useListButtons()
+    public function useListButtons()
     {
         if (Mage::getStoreConfig(self::XML_PATH_USE_LIST_BUTTONS) != 0) {
             return true;
@@ -371,12 +403,12 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         return false;
     }
 
-    public static function useGlobalShoppingCartWithTime()
+    public function useGlobalShoppingCartWithTime()
     {
         return Mage::getStoreConfig(self::XML_PATH_GLOBAL_DATES_WITH_TIME);
     }
 
-    public static function useGlobalDatesWithTime()
+    public function useGlobalDatesWithTime()
     {
         return Mage::getStoreConfig(self::XML_PATH_USE_GLOBAL_CALENDAR_TIME);
     }
@@ -646,7 +678,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      * @return string
      */
 
-    public static function getMaximumMessageText($productId, $storeId = null){
+    public function getMaximumMessageText($productId, $storeId = null){
         if ($productId > 0 && ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'global_max_period') == 0) {
             $payperrentalsMaxNumber = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_max_number');
             $payperrentalsMaxType = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_max_type');
@@ -671,7 +703,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      * @return string
      */
 
-    public static function getMinimumMessageText($productId, $storeId = null){
+    public function getMinimumMessageText($productId, $storeId = null){
         if ($productId > 0 && ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'global_min_period') == 0) {
             $payperrentalsMinNumber = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_min_number');
             $payperrentalsMinType = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_min_type');
@@ -699,7 +731,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      * @return int
      */
 
-    public static function getMinimumPeriod($productId, $storeId = null, $forcePeriod = false){
+    public function getMinimumPeriod($productId, $storeId = null, $forcePeriod = false){
         if ($productId > 0 && ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'global_min_period') == 0) {
             $payperrentalsMinNumber = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_min_number');
             $payperrentalsMinType = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_min_type');
@@ -731,7 +763,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      * @return int
      */
 
-    public static function getMaximumPeriod($productId, $storeId = null){
+    public function getMaximumPeriod($productId, $storeId = null){
         if ($productId > 0 && ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'global_max_period') == 0) {
             $payperrentalsMaxNumber = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_max_number');
             $payperrentalsMaxType = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_max_type');
@@ -756,7 +788,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      * @return float
      */
 
-    public static function getTurnoverTimeBefore($productId, $storeId = null){
+    public function getTurnoverTimeBefore($productId, $storeId = null){
         if (isset($productId) && ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'global_turnover_before') == 0) {
             $payperrentalsAvailNumberb = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_avail_numberb');
             $payperrentalsAvailTypeb = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_avail_typeb');
@@ -779,7 +811,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      *
      * @return float
      */
-    public static function getTurnoverTimeAfter($productId, $storeId = null){
+    public function getTurnoverTimeAfter($productId, $storeId = null){
         if (isset($productId) && ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'global_turnover_after') == 0) {
             $payperrentalsAvailNumberb = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_avail_number');
             $payperrentalsAvailTypeb = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'payperrentals_avail_type');
@@ -997,7 +1029,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      * @return bool|mixed
      */
 
-    public static function isShortTimeFormat($storeId = null){
+    public function isShortTimeFormat($storeId = null){
             if (Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_STORE_TIME_FORMAT, $storeId) == '12h'){
                 return true;
             }
@@ -1014,7 +1046,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      * @return bool|mixed
      */
 
-    public static function hasExtendEnabled($productId, $storeId = null){
+    public function hasExtendEnabled($productId, $storeId = null){
         if (isset($productId) && ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'enable_extend_order') == 2) {
             return false;
         } else if (isset($productId) && ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'enable_extend_order') == 1) {
@@ -1031,7 +1063,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
      * @return int
      */
 
-    public static function getMaximumExtensionLength($storeId = null){
+    public function getMaximumExtensionLength($storeId = null){
         if(Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_MAX_EXTENSION_NUMBER, $storeId) != '') {
             ITwebexperts_Payperrentals_Helper_Data::getPeriodInSeconds(
                 Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_MAX_EXTENSION_NUMBER, $storeId),
@@ -1042,7 +1074,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         }
     }
 
-    public static function showTurnovers($storeId = null){
+    public function showTurnovers($storeId = null){
         if ($storeId) {
             return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_TURNOVER_SHOW, $storeId);
         } else {
@@ -1050,7 +1082,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         }
     }
 
-    public static function isChargedDeposit($storeId = null)
+    public function isChargedDeposit($storeId = null)
     {
         if ($storeId) {
             return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_DEPOSIT_TYPE, $storeId);
@@ -1059,7 +1091,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         }
     }
 
-    public static function showBuyoutPrice($storeId = null)
+    public function showBuyoutPrice($storeId = null)
     {
         if ($storeId) {
             return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_SHOW_BUYOUT_PRICE, $storeId);
@@ -1068,7 +1100,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         }
     }
 
-    public static function keepListingPriceAfterDatesSelection($storeId = null)
+    public function keepListingPriceAfterDatesSelection($storeId = null)
     {
         if ($storeId) {
             return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_KEEP_LISTING_PRICE_AFTER_SELECTION, $storeId);
@@ -1077,7 +1109,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         }
     }
 
-    public static function disableClickingRentIfDatesNotSelected($storeId = null)
+    public function disableClickingRentIfDatesNotSelected($storeId = null)
     {
         if ($storeId) {
             return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_DISABLE_RENT_ON_GLOBAL_IF_DATES_NOT_SELECTED, $storeId);
@@ -1086,7 +1118,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         }
     }
 
-    public static function keepSelectedDays($storeId = null)
+    public function keepSelectedDays($storeId = null)
     {
         if ($storeId) {
             return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_USE_GLOBAL_DAYS, $storeId);
@@ -1097,7 +1129,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
 
 
 
-    public static function showCalendarOnProductInfo($storeId = null){
+    public function showCalendarOnProductInfo($storeId = null){
         if ($storeId) {
             return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_SHOW_CALENDAR_PRODUCT_INFO, $storeId);
         } else {
@@ -1106,7 +1138,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         //return true;
     }
 
-    public static function showNextAvailableDateOnListing($storeId = null){
+    public function showNextAvailableDateOnListing($storeId = null){
         if ($storeId) {
             return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_SHOW_NEXT_AVAILABLE_DATE_ON_LISTING, $storeId);
         } else {
@@ -1114,7 +1146,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         }
     }
 
-    public static function showNextAvailableDateOnView($storeId = null){
+    public function showNextAvailableDateOnView($storeId = null){
         if ($storeId) {
             return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_SHOW_NEXT_AVAILABLE_DATE_ON_VIEW, $storeId);
         } else {
@@ -1122,7 +1154,7 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         }
     }
 
-    public static function excludeDisabledDaysOfWeekFromTurnover($storeId = null){
+    public function excludeDisabledDaysOfWeekFromTurnover($storeId = null){
         if ($storeId) {
             return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_EXCLUDE_DISABLED_DAYS_FROM_TURNOVER, $storeId);
         } else {
@@ -1130,21 +1162,56 @@ class ITwebexperts_Payperrentals_Helper_Config extends Mage_Core_Helper_Abstract
         }
     }
 
-    public static function getMinQtyAllowed($storeId = null){
+     public function getMinQtyAllowed($storeId = null){
         if ($storeId) {
-            return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_MIN_QTY_ALLOWED, $storeId);
+            return (int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_MIN_QTY_ALLOWED, $storeId);
         } else {
-            return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_MIN_QTY_ALLOWED);
+            return (int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_MIN_QTY_ALLOWED);
         }
     }
 
-    public static function getMaxQtyAllowed($storeId = null){
+    public function getMaxQtyAllowed($storeId = null){
         if ($storeId) {
-            return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_MAX_QTY_ALLOWED, $storeId);
+            return (int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_MAX_QTY_ALLOWED, $storeId);
         } else {
-            return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_MAX_QTY_ALLOWED);
+            return (int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_MAX_QTY_ALLOWED);
         }
     }
 
+    public function showCalendarNoInputs($storeId = null){
+        if ($storeId) {
+            return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_SHOW_CALENDAR_NO_INPUTS, $storeId);
+        } else {
+            return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_SHOW_CALENDAR_NO_INPUTS);
+        }
+    }
+
+    public function forceDamageWaiver($storeId = null){
+        if ($storeId) {
+            return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_FORCE_DAMAGE_WAIVER, $storeId);
+        } else {
+            return (bool)(int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_FORCE_DAMAGE_WAIVER);
+        }
+    }
+
+    public function getFutureReservationLimit($product = null, $storeId = null){
+        if(is_object($product)){
+            $productId = $product->getId();
+        }else{
+            $productId = $product;
+        }
+
+        $useGlobalFutureLimit = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'use_global_future_limit');
+        if($useGlobalFutureLimit == 0){
+            $futureLimit = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($productId, 'future_reservation_limit');
+            return (int)$futureLimit;
+        }else {
+            if ($storeId) {
+                return (int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_FUTURE_LIMIT, $storeId);
+            } else {
+                return (int)Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_FUTURE_LIMIT);
+            }
+        }
+    }
 
 }

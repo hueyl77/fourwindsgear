@@ -10,10 +10,15 @@ class ITwebexperts_Payperrentals_Model_Mysql4_Reservationorders extends Mage_Cor
         return $this;
     }
 
-	public function updateSendReturnById($id, $sr) {
-		$this->_getWriteAdapter()->update($this->getMainTable(), array('sendreturn_id' => $sr),'id='.($id));
+	public function updateShippedQty($id, $qtyShipped) {
+		$this->_getWriteAdapter()->update($this->getMainTable(), array('qty_shipped' => $qtyShipped),'id='.($id));
 		return $this;
 	}
+
+    public function updateReturnedQty($id, $qtyReturned) {
+        $this->_getWriteAdapter()->update($this->getMainTable(), array('qty_returned' => $qtyReturned),'id='.($id));
+        return $this;
+    }
 
     public function updateStartEndByOrderId($order_id, $start, $end) {
         $this->_getWriteAdapter()->update($this->getMainTable(), array('start_date' => $start, 'end_date' => $end),'order_id="'.($order_id).'"');

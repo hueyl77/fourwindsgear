@@ -52,7 +52,7 @@ class ITwebexperts_Payperrentals_Model_Sales_Quote_Address_Total_Depositppr exte
             $address->setBaseDepositpprAmount($depositAmt);
 
             $quote->setDepositpprAmount($depositAmt);
-            if(ITwebexperts_Payperrentals_Helper_Config::isChargedDeposit()) {
+            if(Mage::helper('payperrentals/config')->isChargedDeposit()) {
                 $address->setGrandTotal($address->getGrandTotal() + $address->getDepositpprAmount());
                 $address->setBaseGrandTotal($address->getBaseGrandTotal() + $address->getBaseDepositpprAmount());
             }

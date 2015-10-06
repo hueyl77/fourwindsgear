@@ -48,7 +48,6 @@ class ITwebexperts_Payperrentals_Helper_Timebox extends Mage_Core_Helper_Abstrac
             $_endTime -= $_timeIncrement * 60;
         }
         while ($_startTime <= $_endTime) {
-
             /** Break calculation for last element range, because if $_startTime == $_endTime it give +1 odd element */
             $_endTimePeriod = strtotime('+' . $_timeIncrement . ' minutes', $_startTime);
             if($_optionType == 'range' && ($_endTimePeriod > $_endTime)) break;
@@ -61,12 +60,11 @@ class ITwebexperts_Payperrentals_Helper_Timebox extends Mage_Core_Helper_Abstrac
             }
             switch ($_optionType) {
                 case 'label':
-                    if(ITwebexperts_Payperrentals_Helper_Config::isShortTimeFormat()) {
+                    if(Mage::helper('payperrentals/config')->isShortTimeFormat()) {
                         $_keyValue = preg_replace('/^0+?|:[0-9]*/', '', self::convertSecondsToTime($_startTime, 'h:i A'));
                     }else{
                         $_keyValue = preg_replace('/^0+?|:[0-9]*/', '', self::convertSecondsToTime($_startTime, 'H:i'));
                     }
-
                     $_options[$_keyValue]['colspan'] = (isset($_options[$_keyValue]) && isset($_options[$_keyValue]['colspan'])) ? $_options[$_keyValue]['colspan'] + 1 : 1;
                     $_options[$_keyValue]['label'] = $_keyValue;
                     break;
@@ -81,7 +79,7 @@ class ITwebexperts_Payperrentals_Helper_Timebox extends Mage_Core_Helper_Abstrac
                     break;
                 case 'all':
                 default:
-                if(ITwebexperts_Payperrentals_Helper_Config::isShortTimeFormat()) {
+                if(Mage::helper('payperrentals/config')->isShortTimeFormat()) {
                     $_options[] = array(
                         'label' => self::convertSecondsToTime($_startTime, 'h:i A'),
                         'value' => $_timeString
@@ -215,7 +213,6 @@ class ITwebexperts_Payperrentals_Helper_Timebox extends Mage_Core_Helper_Abstrac
         $timeDetailHtml = '';
         if(count($_timeHeaderAr)) {
             $headColumnHtml = '';
-
             foreach ($_timeHeaderAr as $_timeHeader) {
                 $headColumnHtml .= '<td colspan = "' . $_timeHeader['colspan'] . '">' . $_timeHeader['label'] . ' </td >';
             }

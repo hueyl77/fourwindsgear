@@ -1,0 +1,614 @@
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/datepick/date.js'; ?>"></script>
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) . 'itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js'; ?>"></script>
+<script type="text/javascript">
+    if(typeof $jppr == 'undefined') {$jppr = jQuery.noConflict();}
+</script>
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/datepick/jquery.formatDateTime.js'; ?>"></script>
+<link rel="stylesheet" type="text/css" href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'frontend/base/default/itwebexperts_payperrentals/datepick/default/jquery-ui.theme.css'; ?>" media="all"/>
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) . 'itwebexperts_payperrentals/datepick/jquery.datepick.js'; ?>"></script>
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/autocomplete/jquery-autocomplete.js'; ?>"></script>
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/utils/generalFunctions.js'; ?>"></script>
+<link rel="stylesheet" href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/autocomplete/jquery-autocomplete.css'; ?>" />
+
+<?php
+
+$_product = $this->getProduct();
+if(!is_object($_product)){
+    unset($_product);
+}
+$quoteItemId = $this->getQuoteItemId();
+$quoteItem = $this->getQuoteItem();
+$_useGlobalDates = ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDates();
+/** @var $_configHelper ITwebexperts_Payperrentals_Helper_Config */
+$_configHelper = Mage::helper('payperrentals/config');
+/** @var $_configHelper ITwebexperts_Payperrentals_Helper_Calendar */
+$_calendar = Mage::helper('payperrentals/calendar');
+
+$_useNonsequential = Mage::helper('payperrentals/config')->isNonSequentialSelect(Mage::app()->getStore()->getId());
+$_useFlicker = Mage::helper('payperrentals/config')->getThemeStyle(Mage::app()->getStore()->getId()) == ITwebexperts_Payperrentals_Model_Source_Themestyle::RTRW_STYLE;
+$_useThemeRoller = Mage::helper('payperrentals/config')->getThemeStyle(Mage::app()->getStore()->getId()) != ITwebexperts_Payperrentals_Model_Source_Themestyle::DEFAULT_STYLE;
+
+$_currentTimeStamp = Mage::getSingleton('core/date')->timestamp(time());
+$_customOptions = $this->getCustomOptions();
+list($_storeOpen, $_storeClose) = $_configHelper->getStoreTime();
+if(!$this->getForceUseTime()) {
+    if ($_product) {
+        $_useTimes = ITwebexperts_Payperrentals_Helper_Data::useTimes($_product->getId());
+    } else {
+        /** No need reconfigurate for admin, because use times already defined in data.phtml */
+        if (!Mage::app()->getStore()->isAdmin()) {
+            $_useTimes = 0;
+        } else if (isset($quoteItemId)) {
+            $_useTimes = ITwebexperts_Payperrentals_Helper_Data::useTimes($quoteItemId);
+        }
+    }
+}else{
+    $_useTimes = true;
+}
+
+$_minRentalPeriod = Mage::helper('payperrentals/config')->getMinimumPeriod(($_product)?$_product->getId():0);
+$_maxRentalPeriod = Mage::helper('payperrentals/config')->getMaximumPeriod(($_product)?$_product->getId():0);
+$_minRentalMessageText = Mage::helper('payperrentals/config')->getMinimumMessageText(($_product)?$_product->getId():0);
+$_maxRentalMessageText = Mage::helper('payperrentals/config')->getMaximumMessageText(($_product)?$_product->getId():0);
+
+if (Mage::app()->getStore()->isAdmin()) {
+    $_minRentalPeriod = 0;
+    $_maxRentalPeriod = 0;
+}
+
+$_autoSelectEndDate = false;
+$_selectedToEndPeriod = 0;
+$_selectedToStartPeriod = 0;
+$_selectedArray = false;
+$_selectedArray = Mage::helper('payperrentals/config')->getFixedSelection();
+
+if ($_selectedArray !== false || Mage::helper('payperrentals/config')->useListButtons()){
+    $_autoSelectEndDate = true;
+}
+
+if (Mage::app()->getStore()->isAdmin()) {
+    $_autoSelectEndDate = false;
+}
+
+if ($_selectedArray !== false) {
+    if (Mage::helper('payperrentals/config')->NoCalendarUseTodayAsStartDate()) {
+        if (Mage::helper('payperrentals/config')->isNextHourSelection()) {
+            $_selectedToStartPeriod = date('Y-m-d', strtotime('+1 day', time()));
+        } else {
+            $_selectedToStartPeriod = date('Y-m-d', strtotime('+0 day', time()));
+        }
+    }else{
+        if(Mage::getSingleton('core/session')->getData('startDateInitial') && ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDates()){
+            $timeNow = Mage::getSingleton('core/session')->getData('startDateInitial');
+            $_selectedToStartPeriod = date('Y-m-d', strtotime('+0 day', strtotime($timeNow)));
+        }
+    }
+    $_selectedToEndPeriod = ($_selectedArray[0]);
+}
+
+$useButtons = Mage::helper('payperrentals/config')->useListButtons();
+
+$_minRentalMessage = $this->__('Minimum rental period is "%s". Please make sure you select at least that number',
+    $_minRentalMessageText
+);
+$_maxRentalMessage = $this->__('Maximum rental period is "%s". Please make sure you select no more than that number',
+    $_maxRentalMessageText
+);
+$_betweenMessage = $this->__('There are unavailable days between the selected dates');
+
+$_booked = array();
+if ($_product) {
+    $_maxQty = ITwebexperts_Payperrentals_Helper_Inventory::isAllowedOverbook($_product) ? 10000 : ITwebexperts_Payperrentals_Helper_Inventory::getQuantity($_product);
+} else {
+    $_maxQty = 0;
+}
+
+$_timeBooked = array();
+$_timeBookedDate = array();
+
+$_disableWithMessage = $_product && $_product->getDisabledWithMessage() == ITwebexperts_Payperrentals_Model_Product_Disabledwithmessage::STATUS_ENABLED ? 'true' : 'false';
+$_disabledMessage = $this->__('If you require service within 48 hours, please contact us directly');
+
+if($_product){
+    $_productId = $_product->getId();
+} else {
+    $_productId = null;
+}
+
+$_disabledDays = ITwebexperts_Payperrentals_Helper_Data::getDisabledDays($_productId);
+
+$_paddingDays = ITwebexperts_Payperrentals_Helper_Data::getFirstAvailableDateRange($_productId, null, false, true);
+if(!$_paddingDays){
+    $_isDisabled = true;
+    $_paddingDays = array();
+}
+$_paddingDays = ITwebexperts_Payperrentals_Helper_Data::toFormattedDateArray($_paddingDays);
+if($_selectedToStartPeriod != 0){
+    $_selectedToStartPeriod = date('Y-m-d', strtotime('+'.count($_paddingDays).' day', strtotime($_selectedToStartPeriod)));
+}
+$_disabledDaysStart = array();
+$_disabledDaysEnd = array();
+$_ignoreTurnoverDay = array();
+$_turnoverTimeBefore = 0;
+$_turnoverTimeAfter = 0;
+
+$_isDisabled = ($_maxQty >= 1 || !$_product) ? false : true;
+if (isset($isAdmin) && $isAdmin == true) {
+    $_isDisabled = false;
+}
+$_blockedDates = ITwebexperts_Payperrentals_Helper_Data::getDisabledDates($_productId);
+$_blockedDates = ITwebexperts_Payperrentals_Helper_Data::toFormattedDateArray($_blockedDates);
+
+$_locDateFormat = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT);
+$magentoVersion = Mage::getVersion();
+if (version_compare($magentoVersion, '1.9.1', '>=')){
+    if (strpos($_locDateFormat, "YYY") === false && strpos($_locDateFormat, "YY") === false) $_locDateFormat = str_replace("Y", "YYYY", $_locDateFormat);
+    if (strpos($_locDateFormat, "yyy") === false && strpos($_locDateFormat, "yy") === false) $_locDateFormat = str_replace("y", "yyyy", $_locDateFormat);
+}
+else{
+    if (strpos($_locDateFormat, "YYY") === false) $_locDateFormat = str_replace("YY", "YYYY", $_locDateFormat);
+    if (strpos($_locDateFormat, "yyy") === false) $_locDateFormat = str_replace("yy", "yyyy", $_locDateFormat);
+}
+
+$_datestr = ITwebexperts_Payperrentals_Helper_Date::convertIsoToDatepickerFormat($_locDateFormat);
+$_localeCode = substr(Mage::app()->getLocale()->getLocaleCode(), 0, strpos(Mage::app()->getLocale()->getLocaleCode(), '_'));
+?>
+
+
+<?php
+$_startDateInitialVal = Mage::getSingleton('core/session')->getData('startDateInitial');
+$_endDateInitialVal = Mage::getSingleton('core/session')->getData('endDateInitial');
+
+if (isset($quoteItemId) && $quoteItemId != -1 && Mage::app()->getRequest()->getActionName() != 'configureProductToAdd') {
+    $buyRequest = $quoteItem->getBuyRequest();
+    $_showTime = (bool)Mage::getResourceModel('catalog/product')
+        ->getAttributeRawValue(
+            $quoteItem->getProductId(),
+            'payperrentals_use_times',
+            $quoteItem->getStoreId()
+        );
+    if (!$_useNonsequential) {
+        if($buyRequest->getStartTime()){
+            $buyStartDate = str_replace('00:00:00', $buyRequest->getStartTime(), $buyRequest->getStartDate());
+            $buyEndDate = str_replace('23:59:59', $buyRequest->getEndTime(), $buyRequest->getEndDate());
+        }else{
+            $buyStartDate = $buyRequest->getStartDate();
+            $buyEndDate = $buyRequest->getEndDate();
+        }
+        $_startDateInitialVal = ($buyStartDate != '') ? $buyStartDate: (($_startDateInitialVal) ? $_startDateInitialVal : false);
+        $_endDateInitialVal = ($buyEndDate != '') ? $buyEndDate : (($_endDateInitialVal) ? $_endDateInitialVal : false);
+    } else {
+        $_startDateInitialVal = ($buyRequest->getStartDate() != '') ? ITwebexperts_Payperrentals_Helper_Date::localiseNonsequentialBuyRequest($buyRequest->getStartDate(), $_showTime) : (($_startDateInitialVal) ? $_startDateInitialVal : false);
+        $_endDateInitialVal = ($buyRequest->getStartDate() != '') ? ITwebexperts_Payperrentals_Helper_Date::localiseNonsequentialBuyRequest($buyRequest->getStartDate(), $_showTime) : (($_startDateInitialVal) ? $_startDateInitialVal : false);
+    }
+}
+
+if ($_startDateInitialVal) {
+    list($_startDateInitialVal, $_endDateInitialVal) = ITwebexperts_Payperrentals_Helper_Date::convertDatepickerToDbFormat($_startDateInitialVal, $_endDateInitialVal);
+
+    $_startDateInitArr = explode(' ', $_startDateInitialVal);
+    $_startDateInit = $_startDateInitArr[0];
+    if (isset($_startDateInitArr[1])) {
+        $_startTimeInit = $_startDateInitArr[1];
+    } else {
+        $_startTimeInit = '';
+    }
+
+    if ($_useNonsequential) {
+        $_startDateInit = $_startDateInitialVal;
+        $_startTimeInit = '';
+    }
+
+
+    $_endDateInitArr = explode(' ', $_endDateInitialVal);
+    $_endDateInit = $_endDateInitArr[0];
+    if (isset($_endDateInitArr[1])) {
+        $_endTimeInit = $_endDateInitArr[1];
+    } else {
+        $_endTimeInit = '';
+    }
+
+}else {
+    $_startDateInit = false;
+    $_endDateInit = false;
+    $_startTimeInit = false;
+    $_endTimeInit = false;
+}
+
+if(!$_useFlicker){
+    $_langCode = $_localeCode;
+}else{
+    $_langCode = 'flick';
+}
+$_showByDefault = false;
+?>
+
+<?php
+/**
+ * For compatibility reason with any template all the js files are loaded with the calendar.
+ * This will ensure that the calendar will work with any template without any problem
+ *
+ */
+?>
+
+    <script type="text/javascript">
+    isFixedDate = false;
+    qtyDefaultArr = [];
+    partiallyBooked = [];
+    bookedDates = [<?php echo implode(',', $_booked);?>];
+    autoSelectFlag = false;
+    isDisabled = <?php echo ($_isDisabled == true)?'true':'false'; ?>;
+    autoSelectEndDate = <?php echo ($_autoSelectEndDate == true)?'true':'false'; ?>;
+    selectedToEndPeriod = '<?php echo (Mage::helper('payperrentals/config')->isAddStartDate()?($_selectedToEndPeriod - 1):$_selectedToEndPeriod);?>';
+    selectedToStartPeriod = '<?php echo $_selectedToStartPeriod;?>';
+    startDateHtml = '<?php echo $this->__('Selected Start Date: ');?>';
+    endDateHtml = '<?php echo $this->__('Selected End Date: ');?>';
+    minRentalPeriodMessage = '<?php echo $_minRentalMessage;?>';
+    betweenErrorMessage = '<?php echo $this->__('There are Dates in between your selected period which do not have available inventory');?>';
+    pleaseSelectMessage = '<?php echo $this->__('Please select start and end dates');?>';
+    noPriceMessage = '<?php echo $this->__('No price is available for these rental periods');?>';
+    chooseOptionsForPrice = '<?= $this->__('Please choose product options for price');?>';
+    noQtyMessage = '<?php echo $this->__('No quantity available for these rental periods');?>';
+    maxRentalPeriodMessage = '<?php echo $_maxRentalMessage; ?>';
+    isDisabledByTimes = false;
+    bprice = 0;
+    dateFormat = '<?php echo $_datestr; ?>';
+    useGlobals = <?php echo ($_useGlobalDates?'true':'false')?>;
+    useCalendarOnProductInfo = <?php echo ( Mage::helper('payperrentals/config')->showCalendarOnProductInfo()?'true':'false')?>;
+    isProduct = <?php echo ($this->getProduct()?'true':'false')?>;
+    addStartingDateNumber = <?php echo (Mage::helper('payperrentals/config')->isAddStartDate() ? '1' : '0');?>;
+    addStartingDatePeriod = <?php echo (Mage::helper('payperrentals/config')->isAddStartDate() ? '86400000' : '0');?>;
+    disabledStartWeekDays = [];
+    disabledEndWeekDays = [];
+    minRentalPeriod = <?php echo ($_minRentalPeriod*1000);?>;
+    dayShortNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    disabledDaysStart = [<?php echo implode(',', $_disabledDaysStart);?>];
+    disabledDaysEnd = [<?php echo implode(',', $_disabledDaysEnd);?>];
+    ignoreTurnoverDay = [<?php echo implode(',', $_ignoreTurnoverDay);?>];
+    disabledDatesPadding = [<?php echo implode(',', $_paddingDays);?>];
+    blockedDates = [<?php echo implode(',', $_blockedDates);?>];
+    disabledDays = ["<?php echo implode('","', $_disabledDays);?>"];
+    maxRentalPeriod = <?php echo ($_maxRentalPeriod*1000);?>;
+    disabledWithMessage = <?php echo $_disableWithMessage;?>;
+    disabledMessage = '<?php echo $_disabledMessage;?>';
+    disabledMessageTurnovers = '<?php  echo $this->__('Date is disabled because turnover days');?>';
+    betweenMessage = '<?php echo $_betweenMessage; ?>';
+    turnoverTimeBefore = <?php echo $_turnoverTimeBefore; ?>;
+    turnoverTimeAfter = <?php echo $_turnoverTimeAfter; ?>;
+    minQty = 10000;
+    minSaleQty = 1;
+    startArray = [<?php echo implode(',', $_timeBooked);?>];
+    bookedTimesArr = [<?php echo implode(',', $_timeBookedDate);?>];
+    urlUpdateInitials = '<?php echo Mage::getUrl("payperrentals_front/ajax/setDateInitial/",array())?>';
+    updateBookedUrl ='<?php echo $this->getUrl("payperrentals_front/ajax/updatebookedforproduct/", array('product_id'=>($_product?$_product->getId():0)))?>'
+    urlUpdateInitialsAdmin = '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/updateinitials/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>';
+    getPriceUrl = '<?php echo $this->getUrl("payperrentals_front/ajax/getprice/", array('product_id'=>($_product?$_product->getId():0)));?>';
+    currentDateForCalendar = '<?php if (Mage::app()->getStore()->isAdmin()) { echo date("Y-m-d", Mage::getModel('core/date')->timestamp(strtotime('-3 year', time()))); }else{ echo date("Y-m-d", Mage::getModel('core/date')->timestamp(time()));} ;?>';
+    monthsToShow = <?php echo Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_APPEARANCE_CALENDAR_PAGES);?>;
+    rangeSelect = <?php echo $_useNonsequential?'false':'true';?>,
+    useThemeRoller = <?php echo $_useThemeRoller?'true':'false'; ?>;
+    useFlicker = <?php echo $_useFlicker?'true':'false'; ?>;
+    useNonSequential = <?php echo $_useNonsequential?'true':'false'; ?>;
+    showByDefault = <?php echo $_showByDefault?'true':'false'; ?>;
+    localDateFormat = '<?php echo $_locDateFormat;?>';
+    serverDateFormat = '<?php echo $_datestr;?>';
+    notAvailableText = '<?php echo $this->__('Not Available'); ?>';
+    reservedText = '<?php echo $this->__('Reserved'); ?>';
+    availableText = '<?php echo $this->__('Available'); ?>';
+
+    startDateInitial = '<?php echo $_startDateInit?$_startDateInit:'';?>';
+    endDateInitial ='<?php echo $_endDateInit?$_endDateInit:'';?>';
+    startTimeInitial = '<?php echo $_startTimeInit?$_startTimeInit:'';?>';
+    endTimeInitial = '<?php echo $_endTimeInit?$_endTimeInit:'';?>';
+
+    useTimes = <?php echo $_useTimes > 0?'true':'false'; ?>;
+    showTimeGrid = <?php echo ($_product && $_product->getShowTimeGrid() || $_configHelper->isShowTimeGrid(Mage::app()->getStore()->getId()))?'true':'false'; ?>;
+    timeHeaderArCount = <?php echo $_calendar->getHoursCount(); ?>;
+    isAutoSelection = <?php echo ($_selectedArray !== false)?'true':'false'; ?>;
+    isUsingGlobalDatesShoppingCart = <?php echo (ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDatesShoppingCart())?'true':'false'; ?>;
+    ajaxLoaderImg = '<?php echo $this->getSkinUrl('images/ajax-loader.gif');?>';
+    isAdminSide = <?php echo Mage::app()->getStore()->isAdmin()?'true':'false'; ?>;
+    currentCalendar = '#topDates, .calendarTables';
+    currentDateForCalendar = Date.parseExact(currentDateForCalendar, 'yyyy-MM-dd');
+
+    if(startDateInitial && startDateInitial != '' && typeof startDateInitial !== 'object') {
+        startDateInitial = Date.parseExact(startDateInitial, 'yyyy-MM-dd');
+    }
+    if(endDateInitial && endDateInitial != '' && typeof endDateInitial !== 'object') {
+        endDateInitial = Date.parseExact(endDateInitial, 'yyyy-MM-dd');
+    }
+</script>
+    <script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/datepick/calendarFunctions.js'; ?>"></script>
+
+<div class="calendarSelector" <?php
+
+if (($_selectedArray !== false) && Mage::registry('current_product')): ?>showLegend="1" <?php endif; ?>>
+<div class="datePickerDiv">
+    <div class="datePicker"></div>
+</div>
+<div class="date-select-panel" style="display: none;color:red;font-size:14px;"><?php echo $this->__('Please choose an option below to enable reservation dates selection');?></div>
+<div class="zip-select-panel" style="display: none;color:red;font-size:14px;"><?php echo $this->__('Please first enter your zip code to choose reservation dates');?></div>
+
+<div class="dateSelectedCalendar" style="display: block;">
+<div class="dateView" style="display: inline-block;width:80%;">
+    <div class="ajax-panel"></div>
+    <?php
+    $resultObject = new Varien_Object();
+    Mage::dispatchEvent('calendar_newelements', array('is_admin_global' => (isset($isAdminGlobal) ? $isAdminGlobal : false), 'is_admin' => (isset($isAdmin) ? $isAdmin : false), 'quote_item_id' => isset($quoteItemId) ? $quoteItemId : -1, 'quote_item' => isset($quoteItem) ? $quoteItem : null, 'result' => $resultObject));
+    echo $resultObject->getReturn();
+
+    ?>
+
+    <div class="datesSelector">
+        <div class="dateStartLine">
+            <div class="dateSelectorStart">
+                <label for="readStartDate"><?php echo $this->__('Start Date'); ?></label>
+                <input type="text" name="start_date" readonly="true" class="readStartDate start_date"/>
+            </div>
+            <?php if ($_useTimes > 0): ?>
+                <div class="timeSelector">
+                    <div class="timesInputs">
+                        <label for="start_time"><?php echo $this->__('Start Time:'); ?></label>
+                        <?php echo $_calendar->getHoursStart(); ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+        <div class="dateEndLine">
+            <div class="dateSelectorEnd"
+                 class="<?php if ($_product && $_product->getHideEndDate() || Mage::getStoreConfig('payperrentals/listing/hide_end_date_product')) echo 'no-show'; ?>">
+                <label for="readEndDate"><?php echo $this->__('End Date:'); ?></label>
+                <input type="text" name="end_date" readonly="true"
+                       class="readEndDate end_date" <?php if ($_autoSelectEndDate) echo 'readonly="readonly"'; ?> />
+            </div>
+            <?php if ($_useTimes > 0): ?>
+                <div class="timeSelector">
+                    <div class="timesInputs">
+                        <label for="end_time"><?php echo $this->__('End Time:'); ?></label>
+                        <?php echo $_calendar->getHoursEnd(); ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+    <div class="datesShow"></div>
+    <div class="errorShow"></div>
+</div>
+<div style="display: inline-block;margin-right: 10px;">
+    <button name="refreshCalendar" type="button" class="button btn-resfreshCalendar">
+                        <span>
+                            <span>
+                                <?php echo $this->__('Reset Calendar'); ?>
+                            </span>
+                        </span>
+    </button>
+</div>
+<?php if(Mage::helper('payperrentals/config')->showTurnovers()): ?>
+    <div class="legend-detail-container">
+        <div class="legend-detail-header"><?php echo $this->__('Legend') ?></div>
+
+        <table class="legend-detail-description">
+            <tbody>
+            <tr>
+                <td class="turnover_before"></td>
+                <td class="description"><?php echo $this->__('Turnover Before') ?></td>
+                <td class="turnover_after"></td>
+                <td class="description"><?php echo $this->__('Turnover After') ?></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+<?php endif; ?>
+<?php if ($_useTimes > 0): ?>
+    <?php if ($_product && $_product->getShowTimeGrid() || $_configHelper->isShowTimeGrid(Mage::app()->getStore()->getId())): ?>
+        <?php echo ITwebexperts_Payperrentals_Helper_Timebox::getTimeDetails()?>
+        <?php echo $_calendar->getHours(); ?>
+        <script type="text/javascript" src="<?php
+        echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) . 'itwebexperts_payperrentals/datepick/calendarTimeFunctions.js'?>">
+        </script>
+        <?php endif; ?>
+<?php endif; ?>
+</div>
+
+</div>
+<?php
+$resultObject = new Varien_Object();
+Mage::dispatchEvent('calendar_ready', array('is_admin_global' => (isset($isAdminGlobal) ? $isAdminGlobal : false), 'is_frontend_global' => (isset($isFrontendGlobal) ? $isFrontendGlobal : false), 'is_admin' => (isset($isAdmin) ? $isAdmin : false), 'quote_item_id' => isset($quoteItemId) ? $quoteItemId : -1, 'quote_item' => isset($quoteItem) ? $quoteItem : null, 'result' => $resultObject));
+echo $resultObject->getReturn();
+?>
+
+    <style type="text/css">
+
+        <?php if(!Mage::helper('payperrentals/config')->showTurnovers()): ?>
+        .turnoverAfter, .turnoverBefore{
+
+        }
+        <?php else: ?>
+        .turnoverBefore{
+            border: 0px solid #ffffff;
+            background: none !important;
+            background-color: #E6DF2A !important;
+            font-weight: normal;
+            color: #ffffff;
+            text-align: center;
+            /*opacity: 1;
+            filter:Alpha(Opacity=100);*/
+            vertical-align: middle;
+        }
+
+        .turnoverAfter{
+            border: 0px solid #ffffff;
+            background: none !important;
+            background-color: #E6DF2A !important;
+            font-weight: normal;
+            color: #ffffff;
+            text-align: center;
+            /*opacity: 1;
+            filter:Alpha(Opacity=100);*/
+            vertical-align: middle;
+        }
+        <?php endif; ?>
+        <?php if(!Mage::app()->getStore()->isAdmin()): ?>
+        .qty .product-qty {width:35px}
+        .actions div, .product-shop .qty {margin: 5px 0}
+
+        /*.product-options-bottom .add-to-cart-buttons{
+            margin-top: 5px;
+        }*/
+        .day-detail-container, .legend-detail-container{
+            margin-top:8px;
+        }
+        .chooseDatesLabel{
+            margin-top:10px;
+        }
+        /*.products-grid li.item {padding-bottom: 100px;}*/
+        <?php else: ?>
+        .datesSelectorTop, .datesSelectorTop .start-time-line, .datesSelectorTop .end-time-line, .datesSelectorTop .date-field, .currency-switcher {
+            display: inline-block;
+            float: left;
+        }
+        .datesSelectorTop .date-field, .currency-switcher {
+            margin-top: 0;
+            margin-right: 25px;
+        }
+        #topDates .day-detail-container{
+            display: none;
+        }
+        #topDates .legend-detail-container{
+            display: none;
+        }
+        .start-time-line, .end-time-line {
+            width: 385px;
+        }
+
+        /*TODO optimize switcher css*/
+        .switcher {
+            padding-bottom: 5px;
+        }
+
+        .dateStartLine, .dateEndLine {display: inline-block; width: 100%;margin:0;}
+        .dateStartLine {margin-bottom: 0px}
+        .dateStartLine .date-line, .dateEndLine .date-line {float: left; margin-right: 30px}
+        #dialogDates {margin: 15px 0 10px 0}
+        #dialogDates td {padding-right: 15px}
+        #dialogDates td.button-column {padding:0}
+        #dialogDates .label {
+            /*width:80px;*/
+            padding-right: 5px;
+        }
+
+        #dialogDates .input-text {
+            width: 70px;
+        }
+
+        #sales_order_view #dialogDates {margin: 0}
+        #sales_order_view #dialogDates table tr td {padding-bottom: 10px; padding-right: 5px}
+        .page-create-order #order-items .entry-edit-head .icon-head {padding-top: 3px}
+        .page-create-order #order-items .entry-edit-head #quick-add-container {float: left; margin-left: 15px; padding-top: 2px}
+        #percent_price_model_table {min-width: 700px;}
+        #percent_price_model_table select {width: 100px;}
+        <?php endif; ?>
+
+        .datePicker {
+            width: 100%;
+        }
+
+        <?php if(!$_showByDefault): ?>
+        .datePickerDiv {
+            position: absolute;
+            display: none;
+            z-index: 1000;
+        }
+        <?php else: ?>
+        .datePickerDiv {
+            z-index: 1000;
+            width:220px;
+        }
+        <?php endif;?>
+
+        .datesShow {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .errorShow {
+            margin-top: 20px;
+            color: red;
+            font-weight: bold;
+            display: none;
+            clear: both;
+        }
+
+        .product-options p.required {
+            top: 0px;
+        }
+
+        <?php if($_useNonsequential): ?>
+        .readStartDate {
+        <?php if(!isset($isFrontendGlobal)): ?> width: 300px;
+        <?php else: ?> width: 200px;
+        <?php endif; ?>
+
+        }
+
+        <?php endif;?>
+        <?php if ($_selectedArray !== false && Mage::helper('payperrentals/config')->NoCalendarUseTodayAsStartDate()): ?>
+        .datesSelector, .chooseDatesLabel, .btn-resfreshCalendar{
+            display: none !important;
+        }
+        <?php endif;?>
+        <?php if($useButtons && !Mage::app()->getStore()->isAdmin() || $_useNonsequential || $_selectedArray !== false && !Mage::app()->getStore()->isAdmin()): ?>
+        .dateSelectorEnd {
+            display: none !important;
+        }
+
+        .datePickerDiv .ui-state-active {
+            color: #ff0084 !important
+        }
+
+        <?php if ($useButtons && $_useGlobalDates): ?>
+        .price-box {
+            display: none !important;
+        }
+
+        .btn-resfreshCalendar {
+            display: none !important;
+        }
+
+        .product-options-bottom .add-to-cart {
+            display: none;
+        }
+
+        .priceList .normalPrice {
+            display: none;
+        }
+
+        <?php endif; ?>
+        <?php endif; ?>
+        <?php if(!Mage::helper('payperrentals/config')->NoCalendarUseTodayAsStartDate() && $_selectedArray != false && !Mage::app()->getStore()->isAdmin()):?>
+        .dateSelectorEnd {
+            display: none !important;
+        }
+
+        <?php endif; ?>
+    </style>
+
+<?php if ($_product && $_product->getIsReservation() == ITwebexperts_Payperrentals_Model_Product_Isreservation::STATUS_RENTAL): ?>
+    <style type="text/css">
+        .regular-price {
+            display: none;
+        }
+    </style>
+<?php endif; ?>
+<?php if ($_product && $_product->getTypeId() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE_BUNDLE): ?>
+    <style type="text/css">
+        .price-notice {
+            display: none;
+        }
+    </style>
+<?php endif; ?>
+<?php
+$resultObject = new Varien_Object();
+Mage::dispatchEvent('calendar_styles', array('is_admin_global' => (isset($isAdminGlobal) ? $isAdminGlobal : false), 'is_admin' => (isset($isAdmin) ? $isAdmin : false), 'result' => $resultObject));
+echo $resultObject->getReturn();
+?>

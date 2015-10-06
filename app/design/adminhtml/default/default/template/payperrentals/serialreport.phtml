@@ -1,3 +1,4 @@
+<?php /** $this ITwebexperts_Payperrentals_Block_Adminhtml_Serialreport */ ?>
 <div class="content-header">
 	<table cellspacing="0" class="grid-header">
 		<tr>
@@ -11,38 +12,16 @@
 <div class="entry-edit" style="margin-bottom:20px;">
 	<form id="edit_form" name="edit_form">
 		<input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
-			<table cellspacing="0" class="form-list-s">
+			<table cellspacing="5" class="form-list-s">
 				<tr>
-					<td class="label"><?php echo $this->__('Search by serial')?></td>
-					<td class="input-ele"><input class="input-text productName" name="productName" /></td>
-
-					<td class="label"><?php echo $this->__('Go to date')?></td>
-					<td>
-						<?php
-						$gotoDate = '';
-						$gotoDateFullCalendar = '';
-						if(urldecode($this->getRequest()->getParam('gotoDate'))){
-							$zDate = new Zend_Date(urldecode($this->getRequest()->getParam('gotoDate')), Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT));
-							$gotoDate = urldecode($this->getRequest()->getParam('gotoDate'));
-							$gotoDateFullCalendar = $zDate->get('yyyy-MM-dd');
-						}
-						echo $this->getLayout()->createBlock('core/html_date')
-								//->setTime('true')
-								->setImage(Mage::getDesign()->getSkinUrl('images/grid-cal.gif'))
-								->setFormat(Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT))
-								->setName('gotoDate')
-								->setValue($gotoDate)
-								->setId('gotoDate')
-								->setClass('datetime-picker input-text gotoDate')
-								->toHtml();
-
-						?>
-					</td>
-
+					<td class="label"><?php echo $this->__('Search by serial')?>: </td>
+					<td class="input-ele"><input class="input-text serialName" id="serialName" name="serialName" value="<?php echo $this->getRequest()->getParam('serialName')?>"/></td>
+					<td class="label"><?php echo $this->__('Search by product')?>: </td>
+					<td><input type="text" class="productName" id="productName" name="productName" value="<?php echo $this->getRequest()->getParam('productName')?>"></td>
 				</tr>
 				<tr>
 					<td colspan="4" class="a-right" style="padding-top: 10px;">
-						<button class="searchBut" type="button" style="display: inline-block;"><span><?php echo $this->__('Search')?></span></button>
+						<button class="searchBut" type="button" style="display: inline-block;" onclick="form.submit()"><span><?php echo $this->__('Search')?></span></button>
                         <button class="searchAllBut" type="button" style="display: inline-block;"><span><?php echo $this->__('Reset')?></span></button>
 					</td>
 				</tr>
@@ -59,58 +38,19 @@
 	?>
 </div>
 
-<?php $localeDateFormat = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_LONG); ?>
-<?php $localeDateFormat = str_replace('y', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyyyy', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyyy', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyy', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yy', 'yyyy', $localeDateFormat); ?>
-<?php $monthFormat = str_replace('d', '', $localeDateFormat); ?>
-<?php $weekFormat = str_replace('', '', $localeDateFormat); ?>
-<?php $weekFormat = $weekFormat . "{ &#8212;" . $weekFormat . "}"; ?>
-<?php $dayFormat = str_replace('yy', '', $localeDateFormat); ?>
-
-<?php $localeDateFormat = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT); ?>
-<?php $localeDateFormat = str_replace('y', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyyyy', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyyy', 'yy', $localeDateFormat); ?>
-<?php $localeDateFormat = str_replace('yyy', 'yy', $localeDateFormat); ?>
-<?php $monthFormatC = str_replace('yy', '', $localeDateFormat); ?>
-<?php $monthFormatC = str_replace('MM', '', $monthFormatC); ?>
-<?php $monthFormatC = str_replace('///', '/', $monthFormatC); ?>
-<?php $monthFormatC = str_replace('//', '/', $monthFormatC); ?>
-<?php $monthFormatC = rtrim($monthFormatC, '/'); ?>
-<?php $weekFormatC = 'ddd ' . $monthFormatC; ?>
-<?php $weekFormatC = str_replace('//', '/', $weekFormatC); ?>
-<?php $dayFormatC = str_replace('yy', '', $localeDateFormat); ?>
+<?php list($monthFormat, $weekFormat, $dayFormat) = $this->getDatesFormat();?>
+<?php list($monthFormatC, $weekFormatC, $dayFormatC) = $this->getDatesFormatCalendar();?>
 
 <?php
 
-	$collection = $this->getPager()->getCollection();
+	$productsCollection = $this->getPager()->getCollection();
 	$resources = array();
-    $productsids = array();
-	foreach($collection as $resProduct) {
-
-
+    $serialNumbers = array();
+	foreach($productsCollection as $resProduct) {
 		$Product = Mage::getModel('catalog/product')->load($resProduct->getId());
-		//get Serials
-		$coll = Mage::getModel('payperrentals/serialnumbers')
-				->getCollection()
-				->addEntityIdFilter($Product->getId())
-		;
-
-		$nameqty = '<div style="width:150px;float:left;line-height:48px;"><b>'.$Product->getName().'</b> </div>';
-		foreach ($coll as $item) {
-			$resources[] = array(
-				'name' => $nameqty . '<div style="width:100px;float:left;line-height:48px;">'.$item->getSn().'</div>',
-				'id' => $item->getSn()
-			);
-
-			$productsids[] = $item->getSn();
-			$nameqty = '<div style="width:150px;float:left;line-height:48px;">&nbsp;</div>';
-		}
+		$coll = $this->getSerialCollection($resProduct->getId());
+        $resources = $this->getResource($Product,$coll,$resources);
 	}
-
 	$resources_JSON_array = json_encode($resources);
 ?>
 
@@ -151,7 +91,7 @@
 				url: '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/getSerialevents/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>',
 				type: 'POST',
 				data: {
-					productsids: '<?php echo implode(',',$productsids);?>'
+					productsids: '<?php echo implode(',',$serialNumbers);?>'
 				},
 				error: function() {
 					alert('there was an error while fetching events!');
@@ -224,31 +164,6 @@
 		$jppr(window).resize(function() {
 			$jppr('#calendarProducts').fullCalendar('option', 'height', calcCalendarHeight());
 		});
-		$jppr('.searchBut').click(function(){
-
-			if($jppr('.productName').val() == ''){
-				if($jppr('.gotoDate').val() != ''){
-                    $jppr('#calendarProducts').fullCalendar('gotoDate', new Date($jppr.formatDateTime('yy-mm-dd',new Date($jppr('.gotoDate').val()))));
-				}
-			} else{
-				var location = '<?php echo  Mage::getUrl("payperrentals_admin/adminhtml_serialreport/index",array('key'=> $this->getRequest()->getParam('key')))?>'+'?productName='+$jppr('.productName').val()+'&';
-				if($jppr('.gotoDate').val() != ''){
-					location = location +'gotoDate='+encodeURIComponent($jppr('.gotoDate').val());
-				}
-				window.location.href = location;
-			}
-			return false;
-		});
-		$jppr('.searchAllBut').click(function(){
-			var location = '<?php echo  Mage::getUrl("payperrentals_admin/adminhtml_serialreport/index",array('key'=> $this->getRequest()->getParam('key')))?>';
-			if($jppr('.gotoDate').val() != ''){
-				location = location +'?gotoDate='+encodeURIComponent($jppr('.gotoDate').val());
-			}
-			window.location.href = location;
-		});
-
-		$jppr('.searchBut').trigger('click');
-
 	});
 
 </script>

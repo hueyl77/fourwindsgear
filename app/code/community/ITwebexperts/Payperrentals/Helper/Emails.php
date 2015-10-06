@@ -68,6 +68,33 @@ class ITwebexperts_Payperrentals_Helper_Emails extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * attach file to email
+     * supported types: pdf
+     *
+     * @param        $file
+     * @param        $mailObj
+     *
+     * @return mixed
+     */
+    public function addFileAttachment($filePath, $mailObj)
+    {
+        try {
+            if (file_exists($filePath)) {
+                $mailObj->getMail()->createAttachment(
+                    file_get_contents($filePath),
+                    'application/pdf',
+                    Zend_Mime::DISPOSITION_ATTACHMENT,
+                    Zend_Mime::ENCODING_BASE64,
+                    basename($filePath)
+                );
+            }
+        } catch (Exception $e) {
+            Mage::log('Caught error while attaching pdf:' . $e->getMessage());
+        }
+        return $mailObj;
+    }
+
+    /**
      * @param $emailItems
      *
      * @throws Exception

@@ -41,46 +41,16 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Html_Sendreturngridproduct exte
      */
     protected function _prepareCollection()
     {
-        $isIncludeAll = $this->getRequest()->getParam('include_all');
-        $isIncludeNotSent = $this->getRequest()->getParam('include_not_sent');
-        $isIncludeSent = $this->getRequest()->getParam('include_sent');
-        $isIncludeNotReturned = $this->getRequest()->getParam('include_not_returned');
-        $isIncludeReturned = $this->getRequest()->getParam('include_returned');
         $productId = $this->getRequest()->getParam('product_id');
         $_res = Mage::getSingleton('core/resource');
-        if ($isIncludeAll) {
-            $this->_collection = Mage::getModel('sales/order')->getCollection();
-			$this->_collection->getSelect()->joinLeft(array('resorders'=>$_res->getTableName('payperrentals/reservationorders')), 'main_table.entity_id = '.'resorders.order_id',array('start_date','end_date','product_id','sendreturn_id', 'resorders.qty as qtyo'));
-			$this->_collection->getSelect()->joinLeft(array('sendreturn'=>$_res->getTableName('payperrentals/sendreturn')), 'resorders.sendreturn_id = '.'sendreturn.id',array('send_date','return_date','sn'));
-			$this->_collection->getSelect()->where('resorders.product_type = ?',ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE);
-            if ($isIncludeNotSent) {
-				$this->_collection->getSelect()->where('resorders.sendreturn_id = ?','0');
-            }
-        } else {
+
             $this->_collection = Mage::getModel('payperrentals/reservationorders')->getCollection();
 			$this->_collection->getSelect()->joinLeft(array('sorder'=>$_res->getTableName('sales/order')), 'main_table.order_id = '.'sorder.entity_id',array('main_table.order_id as orderid', 'main_table.product_id as productid','main_table.qty as qtys', 'sorder.increment_id as increments_id','sorder.store_id as store_id'));
-			$this->_collection->getSelect()->joinLeft(array('sendreturn'=>$_res->getTableName('payperrentals/sendreturn')), 'main_table.sendreturn_id = '.'sendreturn.id',array('sendreturn.id as real_id','sendreturn.sn as sn','sendreturn.send_date as send_date','sendreturn.return_date as return_date'));
+			//$this->_collection->getSelect()->joinLeft(array('sendreturn'=>$_res->getTableName('payperrentals/sendreturn')), 'main_table.sendreturn_id = '.'sendreturn.id',array('sendreturn.id as real_id','sendreturn.sn as sn','sendreturn.send_date as send_date','sendreturn.return_date as return_date'));
             $this->_collection->getSelect()->where('main_table.product_type = ?', ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE);
 
             $this->_collection->getSelect()->where('main_table.product_id = ?', $productId);
 
-            if ($isIncludeNotSent) {
-                $this->_collection->getSelect()->where('main_table.sendreturn_id = ?', '0');
-            }
-            if ($isIncludeSent) {
-                $this->_collection->getSelect()->where('main_table.sendreturn_id != ?', '0');
-            }
-            if ($isIncludeNotReturned) {
-				$this->_collection->getSelect()->where('sendreturn.return_date = ?','0000-00-00 00:00:00');
-            }
-            if ($isIncludeReturned) {
-				$this->_collection->getSelect()->where('sendreturn.return_date != ?','0000-00-00 00:00:00');
-            }
-            //die(var_dump((string)$this->_collection->getSelect()->__toString()));
-        }
-        if(urldecode($this->getRequest()->getParam('store'))) {
-            $this->_collection->getSelect()->where('store_id=?', $this->getRequest()->getParam('store'));
-        }
         $this->setCollection(
             $this->_collection
         );
@@ -122,7 +92,8 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Html_Sendreturngridproduct exte
             'header' => Mage::helper('payperrentals')->__('Order'),
             'align' => 'right',
             'width' => '100px',
-            'index' => 'increment_id',
+            'index' => 'increments_id',
+            'filter_index' => 'increments_id',
         ));
 
         $this->addColumn('customer_name', array(
@@ -158,26 +129,6 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Html_Sendreturngridproduct exte
             'width' => '100px'
         ));
 
-        $this->addColumn('send_date', array(
-            'type' => 'datetime',
-            'header' => Mage::helper('payperrentals')->__('Send Date'),
-            'align' => 'left',
-            'index' => 'send_date',
-            'renderer' => new ITwebexperts_Payperrentals_Block_Adminhtml_Html_Renderer_Returndate(),
-            'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
-            'width' => '100px'
-        ));
-
-        $this->addColumn('return_date', array(
-            'type' => 'datetime',
-            'header' => Mage::helper('payperrentals')->__('Return Date'),
-            'align' => 'left',
-            'index' => 'return_date',
-            'renderer' => new ITwebexperts_Payperrentals_Block_Adminhtml_Html_Renderer_Returndate(),
-            'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
-            'width' => '100px'
-        ));
-
         $this->addColumn('qty', array(
             'type' => 'number',
             'header' => Mage::helper('payperrentals')->__('Quantity'),
@@ -185,13 +136,6 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Html_Sendreturngridproduct exte
             'index' => 'qtys',
             'width' => '50px',
             'filter_index' => 'main_table.qtys'
-        ));
-
-        $this->addColumn('sn', array(
-            'header' => Mage::helper('payperrentals')->__('Serial Numbers'),
-            'align' => 'left',
-            'index' => 'sn',
-            'width' => '150px'
         ));
 
         $this->addExportType('payperrentals_admin/adminhtml_reservationgrid/exportCsv', Mage::helper('payperrentals')->__('CSV'));

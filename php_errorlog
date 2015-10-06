@@ -1,0 +1,1 @@
+[01-Oct-2015 13:07:01 UTC] PHP Fatal error:  Call to a member function getStore() on a non-object in /home/fourwin6/public_html/app/code/community/Taxjar/SalesTax/Model/Observer.php on line 18

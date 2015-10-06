@@ -2,7 +2,6 @@
     /*
      * Modify default values. Right now I don't have a faster alternative
      * */
-
     if($('use_global_min_qty')) {
         $('use_global_min_qty').observe("change", function (event) {
             if ($F('use_global_min_qty') == '1') {
@@ -380,7 +379,6 @@
     //$('inventory_use_config_manage_stock').checked = false;
     //toggleValueElements($('inventory_use_config_manage_stock'), $('inventory_use_config_manage_stock').parentNode);
     //$('inventory_manage_stock').select('option')[1].selected = true;
-
     if($('inventory_min_sale_qty')) {
         $('inventory_min_sale_qty').up('tr').hide();
         $('inventory_max_sale_qty').up('tr').hide();
@@ -389,7 +387,6 @@
             visibility: 'hidden'
         })
     }
-
     p = 0;
     $$('[title^="Inventory"]').each( function(i) {
         p++;
@@ -397,7 +394,6 @@
             document.getElementById(i.id+'_content').getElementsByClassName('fieldset')[0].appendChild(
                 document.getElementById('product_info_tabs_inventory_content').getElementsByTagName("table")[0]
             );
-
         }else{
             document.getElementById(i.id).hide();
         }

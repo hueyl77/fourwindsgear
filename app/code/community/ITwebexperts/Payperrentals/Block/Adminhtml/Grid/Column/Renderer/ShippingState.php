@@ -58,11 +58,11 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Grid_Column_Renderer_ShippingSt
     protected function _getShipButtonHtml()
     {
         $_buttonHtml = '';
-        $_order = Mage::getModel('sales/order')->load($this->_getOrder()->getOrderId());
-        if ($this->_isAllowedToShip() && $_order->canShip() && !$_order->getForcedDoShipmentWithInvoice()) {
+        $_order = $this->_getOrder();
+        //if ($this->_isAllowedToShip() && $_order->canShip() && !$_order->getForcedDoShipmentWithInvoice()) {
             $_buttonHtml = '<a><button title="Ship" type="button" class="scalable go" onclick="setLocation(\'' . $this->_getShipUrl() . '\'); return false;" style="">
 			<span><span><span>'.Mage::helper('payperrentals')->__('Ship').'</span></span></span></button></a>';
-        }
+        //}
         return $_buttonHtml;
     }
 

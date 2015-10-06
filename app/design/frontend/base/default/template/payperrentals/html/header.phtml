@@ -1,0 +1,17 @@
+<?php 
+$_useFlicker = Mage::helper('payperrentals/config')->getThemeStyle(Mage::app()->getStore()->getId()) == ITwebexperts_Payperrentals_Model_Source_Themestyle::RTRW_STYLE;
+$_localeCode = substr(Mage::app()->getLocale()->getLocaleCode(), 0, strpos(Mage::app()->getLocale()->getLocaleCode(), '_'));
+if(!$_useFlicker){
+    $_langCode = $_localeCode;
+}else{
+    $_langCode = 'flick';
+}
+?>
+<script type="text/javascript">
+    jsMagentoUrl = '<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS);?>';
+    langCode = '<?php echo $_langCode;?>';
+</script>
+
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/utils/require.js'; ?>"></script>
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/utils/frontendApp.js'; ?>"></script>
+<script type="text/javascript" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) . 'mage/adminhtml/events.js'; ?>"></script>

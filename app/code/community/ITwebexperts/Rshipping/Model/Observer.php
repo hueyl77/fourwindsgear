@@ -4,7 +4,7 @@
 
 
 /**
- * @category   Itwebexperts
+ * @category   ITwebexperts
  * @package    Itwebexperts_Rshipping
  * @copyright  Copyright (c) 2013
  *

@@ -1,2 +1,4 @@
 app/etc/config.xml
 app/etc/local.xml
+var/cache/*
+var/session/*

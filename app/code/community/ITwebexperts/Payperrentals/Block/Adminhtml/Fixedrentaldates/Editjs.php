@@ -1,0 +1,5 @@
+<?php
+class ITwebexperts_Payperrentals_Block_Adminhtml_Fixedrentaldates_Editjs extends Mage_Adminhtml_Block_Abstract
+{
+
+}

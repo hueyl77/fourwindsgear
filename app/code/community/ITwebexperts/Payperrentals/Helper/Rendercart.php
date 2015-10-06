@@ -57,16 +57,20 @@ class ITwebexperts_Payperrentals_Helper_Rendercart extends Mage_Core_Helper_Abst
             $source = unserialize($product->getCustomOption('info_buyRequest')->getValue());
         }elseif (isset($options['info_buyRequest']) && isset($options['info_buyRequest'][ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION])) {
             $source =  $options['info_buyRequest'];
-        }elseif(is_object($product)) {
+        }elseif(is_object($product)){
             if ($product->getCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION)) {
-                $start_date = $product->getCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION)->getValue();
-                $end_date = $product->getCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::END_DATE_OPTION)->getValue();
-                if (is_object($product->getCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::NON_SEQUENTIAL))) {
-                    $nonSequential = $product->getCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::NON_SEQUENTIAL)->getValue();
-                    $source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::NON_SEQUENTIAL] = $nonSequential;
-                }
-                $source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION] = $start_date;
-                $source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::END_DATE_OPTION] = $end_date;
+            $start_date = $product->getCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION)->getValue();
+            $end_date = $product->getCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::END_DATE_OPTION)->getValue();
+            if (is_object($product->getCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::NON_SEQUENTIAL))) {
+                $nonSequential = $product->getCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::NON_SEQUENTIAL)->getValue();
+                $source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::NON_SEQUENTIAL] = $nonSequential;
+            }
+            if (is_object($product->getCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::FIXED_DATE_ID))) {
+                $fixedDateId = $product->getCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::FIXED_DATE_ID)->getValue();
+                $source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::FIXED_DATE_ID] = $fixedDateId;
+            }
+            $source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION] = $start_date;
+            $source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::END_DATE_OPTION] = $end_date;
             }
         }
 
@@ -121,9 +125,30 @@ class ITwebexperts_Payperrentals_Helper_Rendercart extends Mage_Core_Helper_Abst
             $endDate = ITwebexperts_Payperrentals_Helper_Date::formatDbDate($source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION] , !$showTime, false);
             if (!isset($nonSequential) || $nonSequential == 0) {
                 $endDate = ITwebexperts_Payperrentals_Helper_Date::formatDbDate($source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::END_DATE_OPTION] , !$showTime, false);
-                $options[] = array('label' => $this->__('Start Date'), 'value' => $startDate, 'type' => 'reservation');
-                $options[] = array('label' => $this->__('End Date'), 'value' => $endDate, 'type' => 'reservation');
 
+                if(isset($source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::FIXED_DATE_ID])){
+                    $fixedRentalDatesCollection = Mage::getModel('payperrentals/fixedrentaldates')->getCollection()
+                        ->addFieldToFilter('id', $source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::FIXED_DATE_ID])
+                        ->getFirstItem()
+                    ;
+                    $fixedNameId = $fixedRentalDatesCollection->getNameid();
+                    $fixedStartDate = $fixedRentalDatesCollection->getStartDate();
+                    $fixedEndDate = $fixedRentalDatesCollection->getEndDate();
+                    $difference = strtotime($fixedEndDate) - strtotime($fixedStartDate);
+                    $startDate = date('Y-m-d', strtotime($startDate)) . ' '. date('H:i:s', strtotime($fixedStartDate));
+                    $endDate = date('Y-m-d H:i:s', (strtotime($startDate) + $difference));
+                    $fixedRentalNamesCollection = Mage::getModel('payperrentals/fixedrentalnames')->getCollection()
+                        ->addFieldToFilter('id', $fixedNameId)
+                        ->getFirstItem()
+                    ;
+                    $fixedName = $fixedRentalNamesCollection->getName();
+                    $options[] = array('label' => $this->__('Start Date'), 'value' => ITwebexperts_Payperrentals_Helper_Date::formatDbDate($startDate, !$showTime, false), 'type' => 'reservation');
+                    $options[] = array('label' => $this->__('End Date'), 'value' => ITwebexperts_Payperrentals_Helper_Date::formatDbDate($endDate, !$showTime, false), 'type' => 'reservation');
+                    //$options[] = array('label' => $this->__('Fixed Date'), 'value' => $fixedName, 'type' => 'reservation');
+                }else{
+                    $options[] = array('label' => $this->__('Start Date'), 'value' => $startDate, 'type' => 'reservation');
+                    $options[] = array('label' => $this->__('End Date'), 'value' => $endDate, 'type' => 'reservation');
+                }
             } else {
                 $options[] = array('label' => $this->__('Dates:'), 'value' => ITwebexperts_Payperrentals_Helper_Date::localiseNonsequentialBuyRequest($startDate, $showTime), 'type' => 'reservation');
             }
@@ -132,11 +157,11 @@ class ITwebexperts_Payperrentals_Helper_Rendercart extends Mage_Core_Helper_Abst
                 $options = array();
             }
 
-            $damageWaiver = ITwebexperts_Payperrentals_Helper_Price::getDamageWaiver($productId, $startDate, $endDate, $customerGroup, $qty);
+            $damageWaiver = ITwebexperts_Payperrentals_Helper_Price::getDamageWaiver($productId, 1);
             if ($damageWaiver) {
                 $options[] = array(
-                    'label' => $this->__('Damage Waiver:'),
-                    'value' => ITwebexperts_Payperrentals_Helper_Price::getDamageWaiverHtml($item, $damageWaiver, (bool)$item->getBuyRequest()->getDamageWaiver(), $qty),
+                    'label' => $this->__('Damage Waiver'),
+                    'value' => ITwebexperts_Payperrentals_Helper_Price::getDamageWaiverHtml($item, (bool)$item->getBuyRequest()->getDamageWaiver(), $qty),
                     'type' => 'reservation'
                 );
             }
@@ -195,8 +220,8 @@ class ITwebexperts_Payperrentals_Helper_Rendercart extends Mage_Core_Helper_Abst
             }
         }
         if(!$buyRequest->getStartDate()) {
-            if (ITwebexperts_Payperrentals_Helper_Config::NoCalendarUseTodayAsStartDate()) {
-                if (ITwebexperts_Payperrentals_Helper_Config::isNextHourSelection()) {
+            if (Mage::helper('payperrentals/config')->NoCalendarUseTodayAsStartDate()) {
+                if (Mage::helper('payperrentals/config')->isNextHourSelection()) {
                     $buyRequest->setStartDate(date('Y-m-d', strtotime('+1 day', time())) . ' 00:00:00');
                 } else {
                     $buyRequest->setStartDate(date('Y-m-d', strtotime('+0 day', time())) . ' 00:00:00');
@@ -212,6 +237,19 @@ class ITwebexperts_Payperrentals_Helper_Rendercart extends Mage_Core_Helper_Abst
                     )
                 );
             }
+            if($buyRequest->getFixedDateId()){
+                $fixedRentalDatesCollection = Mage::getModel('payperrentals/fixedrentaldates')->getCollection()
+                    ->addFieldToFilter('id', $buyRequest->getFixedDateId())
+                    ->getFirstItem()
+                ;
+                $fixedStartDate = $fixedRentalDatesCollection->getStartDate();
+                $fixedEndDate = $fixedRentalDatesCollection->getEndDate();
+                $difference = strtotime($fixedEndDate) - strtotime($fixedStartDate);
+                $start_date = date('Y-m-d', strtotime($buyRequest->getStartDate())) . ' '. date('H:i:s', strtotime($fixedStartDate));
+                $end_date = date('Y-m-d H:i:s', (strtotime($start_date) + $difference));
+                $buyRequest->setStartDate($start_date);
+                $buyRequest->setEndDate($end_date);
+            }
 
 
         return $msg;
@@ -221,6 +259,7 @@ class ITwebexperts_Payperrentals_Helper_Rendercart extends Mage_Core_Helper_Abst
         $product->addCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION, $buyRequest->getStartDate(), $product);
         $product->addCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::END_DATE_OPTION, $buyRequest->getEndDate(), $product);
         $product->addCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::NON_SEQUENTIAL, $buyRequest->getNonSequential(), $product);
+        $product->addCustomOption(ITwebexperts_Payperrentals_Model_Product_Type_Reservation::FIXED_DATE_ID, $buyRequest->getFixedDateId(), $product);
     }
 
 
@@ -279,7 +318,7 @@ class ITwebexperts_Payperrentals_Helper_Rendercart extends Mage_Core_Helper_Abst
 
         $this->_addCustomOptions($product, $buyRequest);
 
-        ITwebexperts_Payperrentals_Helper_Date::saveDatesForGlobalUse(array('start_date' => $buyRequest->getStartDate(), 'end_date' => $buyRequest->getEndDate()));
+        ITwebexperts_Payperrentals_Helper_Date::saveDatesForGlobalUse((array)$buyRequest);
 
             return 'call_parent';
     }

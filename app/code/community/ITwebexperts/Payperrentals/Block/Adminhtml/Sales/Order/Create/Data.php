@@ -33,51 +33,5 @@
  */
 class ITwebexperts_Payperrentals_Block_Adminhtml_Sales_Order_Create_Data extends Mage_Adminhtml_Block_Sales_Order_Create_Data
 {
-    public function getTemplatePhpInitialisations()
-    {
-        return  Mage::getDesign()->getTemplateFilename('payperrentals/calendar/php_initialisations.phtml', array(
-            '_area' => 'frontend',
-            '_relative' => false
-        ));
-    }
 
-    public function getTemplateFunctions()
-    {
-        return Mage::getDesign()->getTemplateFilename('payperrentals/calendar/admin_global_func.phtml', array(
-            '_area' => 'frontend',
-            '_relative' => false
-        ));
-    }
-
-    public function getTemplateGlobalCalendarFunctions()
-    {
-        return Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar_functions.phtml', array(
-            '_area' => 'frontend',
-            '_relative' => false
-        ));
-    }
-
-    public function getTemplateJsInitialisations()
-    {
-        return Mage::getDesign()->getTemplateFilename('payperrentals/calendar/js_initialisations.phtml', array(
-            '_area' => 'frontend',
-            '_relative' => false
-        ));
-    }
-
-    public function getTemplateStyles()
-    {
-        return Mage::getDesign()->getTemplateFilename('payperrentals/calendar/styles.phtml', array(
-            '_area' => 'frontend',
-            '_relative' => false
-        ));
-    }
-
-    public function getTemplateGlobalCalendar()
-    {
-        return Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar.phtml', array(
-            '_area' => 'frontend',
-            '_relative' => false
-        ));
-    }
 }

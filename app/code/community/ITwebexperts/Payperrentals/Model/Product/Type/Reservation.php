@@ -16,6 +16,7 @@ class ITwebexperts_Payperrentals_Model_Product_Type_Reservation extends Mage_Cat
     const BUYOUT_PRICE_OPTION = 'buyout_price';
     const NO_AVAIL_CHECK_OPTION = 'no_avail_check';
     const NON_SEQUENTIAL = 'non_sequential';
+    const FIXED_DATE_ID = 'fixed_date_id';
     const BUYOUT_MIN_SECONDS = 14552000; // 5 months + 1 second
 
     public function prepareForCartAdvanced(Varien_Object $buyRequest, $product = null, $processMode = null)
@@ -62,6 +63,6 @@ class ITwebexperts_Payperrentals_Model_Product_Type_Reservation extends Mage_Cat
     public function isVirtual($product = null)
     {
         $hasShipping = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($this->getProduct($product)->getId(),'payperrentals_has_shipping');
-        return ((ITwebexperts_Payperrentals_Helper_Config::removeShipping()) || ($hasShipping == ITwebexperts_Payperrentals_Model_Product_Hasshipping::STATUS_DISABLED));
+        return ((Mage::helper('payperrentals/config')->removeShipping()) || ($hasShipping == ITwebexperts_Payperrentals_Model_Product_Hasshipping::STATUS_DISABLED));
     }
 }

@@ -1,0 +1,172 @@
+<?php
+if(Mage::helper('payperrentals/config')->enabledCheckoutSignature()):?>
+<style type="text/css">
+    #signatureparent {
+        color:darkblue;
+        background-color:darkgrey;
+        max-width:600px;
+        padding:20px;
+    }
+
+    /*This is the div within which the signature canvas is fitted*/
+    #signature {
+        border: 2px dotted black;
+        background-color:lightgrey;
+    }
+
+    /* Drawing the 'gripper' for touch-enabled devices */
+    html.touch #content {
+        float:left;
+        width:92%;
+    }
+    html.touch #scrollgrabber {
+        float:right;
+        width:4%;
+        margin-right:2%;
+        background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAFCAAAAACh79lDAAAAAXNSR0IArs4c6QAAABJJREFUCB1jmMmQxjCT4T/DfwAPLgOXlrt3IwAAAABJRU5ErkJggg==)
+    }
+    html.borderradius #scrollgrabber {
+        border-radius: 1em;
+    }
+    #signhere {
+        /*		display:table-cell;*/
+        vertical-align: middle;
+        position: relative;
+        background-color: yellow;
+        width: 100px;
+        padding: 10px;
+        border: 2px solid #C02F50;
+        /*left:2%;*/
+        /*top:15px;*/
+    }
+
+    #signhere:after, #signhere:before {
+        left: 100%;
+        top: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+    }
+
+    #signhere:after {
+        border-color: rgba(136, 183, 213, 0);
+        border-left-color: #FFFF00;
+        border-width: 12px;
+        margin-top: -13px;
+    }
+    #signhere:before {
+        border-color: rgba(194, 225, 245, 0);
+        border-left-color: #C02F50;
+        border-width: 15px;
+        margin-top: -16px;
+    }
+
+</style>
+<ol id="checkout-agreements">
+<br/><br /><h4><?php echo $this->__('Sign Rental Contract') ?></h4>
+<!--<form action="--><?php //echo $this->getFormaction()?><!--" method="POST">-->
+    <?php echo $this->__('By signing below you are agreeing to the terms of the Rental Contract.')?> <?php echo $this->getOrderid()?>.<br /><br />
+    <textarea style="max-width:600px;" rows="6"><?php echo $this->getRentalcontract()?></textarea><br /><br />
+    <div>
+        <div id="content">
+            <div id="signatureparent">
+                <div id="signature"><div id="signhere"><?php echo $this->__('Sign Here')?></div></div></div>
+            <div id="tools"></div>
+        </div>
+        <div id="scrollgrabber"></div><br />
+    </div>
+    <input type="hidden" name="signaturecode" id="signaturecode">
+    <input type="hidden" name="signatureimage" id="signatureimage">
+<!--    <input type="hidden" name="form_key" value="--><?php //echo Mage::getSingleton('core/session')->getFormKey(); ?><!--" />-->
+    <label for="typedsignature">Type Signature: </label>
+    <input type="text" name="typedsignature" id="typedsignature"><br /><br />
+    Signed on: <?php echo Mage::helper('core')->formatDate(NULL, 'medium', false); ?><br /><br />
+</ol>
+<!--    <button><span><span><span>Sign Contract</span></span></span></button>-->
+<!--</form>-->
+<script>
+    /*  @preserve
+     jQuery pub/sub plugin by Peter Higgins (dante@dojotoolkit.org)
+     Loosely based on Dojo publish/subscribe API, limited in scope. Rewritten blindly.
+     Original is (c) Dojo Foundation 2004-2010. Released under either AFL or new BSD, see:
+     http://dojofoundation.org/license for more information.
+     */
+    var topics = {};
+    $jpprSig.publish = function(topic, args) {
+        if (topics[topic]) {
+            var currentTopic = topics[topic],
+                args = args || {};
+
+            for (var i = 0, j = currentTopic.length; i < j; i++) {
+                currentTopic[i].call($, args);
+            }
+        }
+    };
+    $jpprSig.subscribe = function(topic, callback) {
+        if (!topics[topic]) {
+            topics[topic] = [];
+        }
+        topics[topic].push(callback);
+        return {
+            "topic": topic,
+            "callback": callback
+        };
+    };
+    $jpprSig.unsubscribe = function(handle) {
+        var topic = handle.topic;
+        if (topics[topic]) {
+            var currentTopic = topics[topic];
+
+            for (var i = 0, j = currentTopic.length; i < j; i++) {
+                if (currentTopic[i] === handle.callback) {
+                    currentTopic.splice(i, 1);
+                }
+            }
+        }
+    };
+
+</script>
+<script>
+    $jpprSig(document).ready(function() {
+        // This is the part where jSignature is initialized.
+        var $sigdiv = $jpprSig("#signature").jSignature({'UndoButton':true});
+        if (Modernizr.touch){
+            $jpprSig('#scrollgrabber').height($jpprSig('#content').height())
+        }
+        $sigdiv.bind('change', function(e){
+            if($sigdiv.jSignature('getData', 'native').length > 0){
+                $jpprSig('#signhere').hide();
+            } else {
+                $jpprSig('#signhere').show();
+            }
+        });
+        $jpprSig('button:submit').removeAttr('onclick');
+        $jpprSig('button:submit').on('click',function(event){
+            var $signature = $jpprSig('#signature').jSignature('getData','base30');
+            var $signaturetext = $jpprSig('#typedsignature').val();
+            var $signatureimage = $jpprSig('#signature').jSignature('getData','svg');
+            $jpprSig('#signatureimage').val($signatureimage);
+            if($signature[1] == '') {
+                alert('<?php echo $this->__('Signature field must be signed')?>');
+                event.stopImmediatePropagation();
+                event.preventDefault();
+            } else if($signaturetext == '') {
+                alert('<?php echo $this->__('You must fill in the typed signature input field')?>');
+                event.stopImmediatePropagation();
+                event.preventDefault();
+            } else {
+                $jpprSig('#signaturecode').val($signature);
+                console.log($signature);
+                console.log($signatureimage);
+                console.log($jpprSig('#signatureimage'));
+                review.save();
+                return;
+            }
+
+        });
+    })
+</script>
+<?php endif ?>

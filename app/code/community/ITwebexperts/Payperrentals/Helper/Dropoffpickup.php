@@ -1,4 +1,5 @@
 <?php
+
 class ITwebexperts_Payperrentals_Helper_Dropoffpickup extends Mage_Core_Helper_Abstract
 {
     /**
@@ -10,20 +11,21 @@ class ITwebexperts_Payperrentals_Helper_Dropoffpickup extends Mage_Core_Helper_A
      *
      * @return string
      */
-    public function getDropoffInput($storeOpen, $storeClose, $excludeHoursStart){
-        $html = '<td class="label">'. Mage::helper('payperrentals')->__('Dropoff Date:') . ' </td><td>';
+    public function getDropoffInput($storeOpen, $storeClose, $excludeHoursStart)
+    {
+        $html = '<td class="label">' . Mage::helper('payperrentals')->__('Dropoff Date:') . ' </td><td>';
 
-        if(Mage::getSingleton('adminhtml/session_quote')->getOrder()->getSendDatetime()) {
+        if (Mage::getSingleton('adminhtml/session_quote')->getOrder()->getSendDatetime()) {
             $startDate = Mage::getSingleton('adminhtml/session_quote')->getOrder()->getSendDatetime();
-        }elseif(Mage::registry('current_order') && Mage::registry('current_order')->getSendDatetime()){
+        } elseif (Mage::registry('current_order') && Mage::registry('current_order')->getSendDatetime()) {
             $startDate = Mage::registry('current_order')->getSendDatetime();
-        }else{
+        } else {
             $startDate = '';
         }
         $timeSelected = false;
-        if($startDate != ''){
+        if ($startDate != '') {
             $timeSelectedArr = explode(' ', $startDate);
-            if(isset( $timeSelectedArr[1])) {
+            if (isset($timeSelectedArr[1])) {
                 $timeSelected = $timeSelectedArr[1];
             }
             /** @var $coreHelper Mage_Core_Helper_Data */
@@ -40,7 +42,7 @@ class ITwebexperts_Payperrentals_Helper_Dropoffpickup extends Mage_Core_Helper_A
             ->setClass('datetime-picker input-text estimateSend')
             ->toHtml();
 
-        $html .= '</td><td class="label">'. Mage::helper('payperrentals')->__('Time: ') . ' </td><td>';
+        $html .= '</td><td class="label">' . Mage::helper('payperrentals')->__('Time: ') . ' </td><td>';
 
         /** @var $helperTime ITwebexperts_Payperrentals_Helper_Timebox */
         $helperTime = Mage::helper('payperrentals/timebox');
@@ -60,19 +62,20 @@ class ITwebexperts_Payperrentals_Helper_Dropoffpickup extends Mage_Core_Helper_A
      *
      * @return string
      */
-    public function getPickupInput($storeOpen, $storeClose, $excludeHoursEnd){
-        $html = '<td class="label">'. Mage::helper('payperrentals')->__('Pickup Date:') . ' </td><td>';
-        if(Mage::getSingleton('adminhtml/session_quote')->getOrder()->getReturnDatetime()) {
+    public function getPickupInput($storeOpen, $storeClose, $excludeHoursEnd)
+    {
+        $html = '<td class="label">' . Mage::helper('payperrentals')->__('Pickup Date:') . ' </td><td>';
+        if (Mage::getSingleton('adminhtml/session_quote')->getOrder()->getReturnDatetime()) {
             $endDate = Mage::getSingleton('adminhtml/session_quote')->getOrder()->getReturnDatetime();
-        }elseif(Mage::registry('current_order') && Mage::registry('current_order')->getReturnDatetime()){
+        } elseif (Mage::registry('current_order') && Mage::registry('current_order')->getReturnDatetime()) {
             $endDate = Mage::registry('current_order')->getReturnDatetime();
-        }else{
+        } else {
             $endDate = '';
         }
         $timeSelected = false;
-        if($endDate != ''){
+        if ($endDate != '') {
             $timeSelectedArr = explode(' ', $endDate);
-            if(isset( $timeSelectedArr[1])) {
+            if (isset($timeSelectedArr[1])) {
                 $timeSelected = $timeSelectedArr[1];
             }
             /** @var $coreHelper Mage_Core_Helper_Data */
@@ -88,7 +91,7 @@ class ITwebexperts_Payperrentals_Helper_Dropoffpickup extends Mage_Core_Helper_A
             ->setClass('datetime-picker input-text estimateReturn')
             ->toHtml();
 
-        $html .= '</td><td class="label">'. Mage::helper('payperrentals')->__('Time: ') . ' </td><td>';
+        $html .= '</td><td class="label">' . Mage::helper('payperrentals')->__('Time: ') . ' </td><td>';
 
         $hourEnd = Mage::helper('payperrentals/timebox')->getTimeInput('estimateReturnTime', $storeOpen, $storeClose, $excludeHoursEnd, $timeSelected);
 

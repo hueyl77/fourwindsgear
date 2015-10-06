@@ -18,7 +18,7 @@
 "Add to queue","Add to queue"
 "Admin Reminder Emails as comma separated list","Admin Reminder Emails as comma separated list"
 "All Products","All Products"
-"All products must use the same start and end dates","All products must use the same start and end dates"
+All products must use the same start and end dates,All products must use the same start and end dates
 "All Websites","All Websites"
 "Allow change QTY on Listing Page","Allow change QTY on Listing Page"
 "Already registered?","Already registered?"
@@ -50,7 +50,6 @@
 "Checkout as a Guest or Register","Checkout as a Guest or Register"
 "Choose a selection...","Choose a selection..."
 "Chosen quantity is not available","Chosen quantity is not available"
-"Choose Your Rental Dates","Choose Your Rental Dates"
 "Comments History","Comments History"
 "Continue","Continue"
 "Control + Click the statuses you want to have mean that inventory reserved. Is only active if the “Reserve inventory by status” setting is set to yes","Control + Click the statuses you want to have mean that inventory reserved. Is only active if the “Reserve inventory by status” setting is set to yes"
@@ -79,6 +78,7 @@
 "Disabled Days of Week","Disabled Days of Week"
 "Disabled From","Disabled From"
 "Disabled To","Disabled To"
+Download Rental Contract",Download Rental Contract
 "Disabled","Disabled"
 "Dropoff & Pickup Dates MUST BE Different and Dropoff Date MUST BE BIGGER Pickup Date","Dropoff & Pickup Dates MUST BE Different and Dropoff Date MUST BE BIGGER Pickup Date"
 "Dropoff Date:","Dropoff Date:"
@@ -221,7 +221,7 @@
 "Price","Price"
 "Price:","Price:"
 "Pricing","Pricing"
-"Pricing:","Pricing:"
+Pricing:,Pricing:
 "Print Labels","Print Labels"
 "Product Name","Product Name"
 "Product is already in queue","Product is already in queue"
@@ -258,6 +258,7 @@
 "Rent Link Webservice","Rent Link Webservice"
 "Rent","Rent"
 "Rental AND Reservation","Rental AND Reservation"
+Rental Contract,Rental Contract
 "Rental Queue Report","Rental Queue Report"
 "Rental Queue","Rental Queue"
 "Rental Reservation","Rental Reservation"
@@ -343,6 +344,8 @@
 "Show Rental Link on Top Menu","Show Rental Link on Top Menu"
 "Show Start / End Dates as Columns on Order Editor","Show Start / End Dates as Columns on Order Editor"
 "Show Start / End Dates as Text on Order Editor","Show Start / End Dates as Text on Order Editor"
+Sign Here,Sign Here
+Signature field must be signed,Signature field must be signed
 "Show","Show"
 "Skipping import row, required field ""%s"" is not defined.","Skipping import row, required field ""%s"" is not defined."
 "Skipping import row, website ""%s"" field does not exist.","Skipping import row, website ""%s"" field does not exist."
@@ -366,11 +369,13 @@
 "Subtotal: shows as sub-total in order","Subtotal: shows as sub-total in order"
 "Sunday","Sunday"
 "Tax","Tax"
+Thank you we have received your contract signature on,Thank you we have received your contract signature on
 "The coupon code has been accepted.","The coupon code has been accepted."
 "The deposit is only authorized to your credit card and not charged. If items are lost or damaged then we would bill this amount to your credit card according to the damanges or lost items value.","The deposit is only authorized to your credit card and not charged. If items are lost or damaged then we would bill this amount to your credit card according to the damanges or lost items value."
 "The order has been edited.","The order has been edited."
 "The order was placed using %s","The order was placed using %s"
 "The product you requested does not have enough inventory available","The product you requested does not have enough inventory available"
+The signature captured can be seen below. If you need to modify it you can do so with the form.,The signature captured can be seen below. If you need to modify it you can do so with the form.
 "There are Dates in between your selected period which do not have available inventory","There are Dates in between your selected period which do not have available inventory"
 "There are no products matching the selection.","There are no products matching the selection."
 "There are unavailable days between the selected dates","There are unavailable days between the selected dates"
@@ -393,6 +398,7 @@
 "Turnover Before Number","Turnover Before Number"
 "Turnover Before Type","Turnover Before Type"
 "Turnover Times","Turnover Times"
+Undo Last Stroke,Undo Last Stroke
 "Use Fixed Dates Selection","Use Fixed Dates Selection"
 "Use Modified Version Of Order Creator","Use Modified Version Of Order Creator"
 "Use SSO","Use SSO"
@@ -404,6 +410,7 @@
 "Usually Magento will not reserve inventory unless an order is invoiced. If you want inventory to be automatically reserved as soon as an order is placed, set to yes","Usually Magento will not reserve inventory unless an order is invoiced. If you want inventory to be automatically reserved as soon as an order is placed, set to yes"
 "Usually don't change this. Is only for templates that already load jQuery to avoid loading it twice","Usually don't change this. Is only for templates that already load jQuery to avoid loading it twice"
 "View Order","View Order"
+Vïew Rental Contract",View Rental Contract
 "View","View"
 "Website","Website"
 "Wednesday","Wednesday"
@@ -417,9 +424,11 @@
 "Years","Years"
 "You are not allowed renting","You are not allowed renting"
 "You are not allowed renting. Please login on CNH","You are not allowed renting. Please login on CNH"
+You can download your signed rental contract using the buttons above.,You can download your signed rental contract using the buttons above.
 "You cannot remove deposit","You cannot remove deposit"
 "You do not have a rental membership for this product or you are not logged in. Please either login ","You do not have a rental membership for this product or you are not logged in. Please either login "
 "You have no items in your wishlist.","You have no items in your wishlist."
+You must fill in the typed signature input field,You must fill in the typed signature input field
 "Your form has been submitted successfully.","Your form has been submitted successfully."
 "coupon code is not valid","coupon code is not valid"
 "days","days"
@@ -431,3 +440,4 @@
 "or purchase a rental membership below.","or purchase a rental membership below."
 "per page","per page"
 "was added to queue","was added to queue"
+"Choose Your Rental Dates","Choose Your Rental Dates"

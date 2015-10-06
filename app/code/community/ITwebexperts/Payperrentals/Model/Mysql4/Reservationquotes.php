@@ -6,20 +6,6 @@ class ITwebexperts_Payperrentals_Model_Mysql4_Reservationquotes extends Mage_Cor
         $this->_init('payperrentals/reservationquotes', 'id');
     }
 
-
-    public function updateSendReturnById($id, $sr) {
-        $this->_getWriteAdapter()->update($this->getMainTable(), array('sendreturn_id' => $sr),'id='.($id));
-        return $this;
-    }
-
-    public function updateStartEndByOrderId($order_id, $start, $end) {
-        $this->_getWriteAdapter()->update($this->getMainTable(), array('start_date' => $start, 'end_date' => $end),'order_id="'.($order_id).'"');
-        return $this;
-    }
-
-
-
-
     public function deleteByQuoteItem(Mage_Sales_Model_Quote_Item $QuoteItem) {
         $condition =   "quote_item_id=".intval($QuoteItem->getId());
         $this->_getWriteAdapter()->delete($this->getMainTable(), $condition);

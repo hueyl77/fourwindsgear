@@ -224,3 +224,19 @@
 <reference name="notifications">
    <block type="tax/adminhtml_notifications" name="tax_notifications" template="tax/notifications.phtml"/>
 </reference>
+<reference name="head">
+   <action method="addCss">
+      <stylesheet>jmslideshow.css</stylesheet>
+   </action>
+</reference>
+<reference name="content">
+   <block type="core/template" name="jmslideshow.head" template="jmslideshow/head.phtml"/>
+</reference>
+<reference name="head">
+   <action method="addCss">
+      <name>jmbasetheme.css</name>
+   </action>
+</reference>
+<reference name="content">
+   <block type="core/template" name="jmbasethemehead" template="jmbasetheme/jmbasethemehead.phtml"/>
+</reference>

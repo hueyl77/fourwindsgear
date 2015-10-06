@@ -10,48 +10,10 @@
 ) { return; } ?>
 <?php $_product = $this->getProduct(); ?>
 <?php
-$templatePhpInitialisations = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/php_initialisations.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));
-
-$templateJsInitialisations = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/js_initialisations.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));
-
-/*$templateCoreFunctions = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/core_functions.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));*/
-
-$templateFunctions = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/frontend_functions.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));
-$templateGlobalCalendarFunctions = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar_functions.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));
-
-
-$templateStyles = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/styles.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));
-
-$templateGlobalCalendar = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar.phtml', array(
-    '_area' => $this->getArea(),
-    '_relative' => false
-));
-
+/** @var $_configHelper ITwebexperts_Payperrentals_Helper_Config */
+$_configHelper = Mage::helper('payperrentals/config');
 ?>
-
-
-<?php require($templatePhpInitialisations); ?>
     <div class="reservationCalendarDiv">
-
-
         <?php if ($_product->getTypeId() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE_GROUPED): ?>
             <div class="price-box">
               <span class="regular-price" id="product-price-<?php echo $_product->getId() . $_jsFunctionPrefix; ?>">
@@ -86,7 +48,6 @@ $templateGlobalCalendar = Mage::getDesign()->getTemplateFilename('payperrentals/
                 <?php endif; ?>
                 <?php if ($_selectedArray !== false): ?>
                     <div class="selectedDays">
-                        <?php //echo '<div class="instock" style="font-size:16px;font-weight:bold">' . $this->__('Item is in stock') . ': ' . '<br/></div>'; ?>
                         <?php $_p = 0; ?>
                         <?php foreach ($_selectedArray as $_iDay): ?>
                             <?php echo '<input type="radio" class="selectedDayRadio" name="selDays" value="' . $_iDay . '"' . ($_p == 0 ? 'checked="checked"' : '') . ' />' . $_iDay . ' ' . $this->__('days') . '<br/>'; ?>
@@ -99,152 +60,18 @@ $templateGlobalCalendar = Mage::getDesign()->getTemplateFilename('payperrentals/
             <div class="qty-move-container"></div>
 
             <div class="reservationInfo"></div>
-
+            <?php if(!ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDates() || Mage::registry('current_product') && Mage::helper('payperrentals/config')->showCalendarOnProductInfo()): ?>
             <h4 class="chooseDatesLabel"><?php echo $this->__('Choose Your Reservation Dates') ?></h4>
-            <?php require($templateGlobalCalendar); ?>
+            <?php echo $this->getCalendar(); ?>
+                <?php else: ?>
+                <?php
+                $_productId = $this->getProduct()->getId();
+                $_fixedRentalDates = ITwebexperts_Payperrentals_Helper_Data::getFixedRentalDates($_productId);
+                $_fixedRentalDates = ITwebexperts_Payperrentals_Helper_Data::toFormattedArraysOfDatesArray($_fixedRentalDates, false);
+                ?>
+                <?php if (count($_fixedRentalDates) > 0) :?>
+                    <input type="hidden" class="pprproductid" value="<?php echo $this->getProduct()->getId();?>"/>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
     </div>
-
-    <?php require($templateJsInitialisations); ?>
-    <?php require($templateFunctions); ?>
-    <?php require($templateGlobalCalendarFunctions); ?>
-
-
-    <script type="text/javascript">
-        $jppr(document).ready(function () {
-            $selfID<?php echo $_jsFunctionPrefix ?> = $jppr('<?php echo $_jsContainerPrefix ?>');
-
-            //if ($jppr('<?php echo $_jsContainerPrefix ?> #qty').val() == 0) {
-                $jppr('<?php echo $_jsContainerPrefix ?> #qty').val('<?php echo ITwebexperts_Payperrentals_Helper_Inventory::getMinSaleQuantity($_product); ?>');
-            //}
-            $jppr('<?php echo $_jsContainerPrefix ?> .qty-container').appendTo('<?php echo $_jsContainerPrefix ?> .qty-move-container');
-            $jppr('<?php echo $_jsContainerPrefix ?> .reservationCalendarDiv').insertBefore('<?php echo $_jsContainerPrefix ?> #product-options-wrapper');
-            $jppr('<?php echo $_jsContainerPrefix ?> #qty').keyup(function () {
-                $jppr('<?php echo $_jsContainerPrefix ?> .btn-cart').each(function () {
-                    $(this).disabled = true;
-                });
-            });
-            $jppr('<?php echo $_jsContainerPrefix ?> #qty').change(function () {
-                updateBookedDates<?php echo $_jsFunctionPrefix ?>($selfID<?php echo $_jsFunctionPrefix ?>);
-                updateInputVals<?php echo $_jsFunctionPrefix ?>($jppr('<?php echo $_jsContainerPrefix ?>'));
-            });
-
-            $jppr('<?php echo $_jsContainerPrefix ?> .datePicker .datepick-inline').css('width', '100%');
-
-            $jppr('#qty').trigger('change');
-            updatePriceHtml<?php echo $_jsFunctionPrefix ?>(0, 0);
-            $jppr('<?php echo $_jsContainerPrefix ?> .selectedDayRadio').click(function () {
-                var val = $jppr(this).val();
-                selectedToEndPeriod = (parseInt(val) - addStartingDateNumber);
-                $jppr('.calendarSelector').attr('nrSel', (parseInt(val) - addStartingDateNumber + 1));
-                if (selectedToStartPeriod != '0' ||  $jppr('<?php echo $_jsContainerPrefix ?> .readStartDate').val() != '') {
-                    if ($jppr('<?php echo $_jsContainerPrefix ?>').data('selected') == 'start' || $jppr('<?php echo $_jsContainerPrefix ?> .readStartDate').val() != '') {
-                        if ($jppr('<?php echo $_jsContainerPrefix ?> .readStartDate').val() != '') {
-                            $jppr('<?php echo $_jsContainerPrefix ?>').data('wait', 1);
-                            var startDate = splitDateTime<?php echo $_jsFunctionPrefix ?>($jppr('<?php echo $_jsContainerPrefix ?> .readStartDate').val());
-                            startDate = Date.parseExact(startDate[0], '<?php echo $_locDateFormat;?>');
-                            $selfID<?php echo $_jsFunctionPrefix ?>.find('.datePicker').datepick('selectDateTd', startDate);
-                            $jppr('<?php echo $_jsContainerPrefix ?>').data('wait', 0);
-                        }
-                    }
-                    $selfID<?php echo $_jsFunctionPrefix ?>.find('.datePicker').datepick('selectDateTd', Date.parseExact(selectedToStartPeriod, 'yyyy-MM-dd'));
-                }
-            });
-            if ($('shipping_method_select_box') == null || $('shipping_method_select_box').value != 'null' || ($('shipping_method_select_box').value == 'null' && $('zip_code').value != '')) {
-                $jppr('<?php echo $_jsContainerPrefix ?> .selectedDayRadio:checked').trigger('click');
-            }
-
-            $jppr('<?php echo $_jsContainerPrefix ?> .btn-cart').wrap('<div class="over-btn" style="" />');
-            $jppr('<?php echo $_jsContainerPrefix ?> .over-btn').css('float', $jppr('<?php echo $_jsContainerPrefix ?> .btn-cart:eq(0)').css('float'));
-            $jppr('<?php echo $_jsContainerPrefix ?> .over-btn').css('display', $jppr('<?php echo $_jsContainerPrefix ?> .btn-cart:eq(0)').css('display'));
-            //$jppr('<?php echo $_jsContainerPrefix ?> .over-btn').css('width', $jppr('<?php echo $_jsContainerPrefix ?> .btn-cart:eq(0)').css('width'));
-            $jppr('<?php echo $_jsContainerPrefix ?> .over-btn').css('margin', $jppr('<?php echo $_jsContainerPrefix ?> .btn-cart:eq(0)').css('margin'));
-
-            $jppr('<?php echo $_jsContainerPrefix ?> .btn-cart-bqueue, <?php echo $_jsContainerPrefix ?> .btn-cart-buyout').each(function(){
-               $jppr(this).css('float', $jppr('<?php echo $_jsContainerPrefix ?> .over-btn').css('float'));
-                $jppr(this).css('display', $jppr('<?php echo $_jsContainerPrefix ?> .over-btn').css('display'));
-                $jppr(this).css('width', $jppr('<?php echo $_jsContainerPrefix ?> .over-btn').css('width'));
-                $jppr(this).css('margin', $jppr('<?php echo $_jsContainerPrefix ?> .over-btn').css('margin'));
-            });
-            $jppr('<?php echo $_jsContainerPrefix ?> .btn-cart-bqueue, <?php echo $_jsContainerPrefix ?> .btn-cart-buyout').css('margin-left', '5px');
-            $jppr('<?php echo $_jsContainerPrefix ?> .btn-cart-bqueue').css('width', ($jppr('<?php echo $_jsContainerPrefix ?> .btn-cart-bqueue').outerWidth()+20)+'px');
-
-            $jppr('<?php echo $_jsContainerPrefix ?> .over-btn').mousedown(function () {
-                if(typeof Modernizr != 'undefined' && (Modernizr.csstransforms || Modernizr.csstransforms3d)){
-                    Modernizr.csstransforms = null;
-                    Modernizr.csstransforms3d = null;
-                }
-                <?php if( $_useGlobalDates): ?>
-                $jppr(this).find('.btn-cart').removeAttr('disabled');
-                <?php endif ?>
-
-                if ($jppr(this).find('.btn-cart[disabled]').length > 0) {
-                    if(!$jppr(this).children(':first').hasClass('btn-cart-bqueue')) {
-                        if ($jppr('<?php echo $_jsContainerPrefix ?> .readStartDate').val() == '' || $jppr('<?php echo $_jsContainerPrefix ?> .readEndDate').val() == '') {
-                            alert(pleaseSelectMessage);
-                        } else {
-                            alert(noPriceMessage);
-                        }
-                    }else{
-                        $jppr(this).children(':first').removeAttr('disabled');
-                    }
-                }
-            });
-
-            if (typeof bundle !== 'undefined') {
-                for (var option in bundle.config.selected) {
-                    if (bundle.config.options[option]) {
-                        for (var i = 0; i < bundle.config.selected[option].length; i++) {
-                            if (bundle.config.options[option].selections[bundle.config.selected[option][i]].typeid == 'reservation') {
-                                $jppr('<?php echo $_jsContainerPrefix ?> input[name="bundle_option_qty[' + option + ']"]').attr('onblur', '');
-                                $jppr('<?php echo $_jsContainerPrefix ?> input[name="bundle_option_qty[' + option + ']"]').attr('onkeyup', '');
-                            }
-                        }
-                    }
-                }
-            }
-
-            $jppr('<?php echo $_jsContainerPrefix ?> input[name^="bundle_option_qty"]').each(function () {
-                qtyDefaultArr[$jppr(this).attr('id')] = $jppr(this).val();
-            });
-
-            <?php //else: ?>
-            <?php //endif; ?>
-        });
-        $jppr(document).ready(function(){
-            if($jppr('.datesblock .calendarSelector .datesSelector').length > 0) {
-                $jppr('.reservationCalendarDiv .calendarSelector .readStartDate').css('width', $jppr('.datesblock .calendarSelector .readStartDate').css('width'));
-                $jppr('.reservationCalendarDiv .calendarSelector .readEndDate').css('width', $jppr('.datesblock .calendarSelector .readEndDate').css('width'));
-                $jppr('.reservationCalendarDiv .calendarSelector .dateView').css('width', $jppr('.datesblock .calendarSelector .dateView').css('width'));
-                $jppr('.reservationCalendarDiv .calendarSelector .dateView').css('display', 'block');
-                $jppr('.block-pprdates').css('height', $jppr('.block-pprdates').css('height'));
-
-                //var pOffset = $jppr('.block-pprdates .btn-cart').offset();
-                //$jppr('.block-pprdates .btn-cart').css('position','absolute');
-                //$jppr('.block-pprdates .btn-cart').css('top', pOffset.top);
-                //$jppr('.block-pprdates .btn-cart').css('left', pOffset.left);
-                //$jppr('.reservationCalendarDiv .calendarSelector .btn-resfreshCalendar').positionOn($jppr('.datesblock .calendarSelector .btn-resfreshCalendar'));
-
-                $jppr('.block-pprdates .btn-cart').positionOn($jppr('.block-pprdates .btn-cart'));
-
-
-                $jppr('.reservationCalendarDiv .calendarSelector').positionOn($jppr('.datesblock .calendarSelector'));
-                //$jppr('.reservationCalendarDiv .calendarSelector .btn-resfreshCalendar').positionOn($jppr('.datesblock .calendarSelector .btn-resfreshCalendar'));
-
-                $jppr('.datesblock .calendarSelector').hide();
-
-                $jppr('.reservationCalendarDiv .calendarSelector .datesSelector').css('z-index', '10000001');
-                $jppr('.reservationCalendarDiv .calendarSelector .datePickerDiv').css('z-index', '10000002');
-
-                $jppr('.chooseDatesLabel').hide();
-                $jppr('.daydetails').hide();
-            }else{
-            <?php if (ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDatesShoppingCart()):?>
-                $jppr('.reservationCalendarDiv').hide();
-            <?php endif; ?>
-            }
-        });
-
-    </script>
-
-<?php require($templateStyles); ?>

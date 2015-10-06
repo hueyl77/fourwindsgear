@@ -19,6 +19,7 @@ class ITwebexperts_Payperrentals_AjaxController extends Mage_Core_Controller_Fro
         if(!$this->getRequest()->getParam('product_id')){
             $bookedHtml = array(
                     'bookedDates' => '',
+                    'fixedRentalDates' => '',
                     'isDisabled' => true,
                     'isShoppingCartDates' => ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDatesShoppingCart()?true:false,
                     'partiallyBooked' => ''
@@ -51,14 +52,12 @@ class ITwebexperts_Payperrentals_AjaxController extends Mage_Core_Controller_Fro
         /**
          * We get the maximum qty available at this moment for every associated product
          */
-
         foreach($qtyArr as $iProduct => $iQty){
             if(ITwebexperts_Payperrentals_Helper_Inventory::isAllowedOverbook($iProduct)){
                 $maxQtyForChildProduct = 100000;
             }else {
             $maxQtyForChildProduct = ITwebexperts_Payperrentals_Helper_Inventory::getQuantity($iProduct);
             }
-
             $qtyForParentProduct = intval($maxQtyForChildProduct / $iQty) ;
             $maxQtyArr[$iProduct] = $maxQtyForChildProduct;
             if($maxQtyForParentProduct > $qtyForParentProduct){
@@ -130,12 +129,18 @@ class ITwebexperts_Payperrentals_AjaxController extends Mage_Core_Controller_Fro
             $normalPrice = ITwebexperts_Payperrentals_Helper_Price::getPriceListHtml(key($qtyArr));
             $isConfigurable = true;
             $blockedDates = ITwebexperts_Payperrentals_Helper_Data::getDisabledDates(key($qtyArr));
+            $fixedRentalDates = ITwebexperts_Payperrentals_Helper_Data::getFixedRentalDates(key($qtyArr));
         }else{
             $blockedDates = ITwebexperts_Payperrentals_Helper_Data::getDisabledDates($product->getId());
+            $fixedRentalDates = ITwebexperts_Payperrentals_Helper_Data::getFixedRentalDates($product->getId());
         }
+
         $blockedDates = ITwebexperts_Payperrentals_Helper_Data::toFormattedDateArray($blockedDates, false);
+        $fixedRentalDates = ITwebexperts_Payperrentals_Helper_Data::toFormattedArraysOfDatesArray($fixedRentalDates, false);
+
         $bookedHtml = array(
                 'bookedDates' => $bookedDates,
+                'fixedRentalDates' => $fixedRentalDates,
                 'isDisabled' => $isDisabled,
                 'blockedDates' => implode(',', $blockedDates),
                 'isShoppingCartDates' => ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDatesShoppingCart()?true:false,
@@ -158,6 +163,10 @@ class ITwebexperts_Payperrentals_AjaxController extends Mage_Core_Controller_Fro
         }
         if(count($disabledDaysEnd) > 0) {
             $bookedHtml['disabledForEndRange'] = $disabledDaysEnd;
+        }
+
+        if(Mage::helper('payperrentals/config')->getFutureReservationLimit($product) > 0){
+            $bookedHtml['futureDate'] = date('Y-m-d', (time() + Mage::helper('payperrentals/config')->getFutureReservationLimit($product) * 3600 * 24));
         }
 
         Mage::dispatchEvent('ppr_get_booked_html_for_products', array('request_params' => $this->getRequest()->getParams(), 'booked_html' => &$bookedHtml, 'product' => $product));
@@ -211,7 +220,7 @@ class ITwebexperts_Payperrentals_AjaxController extends Mage_Core_Controller_Fro
     public function getPriceAction()
     {
         if (!$this->getRequest()->getParam('product_id') || !$this->getRequest()->getParam('start_date')) {
-            $jsonReturn =  array(
+            $jsonReturn = array(
                 'amount' => -1,
                 'onclick' => '',
                 'needsConfigure' => true,
@@ -222,11 +231,52 @@ class ITwebexperts_Payperrentals_AjaxController extends Mage_Core_Controller_Fro
             return;
         }
 
+
         $productId = $this->getRequest()->getParam('product_id');
         $product = Mage::getModel('catalog/product')->load($productId);
         $qty = urldecode($this->getRequest()->getParam('qty'));
 
         list($startDate, $endDate) = ITwebexperts_Payperrentals_Helper_Date::saveDatesForGlobalUse($this->getRequest()->getPost());
+
+        if ($this->getRequest()->getParam('is_fixed_date')) {
+            //get all fixed dates id with names and hours in a html with rectangle classes.. and disable rent button... have price as an attribute
+            //add onclick event and a hidden field which updates...also enable button and start end date to get the real price
+            $startDate = date('Y-m-d', strtotime($startDate));
+            $endDate = date('Y-m-d', strtotime($endDate));
+            $fixedDatesArray = ITwebexperts_Payperrentals_Helper_Data::getFixedRentalDates($product);
+            $fixedDatesDropdown = '';
+            if (count($fixedDatesArray)) {
+                $fixedDatesDropdown .= '<ul class="fixed_array">';
+            }
+            $hasAvailability = false;
+            foreach ($fixedDatesArray as $fixedDate) {
+                if (date('Y-m-d', strtotime($fixedDate['start_date'])) == date('Y-m-d', strtotime($startDate))) {
+                    if(Mage::helper('payperrentals/inventory')->isAvailable($productId, $fixedDate['start_date'], $fixedDate['end_date'], $qty)) {
+                        //if (date('Y-m-d', strtotime($fixedDate['start_date'])) == date('Y-m-d', strtotime($fixedDate['end_date']))) {
+                         //   $fixedDatesDropdown .= '<li idname="' . $fixedDate['id'] . '">' . date('H:i', strtotime($fixedDate['start_date'])) /*. '   ' . $fixedDate['name']*/ . '</li>';
+                        //} else {
+                            $fixedDatesDropdown .= '<li idname="' . $fixedDate['id'] . '">' . Mage::helper('payperrentals')->__('Start: ') . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($fixedDate['start_date'], false, false) . ' &nbsp;&nbsp;&nbsp;  ' . Mage::helper('payperrentals')->__('End: ') . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($fixedDate['end_date'], false, false) /*. '   ' . $fixedDate['name']*/ . '</li>';
+                        //}
+                        $hasAvailability = true;
+                    }
+                }
+            }
+            if (count($fixedDatesArray)) {
+                $fixedDatesDropdown .= '</ul>';
+            }
+            if(!$hasAvailability){
+                $fixedDatesDropdown = Mage::helper('payperrentals')->__('Sorry, there is no availability left for this option');
+            }
+            $jsonReturn = array(
+                'amount' => 0,
+                'onclick' => '',
+                'fixedDates' => $fixedDatesDropdown,
+                'needsConfigure' => false,
+                'formatAmount' => -1
+            );
+            $this->getResponse()->setBody(Zend_Json::encode($jsonReturn));
+            return;
+        }
 
         $attributes = $this->getRequest()->getParam('super_attribute') ? $this->getRequest()->getParam('super_attribute') : null;
         $bundleOptions = $this->getRequest()->getParam('bundle_option') ? $this->getRequest()->getParam('bundle_option') : null;
@@ -235,7 +285,7 @@ class ITwebexperts_Payperrentals_AjaxController extends Mage_Core_Controller_Fro
         $onClick = '';
         $priceAmount = ITwebexperts_Payperrentals_Helper_Price::getPriceForAnyProductType($product, $attributes, $bundleOptions, $bundleOptionsQty1, $bundleOptionsQty, $startDate, $endDate, $qty, $onClick);
 
-        if (ITwebexperts_Payperrentals_Helper_Config::useListButtons() || ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDates($product)) {
+        if (Mage::helper('payperrentals/config')->useListButtons() || ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDates($product)) {
             ITwebexperts_Payperrentals_Helper_Date::saveDatesForGlobalUse($this->getRequest()->getPost());
         }
 

@@ -49,16 +49,13 @@ class ITwebexperts_Payperrentals_Adminhtml_SendreturnqueuehistoryController
                 $customer = Mage::getModel('customer/customer')->load($resOrder->getCustomerId());
                 /** @var $address Mage_Customer_Model_Address */
                 $address = Mage::getModel('customer/address')->load($customer->getDefaultShipping());
-
                 /** replace \n and blank space to avoid indenting in pdf */
                 $addressFormated = str_replace("\n","",$address->format('html_special'));
                 $re = "/(<br\\s?\\/>)\\s*/";
                 $addressFormated = preg_replace($re,'$1',$addressFormated);
-
                 /** regex remove trailing <br/> */
                 $re = "/<br\\/>\\z/";
                 $addressFormated = preg_replace($re,'',$addressFormated);
-
                 $product = Mage::getModel('catalog/product')->load($resOrder->getProductId());
                 $productName = $product->getName();
                 $productDescription = $product->getDescription();

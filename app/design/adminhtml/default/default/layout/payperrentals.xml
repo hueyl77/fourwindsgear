@@ -144,6 +144,63 @@
         </reference>
     </adminhtml_sales_order_view>
 
+    <payperrentals_adminhtml_signature_view>
+        <remove name="menu" />
+        <remove name="header" />
+        <remove name="footer" />
+        <remove name="top.menu" />
+        <remove name="notifications" />
+        <remove name="top.container" />
+        <remove name="top.links" />
+        <reference name="head">
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jSignature/modernizr.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jSignature/jSignature.min.noconflict.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jSignature/jquery.noconflict.js</script>
+            </action>
+        </reference>
+        <reference name="content">
+            <remove name="nav-bar" />
+            <remove name="header" />
+            <block type="payperrentals/adminhtml_signature_view" name="payperrentals_sales_signature" template="payperrentals/signature/view.phtml"/>
+        </reference>
+    </payperrentals_adminhtml_signature_view>
+
+    <payperrentals_adminhtml_signature_success>
+        <remove name="menu" />
+        <remove name="header" />
+        <remove name="footer" />
+        <remove name="top.menu" />
+        <remove name="notifications" />
+        <remove name="top.container" />
+        <remove name="top.links" />
+        <reference name="head">
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jSignature/modernizr.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jSignature/jSignature.min.noconflict.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jquery/jquery.noconflict.js</script>
+            </action>
+        </reference>
+        <reference name="content">
+            <remove name="nav-bar" />
+            <remove name="header" />
+            <block type="payperrentals/adminhtml_signature_view" name="payperrentals_sales_signature_success" template="payperrentals/signature/success.phtml"/>
+        </reference>
+    </payperrentals_adminhtml_signature_success>
     <adminhtml_sales_order_invoice_new>
         <reference name="invoice_totals">
             <block type="adminhtml/sales_order_totals_item" name="payperrentals.itemst"
@@ -566,7 +623,7 @@
             <action method="addItemRender">
                 <type>bundle</type>
                 <block>payperrentals/adminhtml_sales_order_items_renderer_bundle</block>
-                <template>payperrentals/sales/order/shipment/create/items/renderer/bundle.phtml</template>
+                <template>payperrentals/sales/order/shipment/view/items/renderer/bundle.phtml</template>
             </action>
         </reference>
     </adminhtml_sales_order_shipment_view>
@@ -714,23 +771,68 @@
     </adminhtml_sales_order_create_index>
 
     <payperrentals_adminhtml_quantityreport_index>
+    <reference name="head">
+        <action method="addJs">
+            <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
+        </action>
+        <action method="addJs">
+            <script>itwebexperts_payperrentals/fullcalendar/fullcalendar.js</script>
+        </action>
+        <action method="addJs">
+            <script>itwebexperts_payperrentals/datepick/jquery.formatDateTime.js</script>
+        </action>
+
+        <action method="addJs">
+            <script>itwebexperts_payperrentals/qtip/jquery.qtip.js</script>
+        </action>
+        <action method="addItem">
+            <type>js_css</type>
+            <name>itwebexperts_payperrentals/fullcalendar/fullcalendar.css</name>
+        </action>
+        <action method="addItem">
+            <type>js_css</type>
+            <name>itwebexperts_payperrentals/qtip/jquery.qtip.css</name>
+        </action>
+        <action method="addJs">
+            <script>itwebexperts_payperrentals/jquery/jquery.noconflict.js</script>
+        </action>
+        <action method="addCss">
+            <name>itwebexperts_payperrentals/report/style.css</name>
+        </action>
+        <action method="setTitle" translate="title">
+            <title>Quantity Report</title>
+        </action>
+    </reference>
+    <reference name="content">
+        <block type="payperrentals/adminhtml_quantityreport" name="payperrentals.qreport"
+               template="payperrentals/qreport.phtml">
+            <block type="adminhtml/store_switcher" name="store_switcher" as="store_switcher"
+                   template="store/switcher.phtml">
+                <action method="setUseConfirm">
+                    <params>0</params>
+                </action>
+            </block>
+        </block>
+    </reference>
+</payperrentals_adminhtml_quantityreport_index>
+
+    <payperrentals_adminhtml_fixedreport_index>
         <reference name="head">
             <action method="addJs">
                 <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
             </action>
             <action method="addJs">
-                <script>itwebexperts_payperrentals/fullcalendar/fullcalendar.js</script>
+                <script>itwebexperts_payperrentals/datepick/jquery.formatDateTime.js</script>
             </action>
             <action method="addJs">
-                <script>itwebexperts_payperrentals/datepick/jquery.formatDateTime.js</script>
+                <script>itwebexperts_payperrentals/tablescroll/jquery.stickytableheaders.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/tablescroll/jquery.ba-throttle-debounce.min.js</script>
             </action>
 
             <action method="addJs">
                 <script>itwebexperts_payperrentals/qtip/jquery.qtip.js</script>
-            </action>
-            <action method="addItem">
-                <type>js_css</type>
-                <name>itwebexperts_payperrentals/fullcalendar/fullcalendar.css</name>
             </action>
             <action method="addItem">
                 <type>js_css</type>
@@ -743,12 +845,12 @@
                 <name>itwebexperts_payperrentals/report/style.css</name>
             </action>
             <action method="setTitle" translate="title">
-                <title>Quantity Report</title>
+                <title>Reservations by Start &amp; End Date</title>
             </action>
         </reference>
         <reference name="content">
-            <block type="payperrentals/adminhtml_quantityreport" name="payperrentals.qreport"
-                   template="payperrentals/qreport.phtml">
+            <block type="payperrentals/adminhtml_fixedreport" name="payperrentals.fixedreport"
+                   template="payperrentals/fixedreport.phtml">
                 <block type="adminhtml/store_switcher" name="store_switcher" as="store_switcher"
                        template="store/switcher.phtml">
                     <action method="setUseConfirm">
@@ -757,7 +859,7 @@
                 </block>
             </block>
         </reference>
-    </payperrentals_adminhtml_quantityreport_index>
+    </payperrentals_adminhtml_fixedreport_index>
 
     <payperrentals_adminhtml_serialreport_index>
         <reference name="head">
@@ -1418,6 +1520,43 @@
             </block>
         </reference>
     </payperrentals_adminhtml_reservationpricesdates_edit>
+    <payperrentals_adminhtml_fixedrentaldates_index>
+
+        <reference name="content">
+            <block type="payperrentals/adminhtml_fixedrentaldates" name="payperrentals.fixedrentaldates">
+
+            </block>
+        </reference>
+    </payperrentals_adminhtml_fixedrentaldates_index>
+    <payperrentals_adminhtml_fixedrentaldates_edit>
+        <reference name="head">
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jquery/jquery-1.11.1.min.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jquery/jquery-ui.min.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jquery/timepicker/jquery-ui-timepicker-addon.min.js</script>
+            </action>
+            <action method="addJs">
+                <script>itwebexperts_payperrentals/jquery/jquery.noconflict.js</script>
+            </action>
+            <action method="addItem">
+                <type>js_css</type>
+                <name>itwebexperts_payperrentals/jquery/jquery-ui.min.css</name>
+            </action>
+            <action method="addItem">
+                <type>js_css</type>
+                <name>itwebexperts_payperrentals/jquery/timepicker/jquery-ui-timepicker-addon.min.css</name>
+            </action>
+        </reference>
+        <reference name="content">
+            <block type="payperrentals/adminhtml_fixedrentaldates_edit" name="payperrentals.fixedrentaldates_edit">
+            </block>
+            <block type="payperrentals/adminhtml_fixedrentaldates_editjs" name="payperrentals.fixedrentaldates_editjs"  template="payperrentals/fixedrentaldates/js.phtml"/>
+        </reference>
+    </payperrentals_adminhtml_fixedrentaldates_edit>
     <adminhtml_dashboard_index>
         <reference name="head">
             <action method="addJs">

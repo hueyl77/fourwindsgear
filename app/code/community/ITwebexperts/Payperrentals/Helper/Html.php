@@ -5,12 +5,12 @@ class ITwebexperts_Payperrentals_Helper_Html extends Mage_Core_Helper_Abstract
 {
 
     public static function completeListingAndProductInfoWithExtraButtons($product){
-        if (Mage::getSingleton('core/session')->getData('startDateInitial') && !ITwebexperts_Payperrentals_Helper_Config::useListButtons(
+        if (Mage::getSingleton('core/session')->getData('startDateInitial') && !Mage::helper('payperrentals/config')->useListButtons(
             )
         ) {
             $htmlPrice = '';
 
-            if(ITwebexperts_Payperrentals_Helper_Config::keepListingPriceAfterDatesSelection()){
+            if(Mage::helper('payperrentals/config')->keepListingPriceAfterDatesSelection()){
                 $htmlPrice = ITwebexperts_Payperrentals_Helper_Price::getPriceListHtml($product, Mage::getStoreConfig(
                     ITwebexperts_Payperrentals_Helper_Config::XML_PATH_PRICING_ON_LISTING
                 ));
@@ -23,6 +23,15 @@ class ITwebexperts_Payperrentals_Helper_Html extends Mage_Core_Helper_Abstract
                 if ($priceVal > 0) {
                     $htmlPrice = '<div class="price-box"><span class="price">Price: ' . Mage::helper('core')->currency($priceVal) . '</span></div>';
                 }
+                $buyoutHtml = '';
+                $isRentalBuyout = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($product->getId(), 'payperrentals_enable_buyout');
+                if ($isRentalBuyout) {
+                    $buyoutPrice = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($product->getId(), 'payperrentals_buyoutprice');;
+                    $buyoutHtml = Mage::helper('payperrentals')->__('Buyout: ') . Mage::helper('core')->currency(
+                            $buyoutPrice, true, false
+                        );
+                }
+                $htmlPrice .= $buyoutHtml;
             }
 
         } else {
@@ -38,7 +47,7 @@ class ITwebexperts_Payperrentals_Helper_Html extends Mage_Core_Helper_Abstract
                         'current_product'
                     )
                 ) {
-                    $selectedArray = ITwebexperts_Payperrentals_Helper_Config::getFixedSelection();
+                    $selectedArray = Mage::helper('payperrentals/config')->getFixedSelection();
                     $notAvailable = false;
                     foreach ($selectedArray as $iDay) {
                         $startDate = Mage::getSingleton('core/session')->getData('startDateInitial');
@@ -408,11 +417,18 @@ class ITwebexperts_Payperrentals_Helper_Html extends Mage_Core_Helper_Abstract
                         $buyRequest->getStartDate(), $_showTime
                     );
                 } else {
+                    if($buyRequest->getStartTime()){
+                        $buyStartDate = str_replace('00:00:00', $buyRequest->getStartTime(), $buyRequest->getStartDate());
+                        $buyEndDate = str_replace('23:59:59', $buyRequest->getEndTime(), $buyRequest->getEndDate());
+                    }else{
+                        $buyStartDate = $buyRequest->getStartDate();
+                        $buyEndDate = $buyRequest->getEndDate();
+                    }
                     $stDate = ITwebexperts_Payperrentals_Helper_Date::formatDbDate(
-                        $buyRequest->getStartDate(), !$_showTime
+                        $buyStartDate, !$_showTime
                     );
                     $enDate = ITwebexperts_Payperrentals_Helper_Date::formatDbDate(
-                        $buyRequest->getEndDate(), !$_showTime
+                        $buyEndDate, !$_showTime
                     );
                 }
                 if ($nonSequential) {
@@ -459,9 +475,9 @@ class ITwebexperts_Payperrentals_Helper_Html extends Mage_Core_Helper_Abstract
 
     public static function getDatepickerLocalePath(){
         $localeCode = self::getLocaleCodeForHtml();
-        $file = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/jquery/i18n/datepicker-'.$localeCode.'.js';
+        $file = Mage::getBaseDir() .'/js/itwebexperts_payperrentals/jquery/i18n/datepicker-'.$localeCode.'.js';
         if(is_file($file)){
-            return $file;
+            return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/jquery/i18n/datepicker-'.$localeCode.'.js';
         }else{
             $localeCode = substr($localeCode, 0, strpos($localeCode,'-'));
             return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/jquery/i18n/datepicker-'.$localeCode.'.js';
@@ -470,9 +486,9 @@ class ITwebexperts_Payperrentals_Helper_Html extends Mage_Core_Helper_Abstract
 
     public static function getDatetimepickerLocalePath(){
         $localeCode = self::getLocaleCodeForHtml();
-        $file = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/jquery/timepicker/i18n/jquery-ui-timepicker-'.$localeCode.'.js';
+        $file = $file = Mage::getBaseDir() .'/js/itwebexperts_payperrentals/jquery/timepicker/i18n/jquery-ui-timepicker-'.$localeCode.'.js';
         if(is_file($file)){
-            return $file;
+            return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/jquery/timepicker/i18n/jquery-ui-timepicker-'.$localeCode.'.js';
         }else{
             $localeCode = substr($localeCode, 0, strpos($localeCode,'-'));
             return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/jquery/timepicker/i18n/jquery-ui-timepicker-'.$localeCode.'.js';

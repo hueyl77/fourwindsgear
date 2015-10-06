@@ -470,5 +470,43 @@ class ITwebexperts_Payperrentals_Block_Html_Pprbox extends Mage_Core_Block_Templ
         return $categories;
     }
 
+    public function isPprBox($block, $use_homepage, $is_homepage){
+
+        $use_left	=	Mage::getStoreConfig('payperrentals/global/use_pprbox_left',Mage::app()->getStore());
+        $use_right	=	Mage::getStoreConfig('payperrentals/global/use_pprbox_right',Mage::app()->getStore());
+        $use_header	=	Mage::getStoreConfig('payperrentals/global/use_pprbox_header',Mage::app()->getStore());
+
+        if($block == 'left.pprbox' && !$use_left){
+            return false;
+        }
+
+        if($block == 'right.pprbox' && !$use_right){
+            return false;
+        }
+
+        if($block == 'header.pprbox' && !$use_header && !$use_homepage){
+            return false;
+        }
+        if($block == 'header.pprbox' && !$use_homepage && $is_homepage){
+            return false;
+        }
+        if($block == 'header.pprbox' && $use_homepage && !$is_homepage){
+            return false;
+        }
+        return true;
+    }
+
+    public function getCalendar(){
+        $prodArray = array();
+        if(Mage::registry('current_product')){
+            $prodArray = array(
+                'product' => Mage::registry('current_product')
+            );
+        }
+        return $this->getLayout()
+            ->createBlock('payperrentals/html_calendar', 'my.front.calendar')
+            ->setData($prodArray)
+            ->toHtml();
+    }
 
 }

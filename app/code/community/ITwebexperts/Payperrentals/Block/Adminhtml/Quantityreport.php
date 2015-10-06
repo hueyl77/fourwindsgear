@@ -138,5 +138,27 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Quantityreport extends Mage_Cor
         }
     }
 
+    public function getDatesFormat(){
+        $localeDateFormat = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_LONG);
+        $localeDateFormat = preg_replace("/y+/", "yyyy", $localeDateFormat);
+        $monthFormat = str_replace('d', '', $localeDateFormat);
+        $weekFormat = $localeDateFormat . "{ &#8212;" . $localeDateFormat . "}";
+        $dayFormat = str_replace('yy', '', $localeDateFormat);
+        return array($monthFormat, $weekFormat, $dayFormat);
+    }
+
+    public function getDatesFormatCalendar(){
+        $localeDateFormat = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT);
+        $localeDateFormat = preg_replace("/y+/", "yy", $localeDateFormat);
+        $monthFormatC = str_replace('yy', '', $localeDateFormat);
+        $monthFormatC = str_replace('MM', '', $monthFormatC);
+        $localeDateFormat = preg_replace("/\/+/", "/", $localeDateFormat);
+        $monthFormatC = rtrim($monthFormatC, '/');
+        $weekFormatC = 'ddd ' . $monthFormatC;
+        $weekFormatC = str_replace('//', '/', $weekFormatC);
+        $dayFormatC = str_replace('yy', '', $localeDateFormat);
+        return array($monthFormatC, $weekFormatC, $dayFormatC);
+
+    }
 
 }

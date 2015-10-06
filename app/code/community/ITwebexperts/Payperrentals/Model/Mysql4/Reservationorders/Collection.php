@@ -42,9 +42,20 @@ class ITwebexperts_Payperrentals_Model_Mysql4_Reservationorders_Collection exten
      * @param string $_sendReturnId
      * @return $this
      */
-    public function addSendReturnFilter($_sendReturnId = '0')
+    public function addSendReturnFilter()
     {
-        $this->getSelect()->where('main_table.sendreturn_id=?', $_sendReturnId);
+        $this->getSelect()->where('main_table.qty_shipped=main_table.qty_returned and main_table.qty_shipped=main_table.qty');
+        return $this;
+    }
+
+    /**
+     * Add send/return id filter
+     * @param string $_sendReturnId
+     * @return $this
+     */
+    public function addShippedFilter()
+    {
+        $this->getSelect()->where('main_table.qty_shipped-main_table.qty<0');
         return $this;
     }
 
@@ -92,7 +103,7 @@ class ITwebexperts_Payperrentals_Model_Mysql4_Reservationorders_Collection exten
      */
     public function addProductIdsFilter($_productIds)
     {
-        $this->addFieldToFilter('main_table.product_id', array('in' => $_productIds));
+        $this->addFieldToFilter('product_id', array('in' => $_productIds));
         return $this;
     }
 
@@ -178,28 +189,18 @@ class ITwebexperts_Payperrentals_Model_Mysql4_Reservationorders_Collection exten
         return $countSelect->reset()->from($this->getSelect(), array())->columns('COUNT(*)');
     }
 
-    public function getToSendReturnCollection($startDatefrom,$startDateto,$endDatefrom,$endDateto,$forStore,$sendreturn = 'send')
+    public function getToSendCollection($startDatefrom,$startDateto,$endDatefrom,$endDateto,$forStore)
     {
-        $resource = Mage::getSingleton('core/resource');
-        $this->getSelect()->joinLeft(array('sendreturn'=>$resource->getTableName('payperrentals/sendreturn')),'main_table.sendreturn_id = sendreturn.id',array('send_date','return_date','qtysendreturn'=>'sendreturn.qty','sn','sendreturnid'=>'sendreturn.id'));
         $this->addSelectFilter("start_date >= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate($startDatefrom) . "' AND start_date <= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate(
                 $startDateto
             ) . "'")
             ->addSelectFilter("end_date >= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate($endDatefrom) . "' AND end_date <= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate(
                     $endDateto
                 ) . "'")
+            ->addSelectFilter("main_table.qty >= main_table.qty_shipped")
             ->addSelectFilter("product_type = '" . ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE . "'")
             ->addFieldToFilter('main_table.order_id',array('neq'=>0))
-            ->orderByOrderId();
-        if($sendreturn == 'send') {
-            $this->addFieldToFilter('sendreturn.send_date', array('null' => true));
-        } else if($sendreturn == 'return'){
-            $this->addFieldToFilter('sendreturn.send_date',array('notnull'=>true))
-                ->addFieldToFilter('sendreturn.return_date',array(
-                    array('eq'=>'1970-01-01 00:00:00'),
-                    array('eq'=>'0000-00-00 00:00:00'),
-                    ));
-    }
+            ->groupByOrderId();
         if ($forStore) {
             $this->getSelect()->joinLeft(array('so' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')), 'main_table.order_id = ' . 'so.entity_id', array('so.store_id as store_id'));
             $this->getSelect()->where('so.store_id=?', $this->getRequest()->getParam('forStore'));

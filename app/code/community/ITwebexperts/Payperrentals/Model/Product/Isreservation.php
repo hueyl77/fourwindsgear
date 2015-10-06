@@ -9,9 +9,9 @@ class ITwebexperts_Payperrentals_Model_Product_Isreservation extends Mage_Eav_Mo
 	
 	static public function getOptionArray(){
         return array(
-            self::STATUS_ENABLED    => Mage::helper('payperrentals')->__('Reservation'),
-			self::STATUS_RENTAL    => Mage::helper('payperrentals')->__('Rental Queue'),
-			self::STATUS_RENTALANDRESERVATION    => Mage::helper('payperrentals')->__('Rental AND Reservation'),
+            self::STATUS_ENABLED    => Mage::helper('payperrentals')->__('Reservation (Calendar)'),
+			self::STATUS_RENTAL    => Mage::helper('payperrentals')->__('Rental Queue (Membership)'),
+			self::STATUS_RENTALANDRESERVATION    => Mage::helper('payperrentals')->__('Reservation & Rental Queue'),
             self::STATUS_DISABLED   => Mage::helper('payperrentals')->__('Disabled')
         );
     }

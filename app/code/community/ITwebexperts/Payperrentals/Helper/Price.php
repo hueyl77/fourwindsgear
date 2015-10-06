@@ -213,11 +213,15 @@ class ITwebexperts_Payperrentals_Helper_Price extends Mage_Core_Helper_Abstract
             }
         }
         if(isset($range)) {
-            $availableDate = Mage::helper('payperrentals')->__('Next Available Date: ') . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($range['start_date']);
+            if($range['start_date'] != '0') {
+                $nextAvail = Mage::helper('payperrentals')->__('Next Available Date: ') . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($range['start_date']);
+            }else{
+                $nextAvail = '';
+            }
+            $availableDate =  $nextAvail;
         }
         return $availableDate;
     }
-
     /**
      * HTML Price list for rental products. Used on product listing, product view, and admin order creator
      *
@@ -244,9 +248,9 @@ class ITwebexperts_Payperrentals_Helper_Price extends Mage_Core_Helper_Abstract
                 );
         }
 
-        if(!Mage::registry('current_product') && ITwebexperts_Payperrentals_Helper_Config::showNextAvailableDateOnListing()){
+        if(!Mage::registry('current_product') && Mage::helper('payperrentals/config')->showNextAvailableDateOnListing()){
             $availableDate = self::_printAvailableDate($product);
-        }elseif(ITwebexperts_Payperrentals_Helper_Config::showNextAvailableDateOnView() && Mage::registry('current_product')){
+        }elseif(Mage::helper('payperrentals/config')->showNextAvailableDateOnView() && Mage::registry('current_product')){
             $availableDate = self::_printAvailableDate($product);
         }
 
@@ -323,7 +327,7 @@ class ITwebexperts_Payperrentals_Helper_Price extends Mage_Core_Helper_Abstract
             $html .= $buyoutHtml;
             $html .= '<br/>';
         } else {
-            if (ITwebexperts_Payperrentals_Helper_Config::showBuyoutPrice()) {
+            if (Mage::helper('payperrentals/config')->showBuyoutPrice()) {
                 $html .= $buyoutHtml;
                 $html .= '<br/>';
             }
@@ -398,7 +402,6 @@ class ITwebexperts_Payperrentals_Helper_Price extends Mage_Core_Helper_Abstract
             $product = Mage::getModel('catalog/product')->load($product);
         }
         $typeId = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($product->getId(), 'type_id');
-
         if ($typeId == 'simple') {
             return $product->getPrice();
         }
@@ -1367,157 +1370,156 @@ class ITwebexperts_Payperrentals_Helper_Price extends Mage_Core_Helper_Abstract
         return $priceAmount;
     }
 
-    public static function getDamageWaiver($product, $startingDate, $endingDate, $customerGroup, $qty = 1)
+    public static function getDamageWaiver($product, $rentalPrice)
     {
         if (is_numeric($product)) {
             $product = Mage::getModel('catalog/product')->load($product);
         }
-
-        $useTimes = ITwebexperts_Payperrentals_Helper_Data::useTimes($product->getId());
+        
         if (Mage::app()->getStore()->isAdmin()) {
             $storeID = Mage::getSingleton('adminhtml/session_quote')->getStoreId();
         } else {
             $storeID = Mage::app()->getStore()->getId();
         }
 
-
-        $start_date = new Zend_Date(date('Y-m-d H:i:s', strtotime($startingDate)), 'yyyy-MM-dd HH:mm:ss');
-        $end_date = new Zend_Date(date('Y-m-d H:i:s', strtotime($endingDate)), 'yyyy-MM-dd HH:mm:ss');
-
-        if ($useTimes == 1 && $start_date->get('yyyy-MM-dd') == $end_date->get('yyyy-MM-dd')
-            && $startingDate != $endingDate
-        ) {
-            $start_date->setHour(0);
-            $start_date->setMinute(0);
-            $start_date->setSecond(0);
-            $end_date->setHour(0);
-            $end_date->setMinute(0);
-            $end_date->setSecond(0);
-            $end_date = $end_date->addDay(1);
+        if ($storeID) {
+            $damageWaiver = Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_GLOBAL_DAMAGE_WAIVER, $storeID);
+        } else {
+            $damageWaiver = Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_GLOBAL_DAMAGE_WAIVER);
         }
-
-        $difference = $end_date->sub($start_date);
-        $measure = new Zend_Measure_Time($difference->toValue(), Zend_Measure_Time::SECOND);
-        $currentDate = date('Y-m-d H:i:s');
-        $seconds = $measure->getValue();
-
-        /*add extra time*/
-        if (Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_ADDTIME_NUMBER) != ''
-            && Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_ADDTIME_NUMBER) > 0
-        ) {
-            $secondsToAdd = ITwebexperts_Payperrentals_Helper_Data::getPeriodInSeconds(
-                Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_ADDTIME_NUMBER),
-                Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_ADDTIME_TYPE)
-            );
-            $seconds += $secondsToAdd;
+        $useGlobalDamageWaiver = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($product->getId(), 'use_global_damage_waiver');
+        if(!$useGlobalDamageWaiver){
+            $damageWaiver = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId($product->getId(), 'payperrentals_damage_waiver');
         }
-
-
-        $coll = Mage::getModel('payperrentals/reservationprices')
-            ->getCollection()
-            ->addEntityStoreFilter($product->getId(), $storeID)
-            ->addOrderFilter('ptype DESC')
-            ->addOrderFilter('numberof DESC');
-
-        $usageStoreId = (count($coll->getItemsByColumnValue('store_id', $storeID))) ? $storeID : 0;
-        $damageWaiver = false;
-        $maxDamageWaiver = 0;
-        $maxSeconds = 0;
-        $currentSeconds = 0;
-        /** @var $item ITwebexperts_Payperrentals_Model_Reservationprices */
-        foreach ($coll as $item) {
-            if ($item->getStoreId() != $usageStoreId) {
-                continue;
-            }
-            $continueC = true;
-            $continueQS = true;
-            $continueQE = true;
-            if ($item->getCustomersGroup() == '-1' || $item->getCustomersGroup() == $customerGroup) {
-                $continueC = false;
-            }
-            if ($item->getQtyStart() != '' && $item->getQtyStart() > 0 && $qty >= $item->getQtyStart()
-                || $item->getQtyStart() == ''
-                || $item->getQtyStart() == 0
-            ) {
-                $continueQS = false;
-            }
-            if ($item->getQtyEnd() != '' && $item->getQtyEnd() > 0 && $qty <= $item->getQtyEnd()
-                || $item->getQtyEnd() == ''
-                || $item->getQtyEnd() == 0
-            ) {
-                $continueQE = false;
-            }
-
-            if ($continueC || $continueQS || $continueQE) {
-                continue;
-            }
-            $itemDamageWaiver = $item->getDamageWaiver();
-            $itemSeconds = ITwebexperts_Payperrentals_Helper_Data::getPeriodInSeconds(
-                $item->getNumberof(), $item->getPtype()
-            );
-            if ($itemSeconds > $maxSeconds) {
-                $maxSeconds = $itemSeconds;
-                $maxDamageWaiver = $itemDamageWaiver;
-            }
-            if ($seconds <= $itemSeconds) {
-                if ($currentSeconds == 0 || $currentSeconds > $itemSeconds) {
-                    $currentSeconds = $itemSeconds;
-                    $damageWaiver = $itemDamageWaiver;
-                }
-            }
+        if(!$damageWaiver){
+            return null;
         }
-        if ($damageWaiver === false && $seconds >= $maxSeconds) {
-            $damageWaiver = $maxDamageWaiver;
+        if(strpos($damageWaiver, '%') !== false){
+            $damageWaiver = floatval(substr($damageWaiver, 0, strlen($damageWaiver) - 1));
+            $damageWaiver = $damageWaiver/100 * $rentalPrice;
+        }
+        if($damageWaiver == ''){
+            return null;
         }
         return $damageWaiver;
     }
 
-    public static function getDamageWaiverHtml(
-        $item, $damageWaiver, $selected = false, $choice = true
+    public static function getAdminDamageWaiverHtml(
+        $item, $productId
     )
     {
-        $product = $item->getProduct();
-        if(is_object($item->getQuote())){
-            $product->setCustomerGroupId($item->getQuote()->getCustomerGroupId());
+        $html = '<div>';
+        $startDate = Mage::getSingleton('core/session')->getData('startDateInitial');
+        $endDate = Mage::getSingleton('core/session')->getData('endDateInitial');
+        $damageWaiverSelected = false;
+        if (isset($item) && $item != -1 && Mage::app()->getRequest()->getActionName() != 'configureProductToAdd') {
+            $buyRequest = $item->getBuyRequest();
+            if($buyRequest->getDamageWaiver() != '' && $buyRequest->getDamageWaiver() == '1'){
+                $damageWaiverSelected = true;
+            }
+            $_showTime = (bool)Mage::getResourceModel('catalog/product')
+                ->getAttributeRawValue(
+                    $item->getProductId(),
+                    'payperrentals_use_times',
+                    $item->getStoreId()
+                );
+            if (!Mage::helper('payperrentals/config')->isNonSequentialSelect(Mage::app()->getStore()->getId())) {
+                $startDate = ($buyRequest->getStartDate() != '') ? $buyRequest->getStartDate() : (($startDate) ? $startDate : false);
+                $endDate = ($buyRequest->getEndDate() != '') ? $buyRequest->getEndDate() : (($endDate) ? $endDate : false);
+            } else {
+                $startDate = ($buyRequest->getStartDate() != '') ? ITwebexperts_Payperrentals_Helper_Date::localiseNonsequentialBuyRequest($buyRequest->getStartDate(), $_showTime) : (($startDate) ? $startDate : false);
+                $endDate = ($buyRequest->getStartDate() != '') ? ITwebexperts_Payperrentals_Helper_Date::localiseNonsequentialBuyRequest($buyRequest->getStartDate(), $_showTime) : (($startDate) ? $startDate : false);
+            }
         }
+
+        if ($startDate) {
+            list($startDate, $endDate) = ITwebexperts_Payperrentals_Helper_Date::convertDatepickerToDbFormat($startDate, $endDate);
+            $rentalPrice = ITwebexperts_Payperrentals_Helper_Price::calculatePrice($productId, $startDate, $endDate, 1, ITwebexperts_Payperrentals_Helper_Data::getCustomerGroup());
+            $damageWaiverPrice = self::getDamageWaiver($productId, $rentalPrice);
+        }else {
+            $damageWaiverPrice = self::getDamageWaiver($productId, 0);
+        }
+        if($damageWaiverPrice) {
+            $html .= '<input type="radio" name="damage_waiver" class="damage-waiver-input" id="damageWaiverNo" value="0" ';
+            if (!$damageWaiverSelected) {
+                $html .= 'checked="checked"';
+            }
+            $html .= '/>';
+            $html .= '<label for="damageWaiverNo">' . Mage::helper('payperrentals')->__(' No')
+                . '</label>';
+            $html .= '</div>';
+            $html .= '<div>';
+            $html .= '<input type="radio" name="damage_waiver" class="damage-waiver-input" id="damageWaiverYes" value="1" ';
+            if ($damageWaiverSelected) {
+                $html .= 'checked="checked"';
+            }
+            $html .= '/>';
+            $html .= '<label for="damageWaiverYes">' . Mage::helper('payperrentals')->__(
+                    ' Yes +%s', Mage::helper('checkout')->formatPrice(
+                        ($damageWaiverPrice > -1 ? $damageWaiverPrice : $item->getData(ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION_PRICE)), true, true
+                    )
+                ) . '</label>';
+            $html .= '</div>';
+        }
+
+        return $html;
+    }
+
+    public static function getDamageWaiverHtml(
+        $item, $selected = false, $choice = true, $damageWaiverPrice = -1
+    )
+    {
 
         $html = '<div>';
         $request = Mage::app()->getRequest();
         $module = $request->getModuleName();
         $controller = $request->getControllerName();
+        $forceDamageWaiver = Mage::helper('payperrentals/config')->forceDamageWaiver();
         if (!$choice || ($module == 'checkout' && $controller == 'onepage')) {
-            if (!$selected) {
+            if (!$selected && !$forceDamageWaiver) {
                 $html .= '<strong>' . Mage::helper('payperrentals')->__(' No') . '</strong>';
             } else {
                 $html .= '<strong>' . Mage::helper('payperrentals')->__(
                         ' Yes +%s', Mage::helper('checkout')->formatPrice(
-                            $item->getData(ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION_PRICE), true,
+                            ($damageWaiverPrice > -1 ? $damageWaiverPrice:$item->getData(ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION_PRICE)), true,
                             true
                         )
                     ) . '</strong>';
             }
         } else {
-            $html .= '<input type="radio" name="cart[' . $item->getId()
-                . '][damage_waiver]" class="damage-waiver-input" id="damageWaiverNo' . $item->getId() . '" value="0" ';
-            if (!$selected) {
-                $html .= 'checked="checked"';
+            if(!$forceDamageWaiver) {
+                $html .= '<input type="radio" name="cart[' . $item->getId()
+                    . '][damage_waiver]" class="damage-waiver-input" id="damageWaiverNo' . $item->getId() . '" value="0" ';
+                if (!$selected) {
+                    $html .= 'checked="checked"';
+                }
+                $html .= '/>';
+                $html .= '<label for="damageWaiverNo' . $item->getId() . '">' . Mage::helper('payperrentals')->__(' No')
+                    . '</label>';
+                $html .= '</div>';
+                $html .= '<div>';
+                $html .= '<input type="radio" name="cart[' . $item->getId()
+                    . '][damage_waiver]" class="damage-waiver-input" id="damageWaiverYes' . $item->getId() . '" value="1" ';
+                if ($selected) {
+                    $html .= 'checked="checked"';
+                }
+                $html .= '/>';
+                $html .= '<label for="damageWaiverYes' . $item->getId() . '">' . Mage::helper('payperrentals')->__(
+                        ' Yes +%s', Mage::helper('checkout')->formatPrice(
+                            ($damageWaiverPrice > -1?$damageWaiverPrice:$item->getData(ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION_PRICE)), true, true
+                        )
+                    ) . '</label>';
+            }else{
+                $html .=  Mage::helper('checkout')->formatPrice(
+                    ($damageWaiverPrice > -1?$damageWaiverPrice:$item->getData(ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION_PRICE)), true, true
+                );
+                $html .= '<input type="radio" name="cart[' . $item->getId()
+                    . '][damage_waiver]" class="damage-waiver-input" id="damageWaiverYes' . $item->getId() . '" value="1" ';
+
+                $html .= 'checked="checked" style="display:none"';
+
+                $html .= '/>';
             }
-            $html .= '/>';
-            $html .= '<label for="damageWaiverNo' . $item->getId() . '">' . Mage::helper('payperrentals')->__(' No')
-                . '</label>';
-            $html .= '</div>';
-            $html .= '<div>';
-            $html .= '<input type="radio" name="cart[' . $item->getId()
-                . '][damage_waiver]" class="damage-waiver-input" id="damageWaiverYes' . $item->getId() . '" value="1" ';
-            if ($selected) {
-                $html .= 'checked="checked"';
-            }
-            $html .= '/>';
-            $html .= '<label for="damageWaiverYes' . $item->getId() . '">' . Mage::helper('payperrentals')->__(
-                    ' Yes +%s', Mage::helper('checkout')->formatPrice(
-                        $item->getData(ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION_PRICE), true, true
-                    )
-                ) . '</label>';
         }
         $html .= '</div>';
 

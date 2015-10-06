@@ -38,7 +38,6 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Manualreserve_Edit_Form extends
            $prodCollection->addAttributeToFilter('vendor_id',array('eq'=>Mage::getSingleton('vendors/session')->getId()));
         }
 
-
         /**
          * Setup product names array
          */
@@ -281,7 +280,5 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Manualreserve_Edit_Form extends
 
 
     }
-
-
 
 }

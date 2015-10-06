@@ -1,13 +1,11 @@
 <div class="hr">&nbsp;</div>
 <div class="block block-help">
-<div class="block-title"><strong><span>Help &amp; More</span></strong></div>
+<div class="block-title"><strong><span>Terms and Polcies</span></strong></div>
 <div class="block-content">
 <ul>
-<li><a href="http://fourwindsgear.com/index.php/?___SID=Uabout-us">Ours Story</a></li>
-<li><a href="http://fourwindsgear.com/index.php/?___SID=Uprivacy-policy">FAQ's</a></li>
-<li><a href="http://fourwindsgear.com/index.php/?___SID=Uprivacy-policy">Shipping Policy</a></li>
-<li><a href="http://fourwindsgear.com/index.php/?___SID=Uprivacy-policy">Secure Payment</a></li>
-<li><a href="http://fourwindsgear.com/index.php/?___SID=Ucontacts">Contact Us</a></li>
+<li><a title="Rental Policy" href="/rental-policy">Rental Policy</a></li>
+<li><a title="Terms of Service" href="/terms" target="_self">Terms of Service</a></li>
+<li><a title="Privacy Policy" href="/privacy-policy">Privacy Policy</a></li>
 </ul>
 </div>
 </div>

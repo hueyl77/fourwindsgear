@@ -57,13 +57,13 @@
                     <sort_order>1</sort_order>
                     <children>
                         <srreport module="payperrentals">
-                            <title>Send Return Report</title>
+                            <title>Send Return By Product</title>
                             <sort_order>0</sort_order>
                             <action>payperrentals_admin/adminhtml_sendreturnreport</action>
                         </srreport>
                         <srhistory module="payperrentals">
                             <title>Send Return History Report</title>
-                            <sort_order>0</sort_order>
+                            <sort_order>1</sort_order>
                             <action>payperrentals_admin/adminhtml_sendreturnhistory</action>
                         </srhistory>
                     </children>
@@ -77,6 +77,11 @@
                             <sort_order>10</sort_order>
                             <action>payperrentals_admin/adminhtml_quantityreport</action>
                         </qreport>
+                        <fixedreport module="payperrentals">
+                            <title>Reservations by Start &amp; End Date</title>
+                            <sort_order>10</sort_order>
+                            <action>payperrentals_admin/adminhtml_fixedreport</action>
+                        </fixedreport>
                         <serialreport module="payperrentals">
                             <title>Serial Number Report</title>
                             <sort_order>20</sort_order>
@@ -118,6 +123,12 @@
                     <sort_order>6</sort_order>
                     <action>payperrentals_admin/adminhtml_reservationpricesdates</action>
                 </reservationpricesdates>
+                <fixedrentaldates module="payperrentals">
+                    <title>Fixed Rental Dates</title>
+                    <sort_order>6</sort_order>
+                    <action>payperrentals_admin/adminhtml_fixedrentaldates</action>
+                </fixedrentaldates>
+
                 <manualreserve module="payperrentals">
                     <title>Manually Reserve Inventory</title>
                     <sort_order>7</sort_order>
@@ -192,6 +203,9 @@
                                     <qreport module="payperrentals">
                                         <title><![CDATA[Inventory Report]]></title>
                                     </qreport>
+                                    <fixedreport module="payperrentals">
+                                        <title><![CDATA[Reservations by Start & End Date]]></title>
+                                    </fixedreport>
                                     <serialreport module="payperrentals">
                                         <title><![CDATA[Serial Number Report]]></title>
                                     </serialreport>
@@ -218,13 +232,17 @@
                                     </rentalcalendarbystartend>
                                 </children>
                             </rentalcalendarmain>
+                            <fixedrentaldates module="payperrentals">
+                                <title>Fixed Rental Dates</title>
+                                <sort_order>6</sort_order>
+                            </fixedrentaldates>
                             <reservationpricesdates module="payperrentals">
                                 <title>Pricing By Dates &amp; Times</title>
-                                <sort_order>6</sort_order>
+                                <sort_order>7</sort_order>
                             </reservationpricesdates>
                             <manualreserve module="payperrentals">
                                 <title>Manually Reserve Inventory</title>
-                                <sort_order>7</sort_order>
+                                <sort_order>8</sort_order>
                             </manualreserve>
                             <settings>
                                 <title>Settings</title>

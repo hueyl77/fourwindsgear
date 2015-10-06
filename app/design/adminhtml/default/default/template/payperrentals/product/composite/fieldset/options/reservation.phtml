@@ -23,8 +23,6 @@
  * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
-
-
 ?>
 
 <?php /* @var $this Mage_Adminhtml_Block_Catalog_Product_Composite_Fieldset_Options */ ?>
@@ -46,47 +44,63 @@ if(Mage::app()->getRequest()->getActionName() == 'configureProductToAdd'){
         $quoteItemId = $quoteItem->getProductId();
     }
 }
-
-$templatePhpInitialisations = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/php_initialisations.phtml', array(
-    '_area' => 'frontend',
-    '_relative' => false
-));
-$templateFunctions = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/admin_product_func.phtml', array(
-    '_area' => 'frontend',
-    '_relative' => false
-));
-$templateGlobalCalendarFunctions = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar_functions.phtml', array(
-    '_area' => 'frontend',
-    '_relative' => false
-));
-
-$templateJsInitialisations = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/js_initialisations.phtml', array(
-    '_area' => 'frontend',
-    '_relative' => false
-));
-
-$templateStyles = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/styles.phtml', array(
-    '_area' => 'frontend',
-    '_relative' => false
-));
-
-$templateGlobalCalendar = Mage::getDesign()->getTemplateFilename('payperrentals/calendar/global_calendar.phtml', array(
-    '_area' => 'frontend',
-    '_relative' => false
-));
 ?>
 <?php if(ITwebexperts_Payperrentals_Helper_Data::isReservation($this->getProduct()->getId() )) : ?>
 
-<?php require $templatePhpInitialisations; ?>
+    <?php
+    $_product = $this->getProduct();
+    if(Mage::getSingleton('core/session')->getData('startDateInitial') && Mage::getSingleton('core/session')->getData('endDateInitial')){
+        $qty = 1;
+        $startDate = Mage::getSingleton('core/session')->getData('startDateInitial');
+        $endDate = Mage::getSingleton('core/session')->getData('endDateInitial');
+        $isAvailable = true;
+
+        $priceAmount = ITwebexperts_Payperrentals_Helper_Price::calculatePrice($_product, $startDate, $endDate, $qty, ITwebexperts_Payperrentals_Helper_Data::getCustomerGroup());
+        if($priceAmount == -1){
+            $isAvailable = false;
+        }
+        $maxQty = ITwebexperts_Payperrentals_Helper_Inventory::getQuantity($_product, $startDate, $endDate);
+        if($maxQty == 'is_overbook'){
+            $maxQty = 1;
+        }
+
+    }else{
+        $isAvailable = false;
+    }
+    ?>
+
+    <script type="text/javascript">
+    price = '<?php echo Mage::helper('core')->currency($priceAmount);?>';
+    stockAvail = '<?php echo $maxQty;?>';
+    stockRest = '<?php  echo ($maxQty - $qty);?>';
+    checkboxWasPressed = $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent().attr('is_pressed') == '0';
+    isInQuote = <?php echo Mage::app()->getRequest()->getActionName() == 'configureQuoteItems'?'true':'false'; ?>;
+    $quoteItemObject = $jppr('a[product_id="<?php echo $quoteItemId;?>"]').parent().parent();
+    isAvailable = <?php echo $isAvailable?'true':'false';?>;
+    noPriceMessage = '<?php echo $this->__('No price is available for these rental periods');?>';
+    noQtyMessage = '<?php echo $this->__('No quantity available for these rental periods');?>';
+    getPriceAndAvailabilityUrl = '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/getpriceandavailability/",array('product_id'=>$this->getProduct()->getId(),'form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>'
+    $calendarTableObject = $jppr('#calendarTable<?php echo $quoteItemId;?>').parent();
+    $calendarTableObjectChild = $jppr('#calendarTable<?php echo $quoteItemId;?>');
+    updateAllDatesUrl = '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/getupdatealldates/", array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>';
+    selectNewCustomerUrl = '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/getupdatecustomer/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>'
+    estimateCreateUrl = '<?php echo Mage::getUrl("payperrentals_admin/adminhtml_ajax/setEstimatedCreate/",array('form_key'=> Mage::getSingleton('core/session')->getFormKey()))?>'
+    var scrpt = document.createElement('script');
+    scrpt.src='<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS) .'itwebexperts_payperrentals/datepick/calendarFunctionsAdmin.js'; ?>';
+    document.head.appendChild(scrpt);
+    </script>
 
 
-<div id="calendarTable<?php echo $quoteItemId; ?>">
-    <?php require $templateJsInitialisations; ?>
+
+    <div id="calendarTable<?php echo $quoteItemId; ?>" class="calendarTables">
+        <?php
+        $calendar = Mage::helper('payperrentals/calendar');
+        echo $calendar->getCalendar(null, false, $quoteItemId, $quoteItem);
+        ?>
+        <script type="text/javascript">
+            onDocReady();
+        </script>
     <input type="hidden" name="configurate-product-id" value="<?php echo $this->getProduct()->getId() ?>">
-
-    <?php require $templateGlobalCalendar; ?>
-    <?php require $templateFunctions; ?>
-    <?php require $templateGlobalCalendarFunctions; ?>
 
     <div class="priceList" style="margin-top:10px;"> Price List:<br/>
         <?php echo ITwebexperts_Payperrentals_Helper_Price::getPriceListHtml($this->getProduct(), Mage::getStoreConfig(
@@ -95,8 +109,11 @@ $templateGlobalCalendar = Mage::getDesign()->getTemplateFilename('payperrentals/
     </div>
     <div class="datesPrice" style="margin-top:10px;font-weight: bold;"></div>
 </div>
-
+    <?php
+    echo ITwebexperts_Payperrentals_Helper_Price::getAdminDamageWaiverHtml($quoteItem, $_product->getId(), true, $damageWaiver);
+    ?>
 <?php endif; ?>
+
 
 <?php if (count($options)): ?>
 

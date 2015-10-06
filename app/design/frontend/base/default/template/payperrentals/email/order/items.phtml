@@ -48,7 +48,7 @@
 
     <tbody>
         <?php echo $this->getChildHtml('order_totals') ?>
-        </tbody>
+    </tbody>
 </table>
 <?php if ($this->helper('giftmessage/message')->isMessagesAvailable('order', $_order, $_order->getStore()) && $_order->getGiftMessageId()): ?>
     <?php $_giftMessage = $this->helper('giftmessage/message')->getGiftMessage($_order->getGiftMessageId()); ?>

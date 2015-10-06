@@ -16,6 +16,7 @@ $_htmlId = $this->getElement()->getHtmlId() ?>
 <td class="label"><?php echo $this->getElement()->getLabel() ?></td>
 <td colspan="11" class="grid reservationprices">
 <?php echo Mage::helper('payperrentals')->__('Example:<br /><b>Number of:</b> 2 <b>Period Type:</b> Week <b>Price:</b> $5 <b>Additional Type:</b> Day <b>Additional Price:</b> $2<br />This would mean 2 Weeks is $5 and each additional day is $2') ?>
+
 <table cellspacing="0" class="data border" id="reservationprices_table">
     <?php if ($_showWebsite): ?>
         <col width="135"/>
@@ -31,7 +32,6 @@ $_htmlId = $this->getElement()->getHtmlId() ?>
         <th><?php echo Mage::helper('payperrentals')->__('Number of') ?></th>
         <th><?php echo Mage::helper('payperrentals')->__('Period Type') ?></th>
         <th><?php echo Mage::helper('payperrentals')->__('Price') ?></th>
-        <th><?php echo Mage::helper('payperrentals')->__('Damage Waiver') ?></th>
         <th><?php echo Mage::helper('payperrentals')->__('Applies To') ?></th>
 <!--        <th>--><?php //echo Mage::helper('payperrentals')->__('Date Start') ?><!--</th>-->
 <!--        <th>--><?php //echo Mage::helper('payperrentals')->__('Date end') ?><!--</th>-->
@@ -82,7 +82,6 @@ var reservationPricesRowTemplate = '<tr>'
     <?php //endforeach ?>
     + '</select></td>'
     + '<td class="nobr"><input type="text" size="5" class="required-entry validate-zero-or-greater" name="<?php echo $_htmlName ?>[{{index}}][price]" id="reservationprices_row_{{index}}_price"/></td>'
-    + '<td class="nobr"><input type="text" size="5" class="validate-zero-or-greater" name="<?php echo $_htmlName ?>[{{index}}][damage_waiver]" id="reservationprices_row_{{index}}_damage_waiver"/> %</td>'
     + '<td class="nobr"><select name="<?php echo $_htmlName ?>[{{index}}][reservationpricesdates_id]" id="reservationprices_row_{{index}}_reservationpricesdates_id"><?php echo $htmloptions ?></td>'
     //+ '<td class="nobr"><?php //echo $this->makeDateTimeBlock($_htmlName, 'datefrom') ?></td>'
     //+ '<td class="nobr"><?php //echo $this->makeDateTimeBlock($_htmlName, 'dateto') ?></td>'
@@ -137,7 +136,6 @@ var reservationPricesControl = {
             custgroup: '-1',
             store_id: '<?php echo $_storeId; ?>',
             readOnly: false,
-            damage_waiver: '0',
             index: this.itemsCount++
         };
 
@@ -155,11 +153,10 @@ var reservationPricesControl = {
             data.qtyend = arguments[8];
             data.custgroup = arguments[9];
             data.store_id = arguments[10];
-            data.damage_waiver = arguments[11]
         }
 
-        if (arguments.length == 11) {
-            data.readOnly = arguments[12];
+        if (arguments.length == 10) {
+            data.readOnly = arguments[11];
         }
 
         Element.insert($('<?php echo $_htmlId ?>_container'), {
@@ -204,7 +201,6 @@ var reservationPricesControl = {
             //o.selected = o.readAttribute('value') == data.custgroup;
         });
         $('reservationprices_row_' + data.index + '_website').value = data.website_id;
-        $('reservationprices_row_' + data.index + '_damage_waiver').value = data.damage_waiver;
 
         $('reservationprices_row_' + data.index + '_use_default_value').setValue(data.store_id == 0);
         if (data.store_id && (typeof arguments[9] == 'undefined')) {
@@ -297,7 +293,7 @@ var reservationPricesControl = {
     }
 };
 <?php foreach ($this->getValues() as $_item): ?>
-reservationPricesControl.addItem('<?php echo $_item['website_id'] ?>', '<?php echo $_item['numberof']; ?>', '<?php echo $_item['ptype']; ?>', '<?php echo $_item['price']; ?>', '<?php echo $_item['reservationpricesdates_id']; ?>', '<?php echo $_item['ptypeadditional']; ?>','<?php echo $_item['priceadditional']; ?>','<?php echo $_item['qty_start']; ?>', '<?php echo $_item['qty_end']; ?>', '<?php echo $_item['customers_group']; ?>', '<?php echo $_item['store_id'] ?>', <?php echo $_item['damage_waiver'] ?>, <?php echo (int)!empty($_item['readonly'])?>);
+reservationPricesControl.addItem('<?php echo $_item['website_id'] ?>', '<?php echo $_item['numberof']; ?>', '<?php echo $_item['ptype']; ?>', '<?php echo $_item['price']; ?>', '<?php echo $_item['reservationpricesdates_id']; ?>', '<?php echo $_item['ptypeadditional']; ?>','<?php echo $_item['priceadditional']; ?>','<?php echo $_item['qty_start']; ?>', '<?php echo $_item['qty_end']; ?>', '<?php echo $_item['customers_group']; ?>', '<?php echo $_item['store_id'] ?>', <?php echo (int)!empty($_item['readonly'])?>);
 <?php endforeach; ?>
 <?php if ($_readonly): ?>
 $('<?php echo $_htmlId ?>_container').up('table').select('button')

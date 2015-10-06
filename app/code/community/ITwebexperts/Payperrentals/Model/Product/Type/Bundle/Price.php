@@ -63,9 +63,9 @@ class ITwebexperts_Payperrentals_Model_Product_Type_Bundle_Price extends Mage_Bu
                     if ($selection->isSalable()) {
                         $selectionQty = $product->getCustomOption('selection_qty_' . $selection->getSelectionId());
                         if ($selectionQty) {
-                            $price = 0;
-                            if ($selection->getTypeId() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE && $product->getBundlePricingtype() == ITwebexperts_Payperrentals_Model_Product_Bundlepricingtype::PRICING_BUNDLE_FORALL) {
 
+                            if ($selection->getTypeId() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE && $product->getBundlePricingtype() == ITwebexperts_Payperrentals_Model_Product_Bundlepricingtype::PRICING_BUNDLE_FORALL) {
+                                $price = 0;
                                 if(is_object($product->getCustomOption('info_buyRequest'))) {
                                     $source = unserialize($product->getCustomOption('info_buyRequest')->getValue());
                                     if (!isset($source[ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION])) {

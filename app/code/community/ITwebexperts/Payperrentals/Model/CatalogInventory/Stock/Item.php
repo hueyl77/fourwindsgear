@@ -15,7 +15,7 @@ class ITwebexperts_Payperrentals_Model_CatalogInventory_Stock_Item extends Mage_
      */
     public function checkQuoteItemQty($qty, $summaryQty, $origQty = 0, $quoteItem = null, $product = null)
     {
-        if ($quoteItem && ITwebexperts_Payperrentals_Helper_Data::isReservationOnly($product) && (!$quoteItem->getChildren())) {
+        if ($quoteItem && ITwebexperts_Payperrentals_Helper_Data::isReservationOnly($product) && (!$quoteItem->getChildren() || Mage::app()->getStore()->isAdmin())) {
             $qtyOption = 1;
             if($quoteItem->getParentProductQty()){
                 $qty = $quoteItem->getParentProductQty();

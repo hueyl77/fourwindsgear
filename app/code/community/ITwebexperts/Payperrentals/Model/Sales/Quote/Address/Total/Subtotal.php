@@ -110,26 +110,17 @@ class ITwebexperts_Payperrentals_Model_Sales_Quote_Address_Total_Subtotal extend
                     } else {
                         $damageProduct = $product;
                     }
-                    $customerGroup = ITwebexperts_Payperrentals_Helper_Data::getCustomerGroup();
-                    $from_date = $product->getCustomOption(
-                        ITwebexperts_Payperrentals_Model_Product_Type_Reservation::START_DATE_OPTION
-                    )->getValue();
-                    $to_date = $product->getCustomOption(
-                        ITwebexperts_Payperrentals_Model_Product_Type_Reservation::END_DATE_OPTION
-                    )->getValue();
-                    $damageWaiver = ITwebexperts_Payperrentals_Helper_Price::getDamageWaiver(
-                        $damageProduct, $from_date, $to_date, $customerGroup, $quoteItem->getQty()
+                    $damageWaiverPrice = ITwebexperts_Payperrentals_Helper_Price::getDamageWaiver(
+                        $damageProduct, $finalPrice
                     );
-                    $damageWaiverPrice = 0;
-                    if ($damageWaiver) {
-                        $damageWaiverPrice = $finalPrice / 100 * $damageWaiver;
-                    }
+
                     $item->setData(
                         ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION_PRICE, $damageWaiverPrice
                     );
-                    if (isset($source[ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION])) {
-                        if ((bool)$source[ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION]) {
-                            if ($damageWaiver) {
+                    $forceDamageWaiver = Mage::helper('payperrentals/config')->forceDamageWaiver();
+                    if (isset($source[ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION]) || $forceDamageWaiver) {
+                        if ((bool)$source[ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION] || $forceDamageWaiver) {
+                            if ($damageWaiverPrice) {
                                 $finalPrice += $damageWaiverPrice;
                                 $item->setData(
                                     ITwebexperts_Payperrentals_Helper_Price::DAMAGE_WAIVER_OPTION, $damageWaiverPrice

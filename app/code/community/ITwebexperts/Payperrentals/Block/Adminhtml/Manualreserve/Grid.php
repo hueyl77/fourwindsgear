@@ -21,6 +21,7 @@ class ITwebexperts_Payperrentals_Block_Adminhtml_Manualreserve_Grid extends Mage
     protected function _prepareCollection()
     {
         $_collection = Mage::getModel('payperrentals/reservationorders')->getCollection();
+
         $_collection->getSelect()->joinLeft(array('sales_order' => Mage::getSingleton('core/resource')->getTableName('sales/order')),
             'sales_order.entity_id=main_table.order_id',array('customer_firstname','customer_lastname'));
         if(Mage::helper('itwebcommon')->isVendorAdmin()){

@@ -10,80 +10,6 @@ class ITwebexperts_Payperrentals_Model_Observer
     const AUTH_NET_REGISTER_CODE = 'ppr_authnet_payment';
 
     /**
-     * @param array $serialNumbersForOrderItem
-     */
-
-    private function updateSerialNumbersStatus($serialNumbersForOrderItem)
-    {
-        foreach ($serialNumbersForOrderItem as $serial) {
-            Mage::getResourceSingleton('payperrentals/serialnumbers')
-                ->updateStatusBySerial($serial, 'O');
-        }
-    }
-
-    /**
-     * @param ITwebexperts_Payperrentals_Model_Reservationorders $reservationOrder
-     * @param array $serialNumbers
-     * @param array $orderItems
-     * @param int $reservationId
-     *
-     * @return array
-     */
-    private function returnAllTheSerialNumbersForOrder($reservationOrder, $serialNumbers, $orderItems, $reservationId)
-    {
-        /** @var $payperrentalsUseSerials bool */
-        $payperrentalsUseSerials = ITwebexperts_Payperrentals_Helper_Data::getAttributeCodeForId(
-            $reservationOrder->getProductId(), 'payperrentals_use_serials'
-        );
-
-        /** @var array $serialNumbersForOrderItems */
-        $serialNumbersForOrderItems = array();
-
-        /**
-         * Get a list of manually entered serial numbers in the shipment form
-         */
-        if ($payperrentalsUseSerials) {
-            foreach ($serialNumbers as $salesOrderItemId => $serialArr) {
-                if ($salesOrderItemId == $orderItems[$reservationId]) {
-                    foreach ($serialArr as $enteredSerial) {
-                        if ($enteredSerial != '') {
-                            $serialNumbersForOrderItems[] = $enteredSerial;
-                        }
-                    }
-                }
-            }
-
-            /*
-            * Completes the array of entered serial numbers with non broken and not under maintenance serial numbers
-            * */
-
-            if (count($serialNumbersForOrderItems) < $reservationOrder->getQty()) {
-                $collectionSerials = Mage::getModel('payperrentals/serialnumbers')
-                    ->getCollection()
-                    ->addEntityIdFilter($reservationOrder->getProductId())
-                    ->addSelectFilter(
-                        "NOT FIND_IN_SET(sn, '" . implode(',', $serialNumbersForOrderItems)
-                        . "') AND (status = 'A')"
-                    );
-
-                $j = 0;
-                foreach ($collectionSerials as $item) {
-                    /** @var $item ITwebexperts_Payperrentals_Model_Serialnumbers */
-                    $serialNumbersForOrderItems[] = $item->getSn();
-                    if ($j >= $reservationOrder->getQty() - count($serialNumbersForOrderItems)) {
-                        break;
-                    }
-                    $j++;
-                }
-
-            }
-
-            $this->updateSerialNumbersStatus($serialNumbersForOrderItems);
-        }
-        return $serialNumbersForOrderItems;
-    }
-
-    /**
      * Used to add sendreturn table record when shipment is made
      *
      * Event fired before Shipment for an order is saved
@@ -117,11 +43,9 @@ class ITwebexperts_Payperrentals_Model_Observer
         $collectionReservations = Mage::getModel('payperrentals/reservationorders')
             ->getCollection()
             ->addSelectFilter("order_id = '" . $order->getId() . "'")
-            /** Product id filter added, before was adding sendreturn record for all products in reservationorders,
-             * but it should only add them for products in the shipment*/
-            ->addFieldToFilter('product_id', array('in'=>$productids))
+            ->addFieldToFilter('product_id', array('in' => $productids))
             ->addSelectFilter("product_type = '" . ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE . "'")
-            ->addSendReturnFilter();
+            ->addShippedFilter();
 
 
         /** @var array $reservationIds used to get the ids from the collection */
@@ -134,55 +58,9 @@ class ITwebexperts_Payperrentals_Model_Observer
             $reservationIds[] = $iReservation->getId();
             $orderItems[$iReservation->getId()] = $iReservation->getOrderItemId();
         }
+        $shipItemsArray = Mage::app()->getRequest()->getParam('shipment');
 
-        foreach ($collectionReservations as $reservationOrder) {
-
-            /** @var $reservationOrder ITwebexperts_Payperrentals_Model_Reservationorders */
-            $reservationId = $reservationOrder->getId();
-            $serialNumbersForOrder = $this->returnAllTheSerialNumbersForOrder(
-                $reservationOrder, $serialNumbers, $orderItems, $reservationId
-            );
-            $serialNumberForOrderAsString = implode(',', $serialNumbersForOrder);
-
-            $shipqty = 0;
-            foreach($items as $item) {
-                if ($item->getProductId() == $reservationOrder->getProductId()) {
-                    $shipqty = $item->getQty();
-                }
-            }
-
-            /*todo add here shipment_item_id shipment_item table and use this all over/sendreturn_id from reservationorders should be removed*/
-            $sendDatetime = date('Y-m-d H:i:s', Mage::getModel('core/date')->timestamp(time()));
-            /** @var $sendReturn ITwebexperts_Payperrentals_Model_Sendreturn */
-            $sendReturn = Mage::getModel('payperrentals/sendreturn')
-                ->setOrderId($reservationOrder->getOrderId())
-                ->setProductId($reservationOrder->getProductId())
-                ->setResStartdate($reservationOrder->getStartDate())
-                ->setResEnddate($reservationOrder->getEndDate())
-                ->setSendDate($sendDatetime)
-                ->setReturnDate('0000-00-00 00:00:00')
-                ->setQty($shipqty)//here needs a check this should always be true
-                ->setSn($serialNumberForOrderAsString)
-                ->save();
-
-            Mage::getResourceSingleton('payperrentals/reservationorders')->updateSendReturnById(
-                $reservationId, $sendReturn->getId()
-            );
-            $order = Mage::getModel('sales/order')->load($reservationOrder->getOrderId());
-
-            $product = Mage::getModel('catalog/product')->load($reservationOrder->getProductId());
-            if ($reservationOrder->getStartdate() != '0000-00-00 00:00:00') {
-                $sendPerCustomer[$order->getCustomerEmail()][$reservationOrder->getOrderId()][$product->getId()]['name'] = $product->getName();
-                $sendPerCustomer[$order->getCustomerEmail()][$reservationOrder->getOrderId()][$product->getId()]['serials'] = $serialNumberForOrderAsString;
-                $sendPerCustomer[$order->getCustomerEmail()][$reservationOrder->getOrderId()][$product->getId()]['start_date'] = $reservationOrder->getStartDate();
-                $sendPerCustomer[$order->getCustomerEmail()][$reservationOrder->getOrderId()][$product->getId()]['end_date'] = $reservationOrder->getEndDate();
-                $sendPerCustomer[$order->getCustomerEmail()][$reservationOrder->getOrderId()][$product->getId()]['send_date'] = $sendDatetime;
-
-            }
-        }
-        if(isset($sendPerCustomer)) {
-            ITwebexperts_Payperrentals_Helper_Emails::sendEmail('send', $sendPerCustomer);
-        }
+        Mage::helper('payperrentals/inventory')->processShipment($collectionReservations, $serialNumbers, $orderItems, $items, $shipItemsArray);
 
     }
 
@@ -422,7 +300,7 @@ class ITwebexperts_Payperrentals_Model_Observer
                     );
 
                     if ((!isset($updateItemsArr['action']) || $updateItemsArr['action'] != 'remove')
-                        && !Mage::app()->getStore()->isAdmin() && !$isAvailable) {
+                    && !Mage::app()->getStore()->isAdmin() && !$isAvailable) {
                         Mage::throwException(
                             'Product ' . $item->getProduct()->getName()
                             . ' is not available for that qty on the selected dates'
@@ -481,7 +359,7 @@ class ITwebexperts_Payperrentals_Model_Observer
         /** @var $quote Mage_Sales_Model_Quote */
         $quote = Mage::getSingleton('checkout/session')->getQuote();
 
-        if (ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDatesShoppingCart() && $quote->getItemsCount() == 0 || !ITwebexperts_Payperrentals_Helper_Config::keepSelectedDays()) {
+        if (ITwebexperts_Payperrentals_Helper_Data::isUsingGlobalDatesShoppingCart() && $quote->getItemsCount() == 0 || !Mage::helper('payperrentals/config')->keepSelectedDays()) {
             Mage::getSingleton('core/session')->unsetData('startDateInitial');
             Mage::getSingleton('core/session')->unsetData('endDateInitial');
         }
@@ -719,16 +597,19 @@ class ITwebexperts_Payperrentals_Model_Observer
      * @param Varien_Event_Observer $observer
      */
 
-    public function reserveInventory(Varien_Event_Observer $observer)
+    public function reserveInventoryAndSignature(Varien_Event_Observer $observer)
     {
         /** @var $order Mage_Sales_Model_Order */
         $order = $observer->getEvent()->getOrder();
 
-        if (ITwebexperts_Payperrentals_Helper_Config::reserveInventoryNoInvoice()
-            && !ITwebexperts_Payperrentals_Helper_Config::reserveByStatus()
+        if (Mage::helper('payperrentals/config')->reserveInventoryNoInvoice()
+            && !Mage::helper('payperrentals/config')->reserveByStatus()
         ) {
             $items = $observer->getEvent()->getOrder()->getItemsCollection();
             ITwebexperts_Payperrentals_Helper_Data::reserveOrder($items, $order);
+        }
+        if(!Mage::app()->getStore()->isAdmin()) {
+            $this->saveSignature($observer);
         }
     }
 
@@ -745,7 +626,7 @@ class ITwebexperts_Payperrentals_Model_Observer
         $statusArr = explode(
             ',', Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_RESERVED_STATUSES)
         );
-        if (ITwebexperts_Payperrentals_Helper_Config::reserveByStatus() && count($statusArr) > 0
+        if (Mage::helper('payperrentals/config')->reserveByStatus() && count($statusArr) > 0
             && in_array(
                 $statusOrder, $statusArr
             )
@@ -771,8 +652,8 @@ class ITwebexperts_Payperrentals_Model_Observer
             ',', Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_RESERVED_STATUSES)
         );
 
-        if (!ITwebexperts_Payperrentals_Helper_Config::reserveInventoryNoInvoice()
-            || ITwebexperts_Payperrentals_Helper_Config::reserveByStatus() && !in_array($statusOrder, $statusArr)
+        if (!Mage::helper('payperrentals/config')->reserveInventoryNoInvoice()
+            || Mage::helper('payperrentals/config')->reserveByStatus() && !in_array($statusOrder, $statusArr)
         ) {
             $items = $observer->getInvoice()->getOrder()->getItemsCollection();
             ITwebexperts_Payperrentals_Helper_Data::reserveOrder($items, $order);
@@ -1170,11 +1051,10 @@ class ITwebexperts_Payperrentals_Model_Observer
 
         $resource = Mage::getSingleton('core/resource');
         $collection->getSelect()->joinLeft(
-            array('sfo' => $resource->getTableName('sales/order')),
-            'sfo.entity_id=main_table.order_id',
-            array('sfo.start_datetime as start_datetime', 'sfo.end_datetime as end_datetime')
+            array('sfow' => $resource->getTableName('sales/order')),
+            'sfow.entity_id=main_table.order_id',
+            array('sfow.start_datetime as sstart_datetime', 'sfow.end_datetime as send_datetime')
         );
-        // echo $collection->getSelect()->__toString();
 
     }
 
@@ -1263,25 +1143,32 @@ class ITwebexperts_Payperrentals_Model_Observer
         /** @var $block Mage_Adminhtml_Block_Sales_Order_View */
         if ($block->getType() == 'adminhtml/sales_order_view') {
             $order = $block->getOrder();
-            $totalQtyOrdered = (int)$order->getTotalQtyOrdered();
-            $totalQtyShipped = 0;
-            foreach ($order->getShipmentsCollection() as $shipment) {
-                /** @var $shipment Mage_Sales_Model_Order_Shipment */
-                $totalQtyShipped += $shipment->getTotalQty();
-            }
+            $_returnCollection = Mage::getResourceModel('payperrentals/sendreturn_collection')
+                ->addFieldToFilter('order_id', array('in' => array($order->getId(), $order->getIncrementId())));
+            $_totalQtyReturned = 0;
 
-            $totalQtyReturned = 0;
-            $returnCollection = Mage::getResourceModel('payperrentals/sendreturn_collection')->addFieldToFilter(
-                'order_id', array('eq' => $order->getId())
-            );
-            foreach ($returnCollection as $sendReturn) {
-                if ($sendReturn->getReturnDate() != '0000-00-00 00:00:00'
-                    && $sendReturn->getReturnDate() != '1970-01-01 00:00:00'
-                ) {
-                    $totalQtyReturned += $sendReturn->getQty();
+            $_returnedUnixtimeDate = 0;
+            foreach($_returnCollection as $_returnItem) {
+                if($_returnItem->getReturnDate() != '0000-00-00 00:00:00' && $_returnItem->getReturnDate() != '1970-01-01 00:00:00')
+                {
+                    $_totalQtyReturned += $_returnItem->getQty();
+                    if ($_returnedUnixtimeDate < strtotime($_returnItem->getReturnDate())) {
+                        $_returnedUnixtimeDate = strtotime($_returnItem->getReturnDate());
+                    }
                 }
             }
-            if ($totalQtyOrdered == $totalQtyShipped && $totalQtyShipped > $totalQtyReturned) {
+
+            $_shipmentCollection = Mage::getResourceModel('payperrentals/sendreturn_collection')
+                ->addFieldToFilter('order_id', array('in' => array($order->getEntityId(), $order->getIncrementId())));
+            $_totalQtyShipped = 0;
+            foreach($_shipmentCollection as $_shipmentItem) {
+                if($_shipmentItem->getSendDate() != '0000-00-00 00:00:00' && $_shipmentItem->getSendDate() != '1970-01-01 00:00:00') {
+                    $_totalQtyShipped += $_shipmentItem->getQty();
+
+                }
+            }
+
+            if ((!$_totalQtyReturned) || ($_totalQtyReturned < $_totalQtyShipped)) {
                 $block->addButton(
                     'order_return', array(
                         'label' => Mage::helper('payperrentals')->__('Return'),
@@ -1297,10 +1184,10 @@ class ITwebexperts_Payperrentals_Model_Observer
                     'onclick' => 'setLocation(\'' . $this->getRentalEditUrl($block) . '\')',
                 )
             );
-            if (ITwebexperts_Payperrentals_Helper_Extend::isExtensibleOrder($block->getOrder()->getId())) {
+            if(ITwebexperts_Payperrentals_Helper_Extend::isExtensibleOrder($block->getOrder()->getId())) {
                 $block->addButton(
                     'order_extend', array(
-                        'label' => Mage::helper('payperrentals')->__('Extend Order'),
+                        'label'   => Mage::helper('payperrentals')->__('Extend Order'),
                         'onclick' => 'extendOrder(\'' . $block->getOrder()->getId() . '\', \'' . $block->getOrder()->getIncrementId() . '\')',
                     )
                 );
@@ -1308,16 +1195,57 @@ class ITwebexperts_Payperrentals_Model_Observer
 
             if(ITwebexperts_Payperrentals_Helper_Data::isLateOrder($block->getOrder()->getId())) {
                 if(!Mage::helper('itwebcommon')->isVendorAdmin()) {
-                    $block->addButton(
-                        'order_extend', array(
-                            'label' => Mage::helper('payperrentals')->__('Charge Late Fee'),
-                            'onclick' => 'showLateFeePopup(' . '\'popup_form_policy\', ' . $block->getOrder()->getId() . ')',
-                        )
-                    );
-                }
+                $block->addButton(
+                    'order_extend', array(
+                        'label'   => Mage::helper('payperrentals')->__('Charge Late Fee'),
+                        'onclick' => 'showLateFeePopup(' . '\'popup_form_policy\', '.$block->getOrder()->getId() . ')',
+                    )
+                );
+            }
 
             }
+            $block->addButton(
+                'rentalcontract', array(
+                    'label' => Mage::helper('payperrentals')->__('Rental Contract'),
+                    'onclick' => 'setLocation(\'' . $block->getUrl(
+                            'payperrentals_admin/adminhtml_rentalcontract/generate', array('order_id' => $block->getOrder()->getId())
+                        ) . '\')',
+                )
+            );
+            if(Mage::helper('payperrentals')->orderContainsReservation($block->getOrder()->getId()) && Mage::helper('payperrentals/config')->enabledDigitalSignature()){
+            $block->addButton(
+                'signature', array(
+                    'label' => Mage::helper('payperrentals')->__('Capture Signature'),
+                    'onclick' => 'showSignaturePopup(\'' . $block->getUrl(
+                            'payperrentals_admin/adminhtml_signature/view', array('order_id' => $block->getOrder()->getId())
+                        ) . '\')',
+                )
+            );
         }
+        }
+    }
+
+    public function filterCallbackSerials($collection, $column)
+    {
+        /** @var $column Mage_Adminhtml_Block_Widget_Grid_Column */
+        $value = $column->getFilter()->getValue();
+
+
+        $serialCollection = Mage::getModel('payperrentals/serialnumbers')->getCollection();
+        $serialTable = $serialCollection->getTable('payperrentals/serialnumbers');
+
+        /** @var $collection Mage_Sales_Model_Mysql4_Order_Collection */
+        $collection->getSelect()->joinLeft(
+            array("ni" => $serialTable), "e.entity_id = ni.entity_id", array('ni.*')
+        );
+
+        $collection->getSelect()->where(
+                "FIND_IN_SET(ni.sn, '" . $value . "')"
+            );
+
+        $collection->getSelect()
+            ->group('e.entity_id');
+
     }
 
     public function filterCallbackDates($collection, $column)
@@ -1387,45 +1315,59 @@ class ITwebexperts_Payperrentals_Model_Observer
                 /** @var $_block ITwebexperts_Payperrentals_Block_Adminhtml_Catalog_Product_Grid */
                 $_block->addColumnAfter(
                     'booked_qty', array(
-                    'header' => Mage::helper('payperrentals')->__('Booked'),
-                    'index' => 'entity_id',
-                    'width' => '60px',
-                    'align' =>  'right',
-                    'type' => 'number',
-                    'renderer' => 'payperrentals/adminhtml_catalog_product_renderer_booked',
-                    'sortable' => false,
-                    'filter' => false,
-                ), 'qty'
+                        'header' => Mage::helper('payperrentals')->__('Booked'),
+                        'index' => 'entity_id',
+                        'width' => '60px',
+                        'align' =>  'right',
+                        'type' => 'number',
+                        'renderer' => 'payperrentals/adminhtml_catalog_product_renderer_booked',
+                        'sortable' => false,
+                        'filter' => false,
+                    ), 'qty'
                 );
                 $after = 'booked_qty';
                 if(ITwebexperts_Payperrentals_Helper_Data::isMaintenanceInstalled()){
                     $_block->addColumnAfter(
                         'maintenance_qty', array(
-                        'header' => Mage::helper('payperrentals')->__('Maintenance'),
-                        'index' => 'entity_id',
-                        'align' =>  'right',
-                        'width' => '70px',
-                        'type' => 'number',
-                        'renderer' => 'ITwebexperts_Maintenance_Block_Adminhtml_Catalog_Product_Renderer_Maintenance',
-                        'sortable' => false,
-                        'filter' => false,
-                    ), 'booked_qty'
+                            'header' => Mage::helper('payperrentals')->__('Maintenance'),
+                            'index' => 'entity_id',
+                            'align' =>  'right',
+                            'width' => '70px',
+                            'type' => 'number',
+                            'renderer' => 'ITwebexperts_Maintenance_Block_Adminhtml_Catalog_Product_Renderer_Maintenance',
+                            'sortable' => false,
+                            'filter' => false,
+                        ), 'booked_qty'
                     );
                     $after = 'maintenance_qty';
                 }
 
                 $_block->addColumnAfter(
                     'available_inventory', array(
-                    'header' => Mage::helper('payperrentals')->__('Available'),
-                    'index' => 'entity_id',
-                    'width' => '60px',
-                    'type' => 'number',
-                    'align' =>  'right',
-                    'sortable' => false,
-                    'filter' => false,
-                    'renderer' => 'payperrentals/adminhtml_catalog_product_renderer_available'
-                ), $after
+                        'header' => Mage::helper('payperrentals')->__('Available'),
+                        'index' => 'entity_id',
+                        'width' => '60px',
+                        'type' => 'number',
+                        'align' =>  'right',
+                        'sortable' => false,
+                        'filter' => false,
+                        'renderer' => 'payperrentals/adminhtml_catalog_product_renderer_available'
+                    ), $after
                 );
+                if(Mage::helper('payperrentals/config')->showSerialsColumn()){
+                    $_block->addColumnAfter(
+                        'serials', array(
+                        'header' => Mage::helper('payperrentals')->__('Serials'),
+                        'index' => 'entity_id',
+                        'width' => '60px',
+                        'type' => 'text',
+                        'align' =>  'left',
+                        'filter_condition_callback' => array($this, 'filterCallbackSerials'),
+                        'renderer' => 'payperrentals/adminhtml_catalog_product_renderer_serials'
+                    ), 'available_inventory'
+                    );
+                }
+
             }
 
             Mage::register('is_product_grid', true);
@@ -1443,87 +1385,112 @@ class ITwebexperts_Payperrentals_Model_Observer
                     /** @var $_block Mage_Adminhtml_Block_Sales_Order_Grid */
                     $_block->addColumnAfter(
                         'sfo_start_datetime', array(
-                        'header' => Mage::helper('payperrentals')->__('Start Date'),
-                        'index' => 'start_datetime',
-                        'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
+                            'header' => Mage::helper('payperrentals')->__('Start Date'),
+                            'index' => 'start_datetime',
+                            'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
                         'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
-                        'width' => '120px',
-                        'type' => 'datetime',
-                        'filter_index' => 'main_table.start_datetime',
-                    ), 'shipping_name'
+                            'width' => '120px',
+                            'type' => 'datetime',
+                            'filter_index' => 'main_table.start_datetime',
+                        ), 'shipping_name'
                     );
                     $_block->addColumnAfter(
                         'sfo_end_datetime', array(
-                        'header' => Mage::helper('payperrentals')->__('End Date'),
-                        'index' => 'end_datetime',
-                        'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
+                            'header' => Mage::helper('payperrentals')->__('End Date'),
+                            'index' => 'end_datetime',
+                            'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
                         'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
-                        'width' => '120px',
-                        'type' => 'datetime',
-                        'filter_index' => 'main_table.end_datetime',
-                    ), 'sfo_start_datetime'
+                            'width' => '120px',
+                            'type' => 'datetime',
+                            'filter_index' => 'main_table.end_datetime',
+                        ), 'sfo_start_datetime'
                     );
                 } else {
                     /** @var $_block Mage_Adminhtml_Block_Sales_Order_Grid */
                     if (preg_match('/.*adminhtml\/sales_invoice_grid$/',$blocktype)) {
                         $_block->addColumnAfter(
                             'sfo_incr_id', array(
-                            'header' => Mage::helper('payperrentals')->__('Invoice #'),
-                            'width' => '160px',
-                            'type' => 'text',
-                            'index' => 'incr_id',
-                            'filter_condition_callback' => array($this, 'filterCallbackIncrement')
-                        ), 'massaction'
+                                'header' => Mage::helper('payperrentals')->__('Invoice #'),
+                                'width' => '160px',
+                                'type' => 'text',
+                                'index' => 'incr_id',
+                                'filter_condition_callback' => array($this, 'filterCallbackIncrement')
+                            ), 'massaction'
                         );
                     }
-                    $_block->addColumnAfter(
-                        'start_datetime', array(
-                        'header' => Mage::helper('payperrentals')->__('Start Date'),
-                        'index' => 'start_datetime',
-                        'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
-                        'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
-                        'width' => '120px',
-                        'type' => 'datetime',
-                        'filter_index' => 'sfo.start_datetime',
-                    ), 'billing_name'
-                    );
-                    $_block->addColumnAfter(
-                        'sfo_end_datetime', array(
-                        'header' => Mage::helper('payperrentals')->__('End Date'),
-                        'index' => 'end_datetime',
-                        'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
-                        'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
-                        'width' => '120px',
-                        'type' => 'datetime',
-                        'filter_index' => 'sfo.end_datetime',
-                    ), 'sfo_start_datetime'
-                    );
+                    if (preg_match('/.*adminhtml\/sales_shipment_grid$/',$blocktype)) {
+                        $_block->addColumnAfter(
+                            'start_datetime', array(
+                            'header' => Mage::helper('payperrentals')->__('Start Date'),
+                            'index' => 'sstart_datetime',
+                            'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
+                            'filter' => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
+                            'width' => '120px',
+                            'type' => 'datetime',
+                            'filter_index' => 'sfow.start_datetime',
+                        ), 'billing_name'
+                        );
+                        $_block->addColumnAfter(
+                            'sfo_end_datetime', array(
+                            'header' => Mage::helper('payperrentals')->__('End Date'),
+                            'index' => 'send_datetime',
+                            'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
+                            'filter' => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
+                            'width' => '120px',
+                            'type' => 'datetime',
+                            'filter_index' => 'sfow.end_datetime',
+                        ), 'sfo_start_datetime'
+                        );
+                    }else{
+                        $_block->addColumnAfter(
+                            'start_datetime', array(
+                            'header' => Mage::helper('payperrentals')->__('Start Date'),
+                            'index' => 'start_datetime',
+                            'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
+                            'filter' => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
+                            'width' => '120px',
+                            'type' => 'datetime',
+                            'filter_index' => 'sfo.start_datetime',
+                        ), 'billing_name'
+                        );
+                        $_block->addColumnAfter(
+                            'sfo_end_datetime', array(
+                            'header' => Mage::helper('payperrentals')->__('End Date'),
+                            'index' => 'end_datetime',
+                            'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
+                            'filter' => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
+                            'width' => '120px',
+                            'type' => 'datetime',
+                            'filter_index' => 'sfo.end_datetime',
+                        ), 'sfo_start_datetime'
+                        );
+                    }
                     $_block->sortColumnsByOrder();
                 }
                 if (!preg_match('/.*sales_invoice_grid$/',$blocktype) && !preg_match('/.*sales_shipment_grid$/',$blocktype)) {
                     $_block->addColumnAfter(
                         'shipping_state', array(
-                        'header' => Mage::helper('payperrentals')->__('Shipping'),
-                        'index' => 'total_qty_shipped',
+                            'header' => Mage::helper('payperrentals')->__('Shipping'),
+                            'index' => 'total_qty_shipped',
                         'renderer' => $this->getShippingRenderer(),
-                        'width' => '120px',
-                        'type' => 'options',
-                        'options' => Mage::getSingleton('payperrentals/sendreturn')->_getShippingStates(),
-                        'sortable' => false,
-                        'filter' => false,
-                    ), 'status'
+                            'width' => '120px',
+                            'type' => 'options',
+                            'options' => Mage::getSingleton('payperrentals/sendreturn')->_getShippingStates(),
+                            'sortable' => false,
+                            'filter' => false,
+                        ), 'status'
                     );
                     $_block->addColumnAfter(
                         'return_state', array(
-                        'header' => Mage::helper('payperrentals')->__('Return'),
-                        'index' => 'total_qty_returned',
+                            'header' => Mage::helper('payperrentals')->__('Return'),
+                            'index' => 'total_qty_returned',
                         'renderer' => $this->getReturnRenderer(),
-                        'width' => '120px',
-                        'type' => 'options',
-                        'options' => Mage::getSingleton('payperrentals/sendreturn')->_getReturnStates(),
-                        'sortable' => false,
-                        'filter' => false,
-                    ), 'shipping_state'
+                            'width' => '120px',
+                            'type' => 'options',
+                            'options' => Mage::getSingleton('payperrentals/sendreturn')->_getReturnStates(),
+                            'sortable' => false,
+                            'filter' => false,
+                        ), 'shipping_state'
                     );
                 }
             } else {
@@ -1531,84 +1498,84 @@ class ITwebexperts_Payperrentals_Model_Observer
                     if (preg_match('/.*sales_order_grid$/',$blocktype)) {
                         $_block->addColumnAfter(
                             'sfo_start_datetime', array(
-                            'header' => Mage::helper('payperrentals')->__('Start Date'),
-                            'index' => 'start_datetime',
-                            'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
+                                'header' => Mage::helper('payperrentals')->__('Start Date'),
+                                'index' => 'start_datetime',
+                                'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
                             'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
-                            'width' => '120px',
-                            'type' => 'datetime',
-                            'filter_index' => 'main_table.start_datetime',
-                        ), 'shipping_name'
+                                'width' => '120px',
+                                'type' => 'datetime',
+                                'filter_index' => 'main_table.start_datetime',
+                            ), 'shipping_name'
                         );
                         $_block->addColumnAfter(
                             'sfo_end_datetime', array(
-                            'header' => Mage::helper('payperrentals')->__('End Date'),
+                                'header' => Mage::helper('payperrentals')->__('End Date'),
                             'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
-                            'index' => 'end_datetime',
-                            'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
-                            'width' => '120px',
-                            'type' => 'datetime',
-                            'filter_index' => 'main_table.end_datetime',
-                        ), 'sfo_start_datetime'
+                                'index' => 'end_datetime',
+                                'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
+                                'width' => '120px',
+                                'type' => 'datetime',
+                                'filter_index' => 'main_table.end_datetime',
+                            ), 'sfo_start_datetime'
                         );
                         $_block->addColumnAfter(
                             'shipping_state', array(
-                            'header' => Mage::helper('payperrentals')->__('Shipping'),
-                            'index' => 'total_qty_shipped',
-                            'renderer' => 'payperrentals/adminhtml_grid_column_renderer_shippingState',
-                            'width' => '120px',
-                            'type' => 'options',
-                            'options' => Mage::getSingleton('payperrentals/sendreturn')->_getShippingStates(),
-                            'sortable' => false,
-                            'filter' => false,
-                        ), 'status'
+                                'header' => Mage::helper('payperrentals')->__('Shipping'),
+                                'index' => 'total_qty_shipped',
+                                'renderer' => 'payperrentals/adminhtml_grid_column_renderer_shippingState',
+                                'width' => '120px',
+                                'type' => 'options',
+                                'options' => Mage::getSingleton('payperrentals/sendreturn')->_getShippingStates(),
+                                'sortable' => false,
+                                'filter' => false,
+                            ), 'status'
                         );
                         $_block->addColumnAfter(
                             'return_state', array(
-                            'header' => Mage::helper('payperrentals')->__('Return'),
-                            'index' => 'total_qty_returned',
-                            'renderer' => 'payperrentals/adminhtml_grid_column_renderer_returnState',
-                            'width' => '120px',
-                            'type' => 'options',
-                            'options' => Mage::getSingleton('payperrentals/sendreturn')->_getReturnStates(),
-                            'sortable' => false,
-                            'filter' => false,
-                        ), 'shipping_state'
+                                'header' => Mage::helper('payperrentals')->__('Return'),
+                                'index' => 'total_qty_returned',
+                                'renderer' => 'payperrentals/adminhtml_grid_column_renderer_returnState',
+                                'width' => '120px',
+                                'type' => 'options',
+                                'options' => Mage::getSingleton('payperrentals/sendreturn')->_getReturnStates(),
+                                'sortable' => false,
+                                'filter' => false,
+                            ), 'shipping_state'
                         );
                     } else {
                         $_block->addColumnAfter(
                             'sfo_start_datetime', array(
-                            'header' => Mage::helper('payperrentals')->__('Start Date'),
-                            'index' => 'start_datetime',
-                            'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
+                                'header' => Mage::helper('payperrentals')->__('Start Date'),
+                                'index' => 'start_datetime',
+                                'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
                             'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
-                            'width' => '120px',
-                            'type' => 'datetime',
-                            'filter_index' => 'sfo.start_datetime',
-                        ), 'shipping_name'
+                                'width' => '120px',
+                                'type' => 'datetime',
+                                'filter_index' => 'sfo.start_datetime',
+                            ), 'shipping_name'
                         );
                         $_block->addColumnAfter(
                             'sfo_end_datetime', array(
-                            'header' => Mage::helper('payperrentals')->__('End Date'),
-                            'index' => 'end_datetime',
-                            'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
+                                'header' => Mage::helper('payperrentals')->__('End Date'),
+                                'index' => 'end_datetime',
+                                'renderer' => 'payperrentals/adminhtml_html_renderer_datetime',
                             'filter'    => 'payperrentals/adminhtml_widget_grid_column_filter_datetimeppr',
-                            'width' => '120px',
-                            'type' => 'datetime',
-                            'filter_index' => 'sfo.end_datetime',
-                        ), 'sfo_start_datetime'
+                                'width' => '120px',
+                                'type' => 'datetime',
+                                'filter_index' => 'sfo.end_datetime',
+                            ), 'sfo_start_datetime'
                         );
                     }
                 } else {
                     $_block->addColumnAfter(
                         'sfo_dates', array(
-                        'header' => Mage::helper('payperrentals')->__('Dates'),
-                        'index' => 'entity_id',
-                        'renderer' => 'payperrentals/adminhtml_html_renderer_dates',
-                        'width' => '120px',
-                        'type' => 'datetime',
-                        'filter_condition_callback' => array($this, 'filterCallbackDates')
-                    ), 'shipping_name'
+                            'header' => Mage::helper('payperrentals')->__('Dates'),
+                            'index' => 'entity_id',
+                            'renderer' => 'payperrentals/adminhtml_html_renderer_dates',
+                            'width' => '120px',
+                            'type' => 'datetime',
+                            'filter_condition_callback' => array($this, 'filterCallbackDates')
+                        ), 'shipping_name'
                     );
                 }
             }
@@ -1674,8 +1641,7 @@ class ITwebexperts_Payperrentals_Model_Observer
             $endDate = Mage::getSingleton('core/session')->getData('endDateInitial');
             $productsArr = array();
             if ($startDate && $endDate) {
-                 foreach ($productCollectionIds as $productId) {
-                     //$productId = $productObj->getId();
+                foreach ($productCollectionIds as $productId) {
                     if (ITwebexperts_Payperrentals_Helper_Data::isReservationOnly($productId)) {
                         $isAvailable = $inventoryHelper->isAvailable(
                             $productId, $startDate, $endDate, 1);
@@ -1732,6 +1698,53 @@ class ITwebexperts_Payperrentals_Model_Observer
         return $this;
     }
 
+    /**
+     * Attach rental contract to new order email
+     *
+     * @param $observer
+     */
+    public function sendContract($observer)
+    {
+        $mailTemplate = $observer->getEvent()->getTemplate();
+        $order = $observer->getEvent()->getObject();
+        $storeId = $order->getStoreId();
+
+        if (Mage::getStoreConfig(ITwebexperts_Payperrentals_Helper_Config::XML_PATH_ATTACHCONTRACT, $storeId)) {
+            //Create Pdf and attach to email - play nicely with PdfCustomiser
+            $pdf = Mage::getModel('payperrentals/contractpdf')->renderContract($order,'F');
+            $orderAttachmentName = Mage::getModel('payperrentals/contractpdf')->getContractFilename($order);
+            $mailTemplate = Mage::helper('payperrentals/emails')->addFileAttachment($pdf,$mailTemplate);
+        }
+        $test = 'test';
+
+    }
+
+    /**
+     * Saves rental contract signature to order
+     *
+     * @param Varien_Event_Observer $observer
+     */
+
+    public function saveSignature(Varien_Event_Observer $observer)
+    {
+        $order = $observer->getEvent()->getOrder();
+        $post = Mage::app()->getFrontController()->getRequest()->getPost();
+        $date = Mage::getModel('core/date')->date('Y-m-d');
+        $signature = $post['signaturecode'];
+        $signaturetext = $post['typedsignature'];
+        $signatureimage = $post['signatureimage'];
+        $signatureimage = str_replace('image/svg+xml,', '', $signatureimage);
+        $order->setSignatureDate($date);
+        $order->setSignatureText($signaturetext);
+        $order->setSignatureXynative($signature);
+        /** upload image to media/pdfs/signatures */
+        $contractModel = Mage::getModel('payperrentals/contractpdf');
+        $path = $contractModel->getSignaturePath();
+        $imagename = $contractModel->getSignatureFilename($order);
+        $order->setSignatureImage($imagename);
+        Mage::helper('payperrentals')->uploadFileandCreateDir($path,$signatureimage,$imagename);
+        $order->save();
+    }
 
     /**
      * Checks if newly added product to cart uses same start and end dates as the other products
@@ -1746,7 +1759,7 @@ class ITwebexperts_Payperrentals_Model_Observer
             if($observer->getEvent()->getQuote()) {
                 $quote = $observer->getEvent()->getQuote();
             }else{
-                $quote = Mage::getSingleton('checkout/session')->getQuote();
+            $quote = Mage::getSingleton('checkout/session')->getQuote();
             }
             $quoteItems = $quote->getAllItems();
             $firstQuoteItem = false;
@@ -1754,7 +1767,7 @@ class ITwebexperts_Payperrentals_Model_Observer
                 if($quoteItem->getParentItem()) continue;
                 $options = $quoteItem->getOptionsByCode();
                 $buyRequest = $options['info_buyRequest'];
-                if (Mage::getSingleton('checkout/session')->getIsExtendedQuote() && !isset($buyRequest['is_extended'])) {
+                if(Mage::getSingleton('checkout/session')->getIsExtendedQuote() && !isset($buyRequest['is_extended'])){
                     Mage::getSingleton('checkout/session')->addError(
                         $helper->__('This is an extended order you cannot add other items!')
                     );
@@ -1767,9 +1780,9 @@ class ITwebexperts_Payperrentals_Model_Observer
                 $buyRequest = $quoteItem->getBuyRequest();
                 if ($buyRequest->getStartDate() && $buyRequest->getEndDate()) {
                     if (!$firstQuoteItem) {
-                        $startdatetime = new DateTime($buyRequest->getStartDate());
+                    $startdatetime = new DateTime($buyRequest->getStartDate());
                         $startFormatted = $startdatetime->format('Y-m-d H:i:s');
-                        $enddatetime = new DateTime($buyRequest->getEndDate());
+                    $enddatetime = new DateTime($buyRequest->getEndDate());
                         $endFormatted = $enddatetime->format('Y-m-d H:i:s');
 
                         $counter = 0;
@@ -1784,24 +1797,24 @@ class ITwebexperts_Payperrentals_Model_Observer
                                     $endFormattedNew = $enddatetimeNew->format('Y-m-d H:i:s');
 
                                     if ($startFormatted != $startFormattedNew || $endFormatted != $endFormattedNew) {
-                                        Mage::getSingleton('checkout/session')->addError(
-                                            $helper->__('All products must use the same start and end dates')
-                                        );
-                                        Mage::app()->getFrontController()->getResponse()->setRedirect(
-                                            Mage::getUrl('checkout/cart')
-                                        );
-                                        Mage::app()->getResponse()->sendResponse();
-                                        exit;
-                                    }
-                                }
+                            Mage::getSingleton('checkout/session')->addError(
+                                $helper->__('All products must use the same start and end dates')
+                            );
+                            Mage::app()->getFrontController()->getResponse()->setRedirect(
+                                Mage::getUrl('checkout/cart')
+                            );
+                            Mage::app()->getResponse()->sendResponse();
+                            exit;
+                        }
+                    }
                                 $counter++;
                             }
                         }
                     }
                 }
-                break;
+                    break;
+                }
             }
-        }
 
     }
 }

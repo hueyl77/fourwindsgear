@@ -27,7 +27,7 @@
 <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
 <?php $_orders = $this->getOrders(); ?>
 <div class="page-title">
-    <h1><?php echo $this->__('My Orders1') ?></h1>
+    <h1><?php echo $this->__('My Orders') ?></h1>
 </div>
 <?php echo $this->getPagerHtml(); ?>
 <?php if($_orders->getSize()): ?>
@@ -64,6 +64,9 @@
                     <span class="separator">|</span> <a href="<?php echo $this->getReorderUrl($_order) ?>" class="link-reorder"><?php echo $this->__('Reorder') ?></a>
                         <?php if (ITwebexperts_Payperrentals_Helper_Extend::isExtensibleOrder($_order->getId())) : ?>
                             <span class="separator">|</span> <a href="<?php echo ITwebexperts_Payperrentals_Helper_Extend::getExtendUrl($_order->getId()) ?>" class="link-reorder"><?php echo $this->__('Extend') ?></a>
+                        <?php endif ?>
+                        <?php if (Mage::helper('payperrentals')->orderContainsReservation($_order->getId()) && Mage::helper('payperrentals/config')->enabledDigitalSignature()) : ?>
+                            <br /><span class="separator">|</span> <a href="<?php echo Mage::helper('payperrentals')->getSignatureUrl($_order->getId()) ?>" class="link-reorder"><?php echo $this->__('Rental Contract') ?></a>
                         <?php endif ?>
                 <?php endif ?>
                 </span>

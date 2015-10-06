@@ -378,43 +378,14 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
     public function returnSelectedAction()
     {
         $resids = $this->getRequest()->getParam('returnRes');
-        $returnPerCustomer = array();
-        foreach ($resids as $id) {
-            $resOrder = Mage::getModel('payperrentals/sendreturn')->load($id);
-            $sn = explode(',', $resOrder->getSn());
-            $returnTime = date('Y-m-d H:i:s', Mage::getModel('core/date')->timestamp(time()));
-            foreach ($sn as $serial) {
-                Mage::getResourceSingleton('payperrentals/serialnumbers')
-                    ->updateStatusBySerial($serial, 'A');
-            }
-            Mage::getResourceSingleton('payperrentals/sendreturn')
-                ->updateReturndateById($id, $returnTime);
-
-            if ($resOrder->getOrderId() != 0) {
-                $order = Mage::getModel('sales/order')->load($resOrder->getOrderId());
-                $order->setReturnDatetime($returnTime);
-                $order->save();
-            }
-            $product = Mage::getModel('catalog/product')->load($resOrder->getProductId());
-            if ($resOrder->getResStartdate() != '0000-00-00 00:00:00') {
-                $returnPerCustomer[$order->getCustomerEmail()]['is_queue'] = false;
-                $returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['name'] = $product->getName();
-                $returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['serials'] = $resOrder->getSn();
-                $returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['start_date'] = $resOrder->getResStartdate();
-                $returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['end_date'] = $resOrder->getResEndDate();
-                $returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['send_date'] = $resOrder->getSendDate();
-                $returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['return_date'] = $returnTime;
-            } else {
-                $customerId = Mage::getModel('customer/customer')->load($resOrder->getCustomerId());
-
-                $returnPerCustomer[$customerId->getEmail()]['is_queue'] = true;
-                $returnPerCustomer[$customerId->getEmail()][$product->getId()]['name'] = $product->getName();
-                $returnPerCustomer[$customerId->getEmail()][$product->getId()]['serials'] = $resOrder->getSn();
-                $returnPerCustomer[$customerId->getEmail()][$product->getId()]['send_date'] = $resOrder->getSendDate();
-                $returnPerCustomer[$customerId->getEmail()][$product->getId()]['return_date'] = $returnTime;
-            }
+        if (!$resids) {
+            $results = array(
+                'error' => Mage::helper('payperrentals')->__('Please select return items.')
+            );
+            $this->getResponse()->setBody(Zend_Json::encode($results));
+            return $this;
         }
-        ITwebexperts_Payperrentals_Helper_Emails::sendEmail('return', $returnPerCustomer);
+        Mage::helper('payperrentals/inventory')->processReturn($resids);
         $error = '';
 
         $results = array(
@@ -430,7 +401,12 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
      */
     public function sendSelectedAction()
     {
-        $sns = $this->getRequest()->getParam('sn');
+        $shipItemsArray = Mage::app()->getRequest()->getParam('shipment');
+        if (Mage::app()->getRequest()->getParam('sn')) {
+            $serialNumbers = Mage::app()->getRequest()->getParam('sn');
+        } else {
+            $serialNumbers = array();
+        }
         $resids = $this->getRequest()->getParam('sendRes');
         if (!$resids) {
             $results = array(
@@ -439,82 +415,38 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
             $this->getResponse()->setBody(Zend_Json::encode($results));
             return $this;
         }
-        $returnPerCustomer = array();
+        $collectionReservations = Mage::getModel('payperrentals/reservationorders')
+            ->getCollection()
+            ->addFieldToFilter('id', array('in', $resids));
+
+
+        /** @var array $reservationIds used to get the ids from the collection */
+        $reservationIds = array();
+
+        /** @var array $orderItems use to get the order items ids with the index being the reservation id */
+        $orderItems = array();
+
+        foreach ($collectionReservations as $iReservation) {
+            $reservationIds[] = $iReservation->getId();
+            $orderItems[$iReservation->getId()] = $iReservation->getOrderItemId();
+        }
+
+        Mage::helper('payperrentals/inventory')->processShipment($collectionReservations, $serialNumbers, $orderItems, null, $shipItemsArray);
+
         $savedQtys = array();
-        foreach ($resids as $id) {
-            $resOrder = Mage::getModel('payperrentals/reservationorders')->load($id);
-            $product = Mage::getModel('catalog/product')->load($resOrder->getProductId());
-            $sn = array();
-            if ($product->getPayperrentalsUseSerials()) {
-                foreach ($sns as $sid => $serialArr) {
-                    if ($sid == $id) {
-                        foreach ($serialArr as $serial) {
-                            if ($serial != '') {
-                                //todo check if serial exists and has status A
-                                $sn[] = $serial;
-                            }
-                        }
-                    }
-                }
-                if (count($sn) < $resOrder->getQty()) {
-                    $coll = Mage::getModel('payperrentals/serialnumbers')
-                        ->getCollection()
-                        ->addEntityIdFilter($resOrder->getProductId())
-                        ->addSelectFilter("NOT FIND_IN_SET(sn, '" . implode(',', $sn) . "') AND status='A'");
-                    $j = 0;
-                    foreach ($coll as $item) {
-                        $sn[] = $item->getSn();
-                        if ($j >= $resOrder->getQty() - count($sn)) {
-                            break;
-                        }
-                        $j++;
-                    }
-
-                }
-
-                foreach ($sn as $serial) {
-                    Mage::getResourceSingleton('payperrentals/serialnumbers')
-                        ->updateStatusBySerial($serial, 'O');
-                }
-            }
-            $serialNumber = implode(',', $sn);
-            $sendTime = date('Y-m-d H:i:s', Mage::getModel('core/date')->timestamp(time()));
-            $sendReturn = Mage::getModel('payperrentals/sendreturn')
-                ->setOrderId($resOrder->getOrderId())
-                ->setProductId($resOrder->getProductId())
-                ->setResStartdate($resOrder->getStartDate())
-                ->setResEnddate($resOrder->getEndDate())
-                ->setSendDate($sendTime)
-                //->setReturnDate('0000-00-00 00:00:00')
-                ->setQty($resOrder->getQty())//here needs a check this should always be true
-                ->setSn($serialNumber)
-                ->save();
-
-            Mage::getResourceSingleton('payperrentals/reservationorders')->updateSendReturnById($id, $sendReturn->getId());
-
+        foreach ($collectionReservations as $resOrder) {
             $order = Mage::getModel('sales/order')->load($resOrder->getOrderId());
-            $order->setSendDatetime($sendTime);
-            $order->save();
-            $product = Mage::getModel('catalog/product')->load($sendReturn->getProductId());
-            $returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['name'] = $product->getName();
-            $returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['serials'] = $sendReturn->getSn();
-            $returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['start_date'] = $sendReturn->getResStartdate();
-            $returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['end_date'] = $sendReturn->getResEndDate();
-            $returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['send_date'] = $sendReturn->getSendDate();
-            //$returnPerCustomer[$order->getCustomerEmail()][$resOrder->getOrderId()][$product->getId()]['return_date'] = $resOrder->getReturnDate();
             /** Create shipment */
-            if ($order->canShip()) {
-                $savedQtys[$resOrder->getOrderItemId()] = $resOrder->getQty();
-                $shipment = Mage::getModel('sales/service_order', $order)->prepareShipment($savedQtys);
-                $shipment->register();
-                $shipment->setEmailSent(true);
-                $shipment->getOrder()->setIsInProcess(true);
-                $transactionSave = Mage::getModel('core/resource_transaction')
-                    ->addObject($shipment)
-                    ->addObject($shipment->getOrder())
-                    ->save();
-                $shipment->sendEmail();
-            }
+            $savedQtys[$resOrder->getOrderItemId()] = $resOrder->getQty();
+            $shipment = Mage::getModel('sales/service_order', $order)->prepareShipment($savedQtys);
+            $shipment->register();
+            $shipment->setEmailSent(true);
+            $shipment->getOrder()->setIsInProcess(true);
+            Mage::getModel('core/resource_transaction')
+                ->addObject($shipment)
+                ->addObject($shipment->getOrder())
+                ->save();
+            $shipment->sendEmail();
         }
 
         $error = '';
@@ -586,10 +518,7 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
                      * lib/Varien/Db/Adapter/Pdo/Mysql.php converting to timestamp causes 1970-01-01 dates but
                      * inserting no date makes it what we want 0000-00-00
                      */
-                    //->setResStartdate('0000-00-00 00:00:00')
-                    //->setResEnddate('0000-00-00 00:00:00')
                     ->setSendDate($sendTime)
-                    //->setReturnDate('0000-00-00 00:00:00')
                     ->setQty(1)//here needs a check this should always be true
                     ->setSn($serialNumber)
                     ->save();
@@ -605,11 +534,8 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
                 $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
                 $returnPerCustomer[$customer->getEmail()][$product->getId()]['name'] = $product->getName();
                 $returnPerCustomer[$customer->getEmail()][$product->getId()]['serials'] = $sendReturn->getSn();
-                //$returnPerCustomer[$order->getCustomerEmail()][$product->getId()]['start_date'] = $sendReturn->getResStartdate();
-                //$returnPerCustomer[$order->getCustomerEmail()][$product->getId()]['end_date'] = $sendReturn->getResEndDate();
                 $returnPerCustomer[$customer->getEmail()][$product->getId()]['send_date'] = $sendTime;
 
-                //
             } else {
                 $excluded[] = $id;
             }
@@ -648,8 +574,8 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
         );
         $this->getResponse()->setBody(Zend_Json::encode($results));
     }
-
-    /**
+    
+     /**
      * Filters dates for send & return items
      *
      * @param $date
@@ -688,8 +614,6 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
                     <th>' . Mage::helper('payperrentals')->__('Sku') . '</th>
                     <th>' . Mage::helper('payperrentals')->__('Start Date') . '</th>
                     <th>' . Mage::helper('payperrentals')->__('End Date') . '</th>
-                    <th>' . Mage::helper('payperrentals')->__('Send Date') . '</th>
-                    <th>' . Mage::helper('payperrentals')->__('Return Date') . '</th>
                     <th>' . Mage::helper('payperrentals')->__('Quantity') . '</th>
                     <th>' . Mage::helper('payperrentals')->__('Serial Numbers') . '</th>
                     <th>' . Mage::helper('payperrentals')->__('Mark For Send') . '<br/>
@@ -700,39 +624,64 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
         ';
         $sendItemsHtml .= '<tbody>';
         $forStore = urldecode($this->getRequest()->getParam('forStore'));
-        $coll = Mage::getModel('payperrentals/reservationorders')->getCollection()->getToSendReturnCollection($startDatefrom,$startDateto,$endDatefrom,$endDateto,$forStore);
+        $collectionSend = Mage::getModel('payperrentals/reservationorders')->getCollection()->getToSendCollection($startDatefrom,$startDateto,$endDatefrom,$endDateto,$forStore);
 
-        foreach ($coll as $item) {
-            $sendItemsHtml .= '<tr id="resorder_' . $item->getId() . '">';
+        foreach($collectionSend as $shipItems){
+            $order      = Mage::getModel('sales/order')->load($shipItems->getOrderId());
 
-                $order = Mage::getModel('sales/order')->load($item->getOrderId());
+            /**
+             * Check order existing
+             */
+            if (!$order->getId()) {
+                $this->_getSession()->addError($this->__('The order no longer exists.'));
+                return false;
+            }
+            /**
+             * Check shipment is available to create separate from invoice
+             */
+          //  if ($order->getForcedDoShipmentWithInvoice()) {
+          //      $this->_getSession()->addError($this->__('Cannot do shipment for the order separately from invoice.'));
+         //       return false;
+         //   }
+            /**
+             * Check shipment create availability
+             */
+           // if (!$order->canShip()) {
+          //      $this->_getSession()->addError($this->__('Cannot do shipment for the order.'));
+           //     return false;
+          //  }
+
+            $shipment = Mage::getModel('sales/service_order', $order)->prepareShipment(array());
+            foreach($shipment->getAllItems() as $item){
+                $sendItemsHtml .= '<tr id="resorder_' . $shipItems->getId() . '">';
+
                 $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
                 $customerName = $customer->getFirstname() . ' ' . $customer->getLastname();
                 $orderIncId = $order->getIncrementId();
                 $sendItemsHtml .= '<td>' . $orderIncId . ' - ' . $customerName . '</td>';
 
-            $product = Mage::getModel('catalog/product')->load($item->getProductId());
-            $productName = $product->getName();
-            $sendItemsHtml .= '<td>' . $productName . '</td>';
-            $sendItemsHtml .= '<td>' . Mage::getModel('catalog/product')->load($item->getProductId())->getSku() . '</td>';
-            $sendItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getStartDate()) . '</td>';
-            $sendItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getEndDate()) . '</td>';
-            $sendItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getSendDate()) . '</td>';
-            $sendItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getReturnDate()) . '</td>';
+                $product = Mage::getModel('catalog/product')->load($item->getProductId());
+                $productName = $product->getName();
+                $sendItemsHtml .= '<td>' . $productName . '</td>';
+                $sendItemsHtml .= '<td>' . Mage::getModel('catalog/product')->load($item->getProductId())->getSku() . '</td>';
+                $sendItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($shipItems->getStartDate()) . '</td>';
+                $sendItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($shipItems->getEndDate()) . '</td>';
 
-            $sendItemsHtml .= '<td>' . $item->getQty() . '</td>';
-            if ($product->getPayperrentalsUseSerials()) {
-                $sendItemsHtml .= '<td>';
-                for ($j = 0; $j < $item->getQty(); $j++) {
-                    $sendItemsHtml .= '<input type="text" name="sn[' . $item->getId() . '][]" class="sn" prid="' . $item->getProductId() . '" /><br/>';
+                $sendItemsHtml .= '<td>' . '<input type="text" class="input-text" name="shipment[items]['.$item->getId().']" value="'.$item->getQty().'">' . '</td>';
+
+                if ($product->getPayperrentalsUseSerials()) {
+                    $sendItemsHtml .= '<td>';
+                    for ($j = 0; $j < $item->getQty(); $j++) {
+                        $sendItemsHtml .= '<input type="text" name="sn[' . $item->getId() . '][]" class="sn" prid="' . $item->getProductId() . '" /><br/>';
+                    }
+                    $sendItemsHtml .= '</td>';
+                } else {
+                    $sendItemsHtml .= '<td>&nbsp;';
+                    $sendItemsHtml .= '</td>';
                 }
-                $sendItemsHtml .= '</td>';
-            } else {
-                $sendItemsHtml .= '<td>&nbsp;';
-                $sendItemsHtml .= '</td>';
+                $sendItemsHtml .= '<td><input type="checkbox" name="sendRes[]" class="sendRes" value="' . $shipItems->getId() . '"/></td>';
+                $sendItemsHtml .= '</tr>';
             }
-            $sendItemsHtml .= '<td><input type="checkbox" name="sendRes[]" class="sendRes" value="' . $item->getId() . '"/></td>';
-            $sendItemsHtml .= '</tr>';
         }
 
         $sendItemsHtml .= '</tbody></table>';
@@ -740,6 +689,19 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
         $this
             ->getResponse()
             ->setBody(Zend_Json::encode($html));
+    }
+
+    public function getReturnedItems($resorderId){
+        $returnedItems = Mage::getModel('payperrentals/sendreturn')->getCollection();
+
+        $returnedItems//->addFieldToFilter('order_id', array($this->getOrder()->getId(), $this->getOrder()->getIncrementId()))
+        ->addFieldToFilter('send_date', array('0000-00-00 00:00:00', '1970-01-01 00:00:00'))
+            ->addFieldToFilter('resorder_id', array($resorderId));
+        $returnedItems->getSelect()
+            ->columns('SUM(qty) as qty_returned, SUM(qty_parent) as qty_parent_total, GROUP_CONCAT(sn separator ",") as sn_all')
+            ->group(array('resorder_id','product_id'));
+
+        return $returnedItems->getFirstItem();
     }
 
     /**
@@ -758,7 +720,7 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
                 <tr class="headings">
                     <th>' . Mage::helper('payperrentals')->__('Order Id - Customer Name') . '</th>
                     <th>' . Mage::helper('payperrentals')->__('Product Name') . '</th>
-                       <th>' . Mage::helper('payperrentals')->__('Sku') . '</th>
+                    <th>' . Mage::helper('payperrentals')->__('Sku') . '</th>
                     <th>' . Mage::helper('payperrentals')->__('Start Date') . '</th>
                     <th>' . Mage::helper('payperrentals')->__('End Date') . '</th>
                     <th>' . Mage::helper('payperrentals')->__('Send Date') . '</th>
@@ -773,32 +735,60 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
         $returnItemsHtml .= '<tbody>';
 
         $forStore = urldecode($this->getRequest()->getParam('forStore'));
-        $coll = Mage::getModel('payperrentals/reservationorders')->getCollection()->getToSendReturnCollection($startDatefrom,$startDateto,$endDatefrom,$endDateto,$forStore,'return');
+        $sentItems = Mage::getModel('payperrentals/sendreturn')->getCollection();
+        $sentItems->addFieldToFilter('return_date', array('0000-00-00 00:00:00', '1970-01-01 00:00:00'));
+        $sentItems ->addSelectFilter("res_startdate >= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate($startDatefrom) . "' AND res_startdate <= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate(
+            $startDateto
+        ) . "'")
+        ->addSelectFilter("res_enddate >= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate($endDatefrom) . "' AND res_enddate <= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate(
+                $endDateto
+            ) . "'");
+        if ($forStore) {
+            $sentItems->getSelect()->joinLeft(array('so' => Mage::getSingleton('core/resource')->getTableName('sales_flat_order')), 'main_table.order_id = ' . 'so.entity_id', array('so.store_id as store_id'));
+            $sentItems->getSelect()->where('so.store_id=?', $forStore);
+        }
+        $sentItems->getSelect()
+           ->columns('SUM(qty) as qty_shipped, SUM(qty_parent) as qty_parent_total, GROUP_CONCAT(sn separator ",") as sn_all')
+            ->group(array('resorder_id','product_id'));
 
-        foreach ($coll as $item) {
-            $returnItemsHtml .= '<tr id="resorder_' . $item->getId() . '">';
-            $order = Mage::getModel('sales/order')->load($item->getOrderId());
-            $orderIncId = $order->getIncrementId();
-            $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-            $customerName = $customer->getFirstname() . ' ' . $customer->getLastname();
-            $returnItemsHtml .= '<td>' . $orderIncId . ' - ' . $customerName . '</td>';
-            $product = Mage::getModel('catalog/product')->load($item->getProductId());
-            $productName = $product->getName();
-            $returnItemsHtml .= '<td>' . $productName . '</td>';
-            $returnItemsHtml .= '<td>' . Mage::getModel('catalog/product')->load($item->getProductId())->getSku() . '</td>';
-            $returnItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getStartDate()) . '</td>';
-            $returnItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getEndDate()) . '</td>';
-            $returnItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getSendDate()) . '</td>';
-
-            $returnItemsHtml .= '<td>' . $item->getQty() . '</td>';
-            $returnItemsHtml .= '<td>';
-            $snArr = explode(',', $item->getSn());
-            foreach ($snArr as $sn) {
-                $returnItemsHtml .= $sn . '<br/>';
+        foreach ($sentItems as $item) {
+            $returnedItems = $this->getReturnedItems($item->getResorderId());
+            $serialNumbersSent = $item->getSnAll() ? explode(',', $item->getSnAll()) : array();
+            $serialNumbersReturned = $returnedItems->getSnAll() ? explode(',', $returnedItems->getSnAll()) : array();
+            foreach($serialNumbersReturned as $snReturned){
+                $pos = array_search($snReturned, $serialNumbersSent);
+                if($pos !== false) {
+                    unset($serialNumbersSent[$pos]);
+                    }
             }
-            $returnItemsHtml .= '</td>';
-            $returnItemsHtml .= '<td><input type="checkbox" name="returnRes[]" class="returnRes" value="' . $item->getSendreturnid() . '"/></td>';
-            $returnItemsHtml .= '</tr>';
+            $serialNumbers = $serialNumbersSent;
+            $qtyReturned = $returnedItems->getQtyReturned()?$returnedItems->getQtyReturned():0;
+            if($item->getQtyShipped() - $qtyReturned > 0) {
+
+                $returnItemsHtml .= '<tr id="resorder_' . $item->getId() . '">';
+                $order = Mage::getModel('sales/order')->load($item->getOrderId());
+                $orderIncId = $order->getIncrementId();
+                $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+                $customerName = $customer->getFirstname() . ' ' . $customer->getLastname();
+                $returnItemsHtml .= '<td>' . $orderIncId . ' - ' . $customerName . '</td>';
+                $product = Mage::getModel('catalog/product')->load($item->getProductId());
+                $productName = $product->getName();
+                $returnItemsHtml .= '<td>' . $productName . '</td>';
+                $returnItemsHtml .= '<td>' . Mage::getModel('catalog/product')->load($item->getProductId())->getSku() . '</td>';
+                $returnItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getResStartdate()) . '</td>';
+                $returnItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getResEnddate()) . '</td>';
+                $returnItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getSendDate()) . '</td>';
+
+                $returnItemsHtml .= '<td>' . '<input type="text" maxqty="'. ($item->getQtyShipped()-$qtyReturned) .'" name="qty['.$item->getId(). ']" value="'.($item->getQtyShipped()-$qtyReturned). '"/>' . '</td>';
+                $returnItemsHtml .= '<td>';
+
+                foreach ($serialNumbers as $sn) {
+                    $returnItemsHtml .= $sn.'<input type="checkbox" name="sn['. $item->getId().'][]" value="'. $sn.'" />Return' . '<br/>';
+                }
+                $returnItemsHtml .= '</td>';
+                $returnItemsHtml .= '<td><input type="checkbox" name="returnRes[]" class="returnRes" value="' . $item->getId() . '"/></td>';
+                $returnItemsHtml .= '</tr>';
+            }
         }
 
         $returnItemsHtml .= '</tbody></table>';
@@ -993,11 +983,6 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
     public function getReturnQueueItemsAction()
     {
         $startDate = $this->getRequest()->getParam('startDate');
-        //if (!$startDate) {
-        //  $startDate = Mage::getModel('core/date')->date('Y-m-d ', time());
-        //}
-        /*$zDate = new Zend_Date($startDate, Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT));
-        $startDate = $zDate->get('yyyy-MM-dd');*/
         $filter = "(res_startdate='0000-00-00 00:00:00' OR res_startdate='1970-01-01 00:00:00') AND (return_date='0000-00-00 00:00:00' OR return_date='1970-01-01 00:00:00')";
         if ($startDate != '') {
             /**
@@ -1038,14 +1023,10 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
         $customerId = 0;
         foreach ($coll as $item) {
             $returnItemsHtml .= '<tr id="resorder_' . $item->getId() . '">';
-            //if ($customerId != $item->getCustomerId()) {
             $customerId = $item->getCustomerId();
             $customer = Mage::getModel('customer/customer')->load($customerId);
             $customerName = $customer->getFirstname() . ' ' . $customer->getLastname();
             $returnItemsHtml .= '<td>' . $customerName . '</td>';
-            //} else {
-            //    $returnItemsHtml .= '<td>' . '' . '</td>';
-            // }
 
             /**TODO check rentals out and needed*/
             $queueCollection = Mage::getModel('payperrentals/rentalqueue')
@@ -1151,14 +1132,10 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
             }
 
             $returnItemsHtml .= '<tr id="resorder_' . $item->getId() . '">';
-            //if ($customerId != $item->getCustomerId()) {
             $customerId = $item->getCustomerId();
             $customer = Mage::getModel('customer/customer')->load($customerId);
             $customerName = $customer->getFirstname() . ' ' . $customer->getLastname();
             $returnItemsHtml .= '<td>' . $customerName . '</td>';
-            // } else {
-            //$returnItemsHtml .= '<td></td>';
-            //}
             $product = Mage::getModel('catalog/product')->load($item->getProductId());
             $productName = $product->getName();
             $returnItemsHtml .= '<td>' . $productName . '</td>';
@@ -1229,7 +1206,6 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
             $returnItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getResStartdate()) . '</td>';
             $returnItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getResEnddate()) . '</td>';
             $returnItemsHtml .= '<td>' . ITwebexperts_Payperrentals_Helper_Date::formatDbDate($item->getSendDate()) . '</td>';
-
             $returnItemsHtml .= '<td>' . $item->getQty() . '</td>';
             $returnItemsHtml .= '<td>';
             $snArr = explode(',', $item->getSn());
@@ -1376,13 +1352,11 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
                     ) . "' AND res_enddate <= '" . ITwebexperts_Payperrentals_Helper_Date::toDbDate(
                         date('Y-m-d', strtotime('+1 month', strtotime($end_date)))
                     ) . "' AND sn='" . $prid . "'");
-            //echo $prid;
-            //var_export($coll->getData());
             foreach ($coll as $mItem) {
                 $Product = Mage::getModel('catalog/product')->load($mItem->getProductId());
 
-                $turnoverTimeBefore = ITwebexperts_Payperrentals_Helper_Config::getTurnoverTimeBefore($Product->getId());
-                $turnoverTimeAfter = ITwebexperts_Payperrentals_Helper_Config::getTurnoverTimeAfter($Product->getId());
+                $turnoverTimeBefore = Mage::helper('payperrentals/config')->getTurnoverTimeBefore($Product->getId());
+                $turnoverTimeAfter = Mage::helper('payperrentals/config')->getTurnoverTimeAfter($Product->getId());
 
                 $stDate = date('Y-m-d H:i:s', strtotime($mItem->getSendDate()));
 
@@ -1543,8 +1517,8 @@ class ITwebexperts_Payperrentals_Adminhtml_AjaxController extends ITwebexperts_P
         foreach ($quoteArr as $quoteItem) {
             if (!($quoteItem->getParentItem() && $quoteItem->getParentItem()->getProductType() == ITwebexperts_Payperrentals_Helper_Data::PRODUCT_TYPE_BUNDLE)) {
                 if(!$isR4q) {
-                    $optionCollection = Mage::getModel('sales/quote_item_option')->getCollection()
-                        ->addItemFilter(array($quoteItem->getId()));
+                $optionCollection = Mage::getModel('sales/quote_item_option')->getCollection()
+                    ->addItemFilter(array($quoteItem->getId()));
                 }else{
                     $optionCollection = Mage::getModel('request4quote/quote_item_option')->getCollection()
                         ->addItemFilter(array($quoteItem->getId()));

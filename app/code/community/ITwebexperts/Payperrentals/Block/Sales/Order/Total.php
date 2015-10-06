@@ -65,12 +65,12 @@ class ITwebexperts_Payperrentals_Block_Sales_Order_Total extends Mage_Core_Block
             $source = $this->getSource();
             $value  = $source->getDepositpprAmount();
             if(!($source instanceof Mage_Sales_Model_Order_Invoice)) {
-                $this->getParentBlock()->addTotal(new Varien_Object(array(
-                    'code' => 'depositppr',
-                    'strong' => false,
-                    'label' => Mage::helper('payperrentals')->__('Deposit'),
-                    'value' => $source instanceof Mage_Sales_Model_Order_Creditmemo ? -$value : $value
-                )));
+            $this->getParentBlock()->addTotal(new Varien_Object(array(
+                'code'   => 'depositppr',
+                'strong' => false,
+                'label'  => Mage::helper('payperrentals')->__('Deposit'),
+                'value'  => $source instanceof Mage_Sales_Model_Order_Creditmemo ? - $value : $value
+            )));
             }
         }
 
