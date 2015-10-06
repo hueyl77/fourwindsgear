@@ -3396,3 +3396,8 @@ tr.summary-details-excluded { font-style: italic; }
 .sidebar-socials  a:active,
 .sidebar-socials  a:focus,
 .sidebar-socials  a:hover { color: #fff; -moz-transition: all 0.25s ease-in-out; text-decoration: none; transition: all 0.25s ease-in-out; -webkit-transition: all 0.25s ease-in-out; }
+
+.social-icons-container {
+    float: right;
+        margin: 20px 0 0 20px;
+}
