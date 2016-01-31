@@ -1,1 +1,28 @@
 [01-Oct-2015 13:07:01 UTC] PHP Fatal error:  Call to a member function getStore() on a non-object in /home/fourwin6/public_html/app/code/community/Taxjar/SalesTax/Model/Observer.php on line 18
+[06-Oct-2015 18:42:34 UTC] PHP Fatal error:  Uncaught exception 'Exception' with message 'File '/home/fourwin6/public_html/media/catalog/product/cache/1/thumbnail/200x200/9df78eab33525d08d6e5fb8d27136e95/f/l/' does not exists.' in /home/fourwin6/public_html/lib/Varien/File/Transfer/Adapter/Http.php:96
+Stack trace:
+#0 /home/fourwin6/public_html/get.php(205): Varien_File_Transfer_Adapter_Http->send('/home/fourwin6/...')
+#1 /home/fourwin6/public_html/get.php(165): sendFile('/home/fourwin6/...')
+#2 {main}
+  thrown in /home/fourwin6/public_html/lib/Varien/File/Transfer/Adapter/Http.php on line 96
+[06-Oct-2015 18:42:34 UTC] PHP Fatal error:  Uncaught exception 'Exception' with message 'File '/home/fourwin6/public_html/media/favicon/default/' does not exists.' in /home/fourwin6/public_html/lib/Varien/File/Transfer/Adapter/Http.php:96
+Stack trace:
+#0 /home/fourwin6/public_html/get.php(205): Varien_File_Transfer_Adapter_Http->send('/home/fourwin6/...')
+#1 /home/fourwin6/public_html/get.php(165): sendFile('/home/fourwin6/...')
+#2 {main}
+  thrown in /home/fourwin6/public_html/lib/Varien/File/Transfer/Adapter/Http.php on line 96
+[06-Oct-2015 18:42:34 UTC] PHP Fatal error:  Uncaught exception 'Exception' with message 'File '/home/fourwin6/public_html/media/catalog/product/cache/1/thumbnail/200x200/9df78eab33525d08d6e5fb8d27136e95/c/o/' does not exists.' in /home/fourwin6/public_html/lib/Varien/File/Transfer/Adapter/Http.php:96
+Stack trace:
+#0 /home/fourwin6/public_html/get.php(205): Varien_File_Transfer_Adapter_Http->send('/home/fourwin6/...')
+#1 /home/fourwin6/public_html/get.php(165): sendFile('/home/fourwin6/...')
+#2 {main}
+  thrown in /home/fourwin6/public_html/lib/Varien/File/Transfer/Adapter/Http.php on line 96
+[06-Oct-2015 18:42:34 UTC] PHP Fatal error:  Uncaught exception 'Exception' with message 'File '/home/fourwin6/public_html/media/catalog/product/cache/1/thumbnail/200x200/9df78eab33525d08d6e5fb8d27136e95/c/h/' does not exists.' in /home/fourwin6/public_html/lib/Varien/File/Transfer/Adapter/Http.php:96
+Stack trace:
+#0 /home/fourwin6/public_html/get.php(205): Varien_File_Transfer_Adapter_Http->send('/home/fourwin6/...')
+#1 /home/fourwin6/public_html/get.php(165): sendFile('/home/fourwin6/...')
+#2 {main}
+  thrown in /home/fourwin6/public_html/lib/Varien/File/Transfer/Adapter/Http.php on line 96
+[01-Nov-2015 14:07:01 UTC] PHP Fatal error:  Call to a member function getStore() on a non-object in /home/fourwin6/public_html/app/code/community/Taxjar/SalesTax/Model/Observer.php on line 18
+[01-Dec-2015 14:07:01 UTC] PHP Fatal error:  Call to a member function getStore() on a non-object in /home/fourwin6/public_html/app/code/community/Taxjar/SalesTax/Model/Observer.php on line 18
+[01-Jan-2016 14:07:01 UTC] PHP Fatal error:  Call to a member function getStore() on a non-object in /home/fourwin6/public_html/app/code/community/Taxjar/SalesTax/Model/Observer.php on line 18
