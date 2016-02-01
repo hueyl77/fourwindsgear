@@ -73,11 +73,8 @@ Category default layout
         </reference>
         <reference name="right">
             <block type="catalog/navigation" name="catalog.leftnav" before="-" template="catalog/navigation/left.phtml"/>
-            <block type="joomlart_jmproductsslider/list" name="category.jmproductsslider" before="right.permanent.callout" template="joomlart/jmproductsslider/bestseller.phtml" >
-              <action method="setData"><key>mode</key><value>best_buy</value></action> 
-          </block>
         </reference>
-        <reference name="content">            
+        <reference name="content">
             <block type="catalog/category_view" name="category.products" template="catalog/category/view.phtml">
                 <block type="catalog/product_list" name="product_list" template="catalog/product/list.phtml">
                 		<block type="core/text_list" name="product_list.name.after" as="name.after" />
@@ -117,11 +114,8 @@ Category layered navigation layout
         </reference>
         <reference name="right">
             <block type="catalog/layer_view" name="catalog.leftnav" before="-" template="catalog/layer/view.phtml"/>
-            <block type="joomlart_jmproductsslider/list" name="category.jmproductsslider" before="catalog.compare.sidebar" template="joomlart/jmproductsslider/bestseller.phtml" >
-              <action method="setData"><key>mode</key><value>best_buy</value></action> 
-            </block>
         </reference>
-        <reference name="content">			
+        <reference name="content">
             <block type="catalog/category_view" name="category.products" template="catalog/category/view.phtml">
                 <block type="catalog/product_list" name="product_list" template="catalog/product/list.phtml">
                     <block type="core/text_list" name="product_list.name.after" as="name.after" />
@@ -198,9 +192,7 @@ Product view
             <action method="addItem"><type>js</type><name>calendar/calendar-setup.js</name><!--<params/><if/><condition>can_load_calendar_js</condition>--></action>
         </reference>
         <reference name="right">
-            <block type="joomlart_jmproductsslider/list" name="category.jmproductsslider" before="catalog.compare.sidebar" template="joomlart/jmproductsslider/bestseller.phtml" >
-              <action method="setData"><key>mode</key><value>best_buy</value></action> 
-            </block>
+
         </reference>
         <reference name="content">
             <block type="catalog/product_view" name="product.info" template="catalog/product/view.phtml">
@@ -301,7 +293,7 @@ Additional block dependant on product type
             <block type="catalog/product_view_type_configurable" name="product.info.options.configurable" as="options_configurable" before="-" template="catalog/product/view/type/options/configurable.phtml">
               <block type="core/text_list" name="product.info.options.configurable.renderers" as="attr_renderers" />
               <block type="core/text_list" name="product.info.options.configurable.after" as="after" />
-            </block>    
+            </block>
         </reference>
     </PRODUCT_TYPE_configurable>
     <PRODUCT_TYPE_grouped translate="label" module="catalog">
