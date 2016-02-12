@@ -54,9 +54,9 @@
                     <!-- End Thumbnail Image -->
                     <?php endif; // $this->getBaseImage() ?>
                     <!-- If Wishlist or Add to Compare is Enabled Display Link(s) -->
-                    <?php if ($this->getWishlist() || $this->getCompare()): ?> 
+                    <?php if ($this->getWishlist() || $this->getCompare()): ?>
                     <div style="<?php echo $this->getImageFloat() . ": 0; text-align:" . $this->getImageFloat() . ";"; ?>" class="mojowishcompare_wrapper imageZoom_toggle-<?php echo $_selection->getSelectionId(); ?>">
-                        <?php if ($this->helper('wishlist')->isAllow() && $this->getWishlist()) { ?> 
+                        <?php if ($this->helper('wishlist')->isAllow() && $this->getWishlist()) { ?>
                         <a href="<?php echo $this->helper('wishlist')->getAddUrl($_selection); ?>" class="link-compare">
                             <?php echo $this->__('Add To Wishlist'); ?>
                         </a>
@@ -64,7 +64,7 @@
                         <?php if ($this->helper('wishlist')->isAllow() && $this->getWishlist() && $this->getCompare()) { ?>
                         <br />
                         <?php } ?>
-                        <?php if ($this->getCompare()) { ?> 
+                        <?php if ($this->getCompare()) { ?>
                         <a href="<?php echo $this->helper('catalog/product_compare')->getAddUrl($_selection); ?>" class="link-compare">
                             <?php echo $this->__('Add to Compare'); ?>
                         </a>
@@ -179,7 +179,7 @@
 </style>
 <script type="text/javascript">
 <?php if ($this->getShortDescInit() == 0): ?>
-    <?php foreach ($_selections as $_selection): ?>   
+    <?php foreach ($_selections as $_selection): ?>
 jQuery("#<?php echo $_selection->getSelectionId(); ?>").click(function () {
     jQuery(".<?php echo $_selection->getSelectionId(); ?>").slideToggle( 'slow', 'linear' );
 });
@@ -209,7 +209,7 @@ jQuery("a.mojoRadioZoom").hover(function(e) {
         }, function() {
             this.title = this.mojoTitle;
             jQuery("#mojoRadioZoom").remove();
-}); 
+});
 jQuery("a.mojoRadioZoom").mousemove(function(e) {
     jQuery("#mojoRadioZoom")
         .css("top", (e.pageY - mojoY) + "px")

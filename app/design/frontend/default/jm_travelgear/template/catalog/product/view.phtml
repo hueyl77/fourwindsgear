@@ -39,7 +39,7 @@
     var optionsPrice = new Product.OptionsPrice(<?php echo $this->getJsonConfig() ?>);
     if( jQuery ){
 	    jQuery( "#ja-tab-products" ).ready( function($) {
-	    	$( "#ja-tab-products" ).jaContentTabs();							  
+	    	$( "#ja-tab-products" ).jaContentTabs();
 	    } );
     }
     jQuery(document).ready(function() {
@@ -76,6 +76,14 @@
       			<?php echo $this->getReviewsSummaryHtml($_product, false, true)?>
       			<?php echo $this->getChildHtml('product_type_data') ?>
             <?php echo $this->getChildHtml('alert_urls') ?>
+
+            <?php if ($_product->getShortDescription()):?>
+                <div class="short-description">
+                    <h2><?php echo $this->__('Overview') ?></h2>
+                    <div class="std"><?php echo $_helper->productAttribute($_product, nl2br($_product->getShortDescription()), 'short_description') ?></div>
+                </div>
+            <?php endif;?>
+
             <?php echo $this->getTierPriceHtml() ?>
             <?php echo $this->getChildHtml('extrahint') ?>
 
@@ -84,7 +92,7 @@
                 <?php if($_product->isSaleable()): ?>
                     <?php echo $this->getChildHtml('addtocart') ?>
                     <?php echo $this->getChildHtml('addto') ?>
-                    
+
                 <?php endif; ?>
               </div>
               <?php echo $this->getChildHtml('extra_buttons') ?>
@@ -96,16 +104,11 @@
             <?php endif; ?>
 			      <?php if ($_product->isSaleable() && $this->hasOptions()):?>
               <?php echo $this->getChildChildHtml('container1', '', true, true) ?>
-            <?php endif;?>	
+            <?php endif;?>
       			<?php if ($_product->isSaleable() && $this->hasOptions()):?>
       				<?php echo $this->getChildChildHtml('container2', '', true, true) ?>
       			<?php endif;?>
-            <?php if ($_product->getShortDescription()):?>
-                <div class="short-description">
-                    <h2><?php echo $this->__('Overview') ?></h2>
-                    <div class="std"><?php echo $_helper->productAttribute($_product, nl2br($_product->getShortDescription()), 'short_description') ?></div>
-                </div>
-            <?php endif;?>
+
             <?php echo $this->getChildHtml('other');?>
             <?php // Add this button please edit via admin CMS-> Static Block -> Add This. ?>
       			<?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('sharethis')->toHtml() ?>
@@ -115,9 +118,9 @@
             <span class='st_pinterest_hcount' displayText='Pinterest'></span>
             <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
             <script type="text/javascript">stLight.options({publisher: "be87d52a-d9cd-4453-b4b1-3169c6f28e3d", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
-            */ ?>		
+            */ ?>
 		</div>
-       <div class="clearer"></div>       
+       <div class="clearer"></div>
     </form>
     <script type="text/javascript">
     //<![CDATA[
@@ -169,7 +172,7 @@
             }
         }.bind(productAddToCartForm);
 
-      
+
 
     //]]>
     </script>
@@ -196,7 +199,7 @@
 			<?php endif; ?>
 			<?php if($product_reviews = $this->getChildHtml('product_reviews')): ?>
 				<li><a href="#ja-tabitem-reviews"><?php echo $this->__('Product Reviews') ?></a></li>
-			<?php endif; ?>    
+			<?php endif; ?>
 			<?php if($review_form = $this->getChildHtml('review_form')): ?>
 				<li><a href="#ja-tabitem-reviewform"><?php echo $this->__('Write Your Own Review') ?></a></li>
 			<?php endif; ?>
@@ -211,36 +214,36 @@
     			 <?php echo $html; ?>
     		  </div>
     		</div>
-    		<?php endforeach;?>						
+    		<?php endforeach;?>
     		<?php if( $product_additional_data ): ?>
     		<div id="ja-tabitem-tags">
     			<?php echo $product_additional_data; ?>
     		</div>
     		<?php endif;?>
-    		
+
     		<?php if($product_reviews): ?>
     		<div id="ja-tabitem-reviews">
     			<?php echo $product_reviews ?>
     		</div>
     		<?php endif;?>
-    		
+
     		<?php if($review_form): ?>
     		<div id="ja-tabitem-reviewform">
     			<?php echo $review_form; ?>
     		</div>
     		<?php endif;?>
 
-            <?php if($customtab): ?>                        
-            <div id="ja-tabitem-custom">   
-                <div class="box-collateral <?php echo "box-custom-tab"?>">                      
+            <?php if($customtab): ?>
+            <div id="ja-tabitem-custom">
+                <div class="box-collateral <?php echo "box-custom-tab"?>">
                     <?php echo $customtab; ?>
-                </div>                      
-            </div>                      
+                </div>
+            </div>
             <?php endif; ?>
 		</div>
 	</div>
  <div class="box-collateral">
-  	<?php 
+  	<?php
   	if($baseconfig['showupsell']):
   		$upsell_products = $this->getChild('upsell_products');
   		if($upsell_products) {
